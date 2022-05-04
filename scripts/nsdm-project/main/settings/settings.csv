@@ -1,5 +1,5 @@
 parameter;value;group;name;comments
-project;nsdm-example;0_general;project name;
+project;nsdm-project;0_general;project name;
 w_path;/work/FAC/FGSE/IDYST/aguisan/valpar/nsdm-example/;0_general;working path;
 scr_path;/work/FAC/FGSE/IDYST/aguisan/valpar/nsdm-example/scratch;0_general;scratch path;
 clear_sop;TRUE;0_general;delete scratch output folders before new run;logical TRUE or FALSE
