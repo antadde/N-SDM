@@ -59,11 +59,8 @@ print(paste0("N-SDM settings defined"))
 # Set lib path
 .libPaths(lib_path)
 
-# Load required packages
-invisible(lapply(c(packs_data, packs_modl), require, character.only = TRUE))
-
-# Source custom functions
-invisible(sapply(list.files(f_path, pattern = ".R", full.names = TRUE, recursive=TRUE), source))
+# Load nsdm package
+library(nsdm)
 
 ncores<-as.numeric(Sys.getenv('SLURM_CPUS_PER_TASK'))
 
