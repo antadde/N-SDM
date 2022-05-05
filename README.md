@@ -45,7 +45,7 @@ Following the spatially-nested framework of N-SDM, two levels of analysis(local 
 
 ### Data
 
-The 6GB zip file containing species and covariate data required for this example N-SDM run can be downloaded from https://drive.switch.ch/index.php/s/u7DTEE84oDH4f57/download and unziped in the data folder (`curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/u7DTEE84oDH4f57/download` and unzip ./data/nsdm-project.zip -d ./data/nsdm-project/`)
+The 6GB zip file containing species and covariate data required for this example N-SDM run can be downloaded from https://drive.switch.ch/index.php/s/u7DTEE84oDH4f57/download and unziped in the data folder (`curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/u7DTEE84oDH4f57/download` and `unzip ./data/nsdm-project.zip -d ./data/nsdm-project/`)
 
 #### Species data
 
