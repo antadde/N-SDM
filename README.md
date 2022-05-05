@@ -53,11 +53,17 @@ Global-level species occurrence records were obtained from GBIF (https://www.gb
 
 #### Covariate data
 
-We used a new suite of 1,508 swiss-wide candidate covariates (Adde et al. in prep) derived from 157 individual parameters and belonging to 8 main categories (Appendix [put the detailed list is an annex]). Only bioclimatic covariates (n=19) were used for fitting the global-level model and only habitat covariates (n=1,489) were used for the local model (Figure 1). 
+We used a suite of 472 candidate covariates (Adde et al. in prep) derived from 42 individual parameters and belonging to 6 main categories (bioclimatic, land use and cover, edaphic, topographic, population density, transportation and vegetation). Note that some of these covariates are calculated using focal windows (e.g., land use and cover) and others (e.g., bioclimatic) are temporally dynamics. Detailed information on these covariates can be found in the Appendix of the reference manuscript. Only bioclimatic covariates (n=19) were used for fitting the global-level model and all the others were used for the local model (Figure 1).
+
+### N-SDM settings
+
+The edit of N-SDM settings should be done by modifying the settings.csv file available in scripts/nsdm-project/main/settings. You must edit this file to make the settings compatible with your computing environment (e.g. paths, session owner, HPC account, partition etc.). Be careful when saving settings.csv to use “;” as delimiter. In this same directory, the param-grid.xslx file allows specifying the grid for hyperparameter tunning. The pre-filled expert-table.xslx file allows for expert-based prefiltering of taxon-specific candidate covariates.
+
+### Running N-SDM
+
+Position yourself at /scripts/nsdm-project/main, where the main N-SDM bash file (nsdm.sh) is stored. We encourage you running N-SDM in a background no hangup mode to prevent the command from being aborted automatically if logging out or exiting the shell, such as: `nohup bash nsdm.sh &`.
 
 
-
-<!-- CONTRIBUTING -->
 ## Contributing
 
 If you have a suggestion that would make N-SDM better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
@@ -69,14 +75,8 @@ Thanks again!
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-<!-- LICENSE -->
-## License
-
-Distributed under the XXX License. See `LICENSE.txt` for more information.
 
 
-
-<!-- CONTACT -->
 ## Contact
 
 Antoine Adde - aadde@unil.ch
@@ -85,7 +85,6 @@ Project Link: [https://https://github.com/AnAdde/N-SDM](https://https://github.c
 
 
 
-<!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
 
