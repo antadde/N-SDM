@@ -8,7 +8,7 @@ Authors@R:
            email = "aadde@unil.ch",
            comment = c(ORCID = "0000-0003-4388-0880"))
 Description: What the package does (one paragraph).
-Imports: data.table, stringi, stringr, plyr, readxl, writexl, parallel, sp, raster, rgdal, zoo, fst, tools, glmnet, gam, mgcv, randomForest, RRF, lightgbm, ranger, maxnet, caret, ROCR, ecospat, chron, ggpubr
+Imports: data.table, stringi, stringr, plyr, readxl, writexl, parallel, sp, raster, rgdal, zoo, fst, tools, glmnet, gam, mgcv, randomForest, RRF, lightgbm, ranger, maxnet, caret, ROCR, chron, ggpubr
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
