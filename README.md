@@ -27,11 +27,9 @@ Before running N-SDM, you should make sure you have an appropriate set up with t
 
 •	... with available modules: gcc; r; proj; perl; curl; geos; gdal
 
-•	the following R packages are installed: c('data.table', 'stringi', 'stringr', 'plyr', 'readxl','writexl', 'parallel', 'sp', 'raster', 'rgdal', 'zoo','fst','tools', 'glmnet', 'gam', 'mgcv', 'randomForest', 'RRF', 'lightgbm', 'ranger', 'maxnet','caret', 'ROCR','ecospat', 'chron','ggpubr')
-
-•	you have installed the nsdm R package to access the bank of custom functions `remotes::install_github("AnAdde/N-SDM/scripts/nsdm-project/functions")`
-
 •	you have cloned the AnAdde/N-SDM repository in your working directory (e.g. `git clone https://github.com/AnAdde/N-SDM.git .`).
+
+•	you have installed the nsdm R package to access the up-to-date bank of custom functions `remotes::install_github("AnAdde/N-SDM/scripts/nsdm-project/functions")`
 
 
 
@@ -61,7 +59,7 @@ N-SDM settings can be edited by modifying the settings.csv file located in scrip
 
 ### Running N-SDM
 
-Position yourself at /scripts/nsdm-project/main, where the main N-SDM bash file (nsdm.sh) is stored. We encourage you running N-SDM in a background no hangup mode to prevent the command from being aborted automatically if logging out or exiting the shell, such as: `nohup bash nsdm.sh &`.
+Position yourself at /scripts/nsdm-project/main, where the main N-SDM bash file (nsdm.sh) is stored. We encourage you running N-SDM in a background no hangup mode to prevent the command from being aborted automatically if logging out or exiting the shell, such as: `nohup bash nsdm.sh &`. You can follow the execution of N-SDM by checking the generated nohup.out file.
 
 
 
