@@ -31,7 +31,7 @@ Before running N-SDM, you should make sure you have an appropriate set up with t
 
 •	you have installed the nsdm R package to access the bank of custom functions `remotes::install_github("AnAdde/N-SDM/scripts/nsdm-project/functions")`
 
-•	you have downloaded the AnAdde/N-SDM repository as a zip file (e.g. `curl -L http://github.com/AnAdde/N-SDM/master.zip`) and unzipped it in your working directory
+•	you have cloned the AnAdde/N-SDM repository in your working directory (e.g. `git clone https://github.com/AnAdde/N-SDM.git .`).
 
 
 
