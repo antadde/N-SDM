@@ -1,9 +1,4 @@
-  <div align="center">
-  <a href="https://github.com/AnAdde/N-SDM">
-  <img src="FIG.png" alt="Bandeau" width="300" height="300">
-  </a>
-  </div>
-
+<img src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_bandeau.png" alt="HTTPie in action" width="100%"/>
 
 # About N-SDM
 
