@@ -1,17 +1,16 @@
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
+  <div align="center">
   <a href="https://github.com/AnAdde/N-SDM">
     <img src="FIG.png" alt="Logo" width="300" height="300">
   </a>
+  </div>
 
-  <h3 align="center">N-SDM</h3>
-
-  <p align="center">
-    Nested-Species Distribution Modelling pipeline
-    <br />
-  </p>
+<div align="center">
+        <p style="color:blue;font-size:18px;">Info about me....</p>
 </div>
+
+   <div align="center">
+   Nested-Species Distribution Modelling pipeline
+   </div>
 
 ## About N-SDM
 
@@ -23,15 +22,17 @@ N-SDM is a species distribution modelling computer code, mainly written in R lan
 
 Before running N-SDM, you should make sure you have an appropriate set up with the following requirements:
 
-•	you are working on a Linux HPC cluster equipped with the Slurm workload manager...
+1.	you are working on a Linux HPC cluster equipped with the Slurm workload manager
 
-•	... with available modules: gcc; r; proj; perl; curl; geos; gdal
+2.	the list of available modules in your system include gcc, r, proj, perl, curl, geos and gdal
 
-•	you have cloned the AnAdde/N-SDM repository in your working directory (e.g. `git clone https://github.com/AnAdde/N-SDM.git .`).
+3.	you have cloned the AnAdde/N-SDM repository in your working directory `git clone https://github.com/AnAdde/N-SDM.git .`
 
-•	you have installed the nsdm R package to access the up-to-date bank of custom functions `remotes::install_github("AnAdde/N-SDM/scripts/nsdm-project/functions")`
+4.	you have installed the nsdm R package `remotes::install_github("AnAdde/N-SDM/scripts/nsdm-project/functions")`
 
+5. [optional for running the N-SDM example] you have downloaded the 6GB zip file containing example species and covariate data in the ./data folder `curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/u7DTEE84oDH4f57/download`
 
+6. [optional for running the N-SDM example] you have unzipped nsdm-project.zip in the data folder unzip `./data/nsdm-project.zip -d ./data/nsdm-project/`
 
 ## Getting started with an example N-SDM run
 
@@ -43,8 +44,6 @@ Following the spatially-nested framework of N-SDM, two levels of analysis (local
 
 ### Data
 
-The 6GB zip file containing species and covariate data required for this example N-SDM run can be downloaded from https://drive.switch.ch/index.php/s/u7DTEE84oDH4f57/download and unziped in the data folder (`curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/u7DTEE84oDH4f57/download` and `unzip ./data/nsdm-project.zip -d ./data/nsdm-project/`)
-
 #### Species data
 
 Global-level species occurrence records were obtained from GBIF (https://www.gbif.org/). Local-level records aggregated at a 100-m spatial resolution were obtained from the Swiss Species Information Center InfoSpecies (www.infospecies.ch).
@@ -55,11 +54,11 @@ We will use a suite of 472 candidate covariates (Adde et al. in prep) derived fr
 
 ### N-SDM settings
 
-N-SDM settings can be edited by modifying the settings.csv file located in scripts/nsdm-project/main/settings. You must edit this file to make N-SDM settings compatible with your computing environment (e.g. paths, HPC account, partition etc.). Be careful when saving settings.csv to use “;” as delimiter. In this same directory, the param-grid.xslx file allows specifying the grid for hyperparameter tunning. The pre-filled expert-table.xslx file allows for expert-based prefiltering of taxon-specific candidate covariates.
+N-SDM settings can be edited by modifying the settings.csv file located in ./scripts/nsdm-project/main/settings. You must edit this file to make N-SDM settings compatible with your computing environment (e.g. paths, HPC account, partition etc.). Be careful when saving settings.csv to use “;” as delimiter. In this same directory, the param-grid.xslx file allows specifying the grid for hyperparameter tunning. The pre-filled expert-table.xslx file allows for expert-based prefiltering of taxon-specific candidate covariates.
 
 ### Running N-SDM
 
-Position yourself at /scripts/nsdm-project/main, where the main N-SDM bash file (nsdm.sh) is stored. We encourage you running N-SDM in a background no hangup mode to prevent the command from being aborted automatically if logging out or exiting the shell, such as: `nohup bash nsdm.sh &`. You can follow the execution of N-SDM by checking the generated nohup.out file.
+Position yourself at ./scripts/nsdm-project/main, where the main N-SDM bash file (nsdm.sh) is stored. We encourage you running N-SDM in a background no hangup mode to prevent the command from being aborted automatically if logging out or exiting the shell, such as: `nohup bash nsdm.sh &`. You can follow the execution of N-SDM by checking the generated nohup.out file.
 
 
 
