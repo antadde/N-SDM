@@ -23,7 +23,7 @@ mdl.glm <- cv.glmnet(x, as.factor(pa), alpha=0.5, weights=weights, family = "bin
 # Extract results
 glm.beta<-as.data.frame(as.matrix(coef(mdl.glm, s=mdl.glm$lambda.1se)))
 if(plyr::empty(glm.beta)) glm.beta<-as.data.frame(as.matrix(coef(mdl.glm, s=mdl.glm$lambda.min)))
-glm.beta<-data.frame(var = row.names(glm.beta)[which(glm.beta != 0)], coef=abs(glm.beta$s1))[-1,]
+glm.beta<-data.frame(var = row.names(glm.beta)[which(glm.beta != 0)], coef=abs(glm.beta$s1)[which(glm.beta != 0)])[-1,]
 glm.beta<-data.frame(glm.beta[order(glm.beta$coef, decreasing = TRUE),], model="glm")
 glm.beta$var<-stri_sub(glm.beta$var,6,-6)
 glm.beta<-data.frame(setDT(glm.beta)[, .SD[which.max(coef)], by=var])
