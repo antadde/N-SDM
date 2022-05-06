@@ -6,7 +6,7 @@
 #############################################################################
 project<-gsub("/main","",gsub(".*scripts/","",getwd()))
 
-# Load nsdm.ine settings
+# Load N-SDM settings
 load(paste0(gsub("scripts","outputs",gsub("/main","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Load species list

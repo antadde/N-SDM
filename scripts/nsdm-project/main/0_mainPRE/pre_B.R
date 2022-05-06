@@ -21,11 +21,8 @@ setwd(w_path)
 # Set lib path
 .libPaths(lib_path)
 
-# Load required packages
-invisible(lapply(c(packs_data, packs_modl), require, character.only = TRUE))
-
-# Source custom functions
-invisible(sapply(list.files(f_path, pattern = ".R", full.names = TRUE, recursive=TRUE), source))
+# Load nsdm package
+require(nsdm)
 
 ### =========================================================================
 ### B- Definitions

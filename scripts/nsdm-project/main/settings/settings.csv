@@ -7,9 +7,6 @@ svp_path;/work/FAC/FGSE/IDYST/aguisan/valpar/nsdm-example/save;0_general;save pa
 lib_path;/work/FAC/FBM/DEE/aguisan/default/rlib/4.0;0_general;lib path;
 do_fut;TRUE;0_general;do future projections;
 do_loc;TRUE;0_general;do local analyses;
-packs_data;c('data.table', 'stringi', 'stringr', 'plyr', 'readxl','writexl', 'parallel', 'sp', 'raster', 'rgdal', 'zoo','fst','tools');0_general;data preparation R packages;
-packs_modl;c('glmnet', 'gam', 'mgcv', 'randomForest', 'RRF', 'lightgbm', 'ranger', 'maxnet','caret');0_general;core modelling R packages;
-packs_eval;c('ROCR','ecospat', 'chron','ggpubr');0_general;evaluation R packages;
 n_mx_spe;100;1_speciesdata;max number of species evaluated at the same time for a single nsdm run;
 forced_species;force-sp.csv;1_speciesdata;csv file containing names of species to be modelled;optional (0 or vector of species names)
 n_spe;3;1_speciesdata;number of species evaluated;

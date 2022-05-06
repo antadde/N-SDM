@@ -60,7 +60,7 @@ print(paste0("N-SDM settings defined"))
 .libPaths(lib_path)
 
 # Load nsdm package
-library(nsdm)
+require(nsdm)
 
 ncores<-as.numeric(Sys.getenv('SLURM_CPUS_PER_TASK'))
 

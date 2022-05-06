@@ -17,11 +17,8 @@ setwd(w_path)
 # Set lib path
 .libPaths(lib_path)
 
-# Load required packages
-invisible(lapply(c(packs_data, packs_eval), require, character.only = TRUE))
-
-# Custom function
-invisible(sapply(list.files(f_path, pattern = ".R", full.names = TRUE, recursive=TRUE), source))
+# Load nsdm package
+require(nsdm)
 
 # Target species
 species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
