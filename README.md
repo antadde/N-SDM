@@ -1,6 +1,6 @@
   <div align="center">
   <a href="https://github.com/AnAdde/N-SDM">
-    <img src="FIG.png" alt="Bandeau" width="300" height="300">
+  <img src="FIG.png" alt="Bandeau" width="300" height="300">
   </a>
   </div>
 
