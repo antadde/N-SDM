@@ -29,7 +29,7 @@ Before running N-SDM, you should make sure you have an appropriate set up with t
 
 # Example N-SDM run
 
-<img align="right" alt="GIF" src="https://raw.githubusercontent.com/rahul-jha98/rahul-jha98/main/techstack.gif" width="300px"/>
+<img align="right" alt="GIF" src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_logo.png" width="300px"/>
 
 In this example N-SDM run we will model the current and future distributions of three species (Larix decidua, Capra Ibex and Cantharellus cibarius) at 100-m resolution across Switzerland by using a suite of more than 100 candidate covariates.
 
