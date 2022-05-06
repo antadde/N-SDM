@@ -14,7 +14,7 @@
 
 nsdm.retrieve4pred <- function(covstk, scaleparam, mask=NULL, observational=NULL, obsval=NULL){
 # Transform as data.frame and retrieve non-na cells indices
-covdf<-as.data.frame(covstk, row.names=T)
+covdf<-raster::as.data.frame(covstk, row.names=T)
 covdf<-covdf[complete.cases(covdf), ]
 covdf_ix<-as.numeric(row.names(covdf))
 
