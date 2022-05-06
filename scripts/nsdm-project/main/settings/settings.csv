@@ -1,10 +1,10 @@
 parameter;value;group;name;comments
 project;nsdm-project;0_general;project name;
-w_path;/work/FAC/FGSE/IDYST/aguisan/valpar/nsdm-example/;0_general;working path;
-scr_path;/work/FAC/FGSE/IDYST/aguisan/valpar/nsdm-example/scratch;0_general;scratch path;
+w_path;/work/FAC/FGSE/IDYST/aguisan/valpar/wd_test/;0_general;working path;
+scr_path;/work/FAC/FGSE/IDYST/aguisan/valpar/wd_test/scratch/;0_general;scratch path;
 clear_sop;TRUE;0_general;delete scratch output folders before new run;logical TRUE or FALSE
-svp_path;/work/FAC/FGSE/IDYST/aguisan/valpar/nsdm-example/save;0_general;save path;
-lib_path;/work/FAC/FBM/DEE/aguisan/default/rlib/4.0;0_general;lib path;
+svp_path;/work/FAC/FGSE/IDYST/aguisan/valpar/wd_test/save/;0_general;save path;
+lib_path;/work/FAC/FBM/DEE/aguisan/default/rlib/4.0/;0_general;lib path;
 do_fut;TRUE;0_general;do future projections;
 do_loc;TRUE;0_general;do local analyses;
 n_mx_spe;100;1_speciesdata;max number of species evaluated at the same time for a single nsdm run;
