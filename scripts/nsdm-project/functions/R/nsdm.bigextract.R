@@ -163,7 +163,7 @@ if(t_match){
 if(length(cov_rds)>0){
 cells<-cellFromXY(rst_ref, xy)
 l<-readRDS(cov_rds)
-r<-as.data.frame(l)
+r<-raster::as.data.frame(l)
 xt_glo<-data.frame(r[cells,1])
 names(xt_glo)<-names(r)
 }
