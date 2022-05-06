@@ -1,6 +1,6 @@
   <div align="center">
   <a href="https://github.com/AnAdde/N-SDM">
-    <img src="FIG.png" alt="Bandeau" width="300" height="300">
+  <img src="FIG.png" alt="Bandeau" width="300" height="300">
   </a>
   </div>
 
@@ -25,9 +25,11 @@ Before running N-SDM, you should make sure you have an appropriate set up with t
 
 5. [optional for running the N-SDM example] you have downloaded the 6GB zip file containing example species and covariate data in the ./data folder `curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/u7DTEE84oDH4f57/download`
 
-6. [optional for running the N-SDM example] you have unzipped nsdm-project.zip in the data folder unzip `./data/nsdm-project.zip -d ./data/nsdm-project/`
+6. [optional for running the N-SDM example] you have unzipped nsdm-project.zip in the data folder `unzip ./data/nsdm-project.zip -d ./data/nsdm-project/`
 
 # Example N-SDM run
+
+<img align="right" alt="GIF" src="https://raw.githubusercontent.com/rahul-jha98/rahul-jha98/main/techstack.gif" width="300px"/>
 
 In this example N-SDM run we will model the current and future distributions of three species (Larix decidua, Capra Ibex and Cantharellus cibarius) at 100-m resolution across Switzerland by using a suite of more than 100 candidate covariates.
 
