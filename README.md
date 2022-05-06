@@ -5,7 +5,6 @@
 N-SDM is a species distribution modelling computer code, mainly written in R language, specifically developed for high performance computing (HPC) environments. A key characteristic of N-SDM is that it is built around a scale-nesting framework aimed at avoiding climatic niche truncation when doing future projection (Chevalier et al. 2021, REF, REF). Among other innovative SDM features, N-SDM is also equipped with a newly devised covariate selection procedure for selecting best predictors in high dimensional spaces of candidates (Adde et al. in prep), an algorithm-specific hyperparameter grid search for identifying best model parameter values (Vignali et al. 2020, REF, REF) and the ensemble of small models approach for modelling rare species (Breiner et al. 2015, Breiner et al. 2018, Habibzadeh & Ludwig 2019).
 
 
-
 # Prerequisites
 
 Before running N-SDM, you should make sure you have an appropriate set up with the following requirements:
