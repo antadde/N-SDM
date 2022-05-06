@@ -76,4 +76,4 @@ Project Link: [https://https://github.com/AnAdde/N-SDM](https://https://github.c
 
 # Acknowledgments
 
-
+Support by the Swiss Federal Office for the Environment with the www.valpar.ch project is gratefully acknowledged.
