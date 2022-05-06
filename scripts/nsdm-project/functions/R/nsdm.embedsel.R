@@ -21,12 +21,9 @@ form<-as.formula(paste0("as.factor(pa) ~ " ,paste(paste0("poly(",names(covdata),
 x <- model.matrix(form, covdata)
 mdl.glm <- cv.glmnet(x, as.factor(pa), alpha=0.5, weights=weights, family = "binomial", type.measure = "deviance", parallel = TRUE)
 # Extract results
-glm.beta<-stats::coef(mdl.glm, s=mdl.glm$lambda.1se)
-print(glm.beta)
-print(base::which(glm.beta != 0))
-if(plyr::empty(glm.beta)){
-glm.beta<-coef(mdl.glm, s=mdl.glm$lambda.min)}
-glm.beta<-data.frame(var = row.names(glm.beta)[base::which(glm.beta != 0)], coef= abs(glm.beta@x))[-1,]
+glm.beta<-as.data.frame(as.matrix(coef(mdl.glm, s=mdl.glm$lambda.1se)))
+if(plyr::empty(glm.beta)) glm.beta<-coef(mdl.glm, s=mdl.glm$lambda.min)
+glm.beta<-data.frame(var = row.names(glm.beta)[which(glm.beta != 0)], coef=abs(glm.beta$s1))[-1,]
 glm.beta<-data.frame(glm.beta[order(glm.beta$coef, decreasing = TRUE),], model="glm")
 glm.beta$var<-stri_sub(glm.beta$var,6,-6)
 glm.beta<-data.frame(setDT(glm.beta)[, .SD[which.max(coef)], by=var])
