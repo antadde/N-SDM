@@ -2,7 +2,7 @@
 #'
 #' @author Philipp Brun (philipp.brun@wsl.ch)
 
-nsdm.prd=function(mod,tst){
+nsdm.prd<-function(mod,tst){
 
   # Generate probabilistic precitions
   if("maxnet"%in%class(mod)){
