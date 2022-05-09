@@ -2,6 +2,7 @@
 
 export(ecospat.boyce)
 export(nsdm.bigextract)
+export(nsdm.ceval)
 export(nsdm.covfilter)
 export(nsdm.covinfo)
 export(nsdm.covselrk)

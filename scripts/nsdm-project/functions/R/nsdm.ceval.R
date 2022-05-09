@@ -1,6 +1,9 @@
+#' nsdm.ceval
+#'
 #' Model evaluation core function
 #'
 #' @author Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (aadde@unil.ch)
+#' @export
 
 nsdm.ceval<-function(f,pa,tesdat,crit,tre=numeric()){
 

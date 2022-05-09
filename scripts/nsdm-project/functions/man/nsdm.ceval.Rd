@@ -2,7 +2,7 @@
 % Please edit documentation in R/nsdm.ceval.R
 \name{nsdm.ceval}
 \alias{nsdm.ceval}
-\title{Model evaluation core function}
+\title{nsdm.ceval}
 \usage{
 nsdm.ceval(f, pa, tesdat, crit, tre = numeric())
 }
