@@ -80,11 +80,12 @@ Project Link: [https://https://github.com/AnAdde/N-SDM](https://https://github.c
 
 # Acknowledgments
 
-N-SDM devlopment has been conducted within the ECOSPAT lab https://www.unil.ch/ecospat/en/home.html
+N-SDM development has been conducted within the ECOSPAT lab https://www.unil.ch/ecospat/en/home.html
 
-<img src="https://github.com/AnAdde/N-SDM/blob/main/images/ecospat_logo.jpg" align="center" width="20%"/>
 
-Support by the Swiss Federal Office for the Environment with the www.valpar.ch project is gratefully acknowledged.
+Support by the Swiss Federal Office for the Environment with the www.valpar.ch project is gratefully acknowledged
 
-<img src="https://github.com/AnAdde/N-SDM/blob/main/images/valpar_logo.png" align="center" width="20%"/>
+<img src="https://github.com/AnAdde/N-SDM/blob/main/images/ecospat_logo.jpg" align="left" width="17.5%"/>
+
+<img src="https://github.com/AnAdde/N-SDM/blob/main/images/valpar_logo.png" align="left" width="20%"/>
 
