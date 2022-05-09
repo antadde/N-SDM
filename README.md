@@ -2,7 +2,8 @@
 
 # About N-SDM
 
-N-SDM is a species distribution modelling computer code, mainly written in R language, specifically developed for high performance computing (HPC) environments. A key characteristic of N-SDM is that it is built around a scale-nesting framework aimed at avoiding climatic niche truncation when doing future projection (Chevalier et al. 2021, REF, REF). Among other innovative SDM features, N-SDM is also equipped with a newly devised covariate selection procedure for selecting best predictors in high dimensional spaces of candidates (Adde et al. in prep), an algorithm-specific hyperparameter grid search for identifying best model parameter values (Vignali et al. 2020, REF, REF) and the ensemble of small models approach for modelling rare species (Breiner et al. 2015, Breiner et al. 2018, Habibzadeh & Ludwig 2019).
+N-SDM is a species distribution modelling computer code, mainly written in R language, specifically developed for high performance computing (HPC) environments. A key characteristic of N-SDM is that it is built around a scale-nesting framework aimed at avoiding climatic niche truncation when doing future projection. Among other innovative SDM features, N-SDM is also equipped with a newly devised covariate selection procedure for selecting best predictors in high dimensional spaces of candidates, an algorithm-specific hyperparameter grid search for identifying best model parameter values and the ensemble of small models approach for modelling rare species.
+
 
 
 # Prerequisites
@@ -20,6 +21,9 @@ Before running N-SDM, you should make sure you have an appropriate set up with t
 5. [optional for running the N-SDM example] you have downloaded the 6GB zip file containing example species and covariate data in the ./data folder `curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/u7DTEE84oDH4f57/download`
 
 6. [optional for running the N-SDM example] you have unzipped nsdm-project.zip in the data folder `unzip ./data/nsdm-project.zip -d ./data/nsdm-project/`
+
+
+
 
 # Example N-SDM run
 
@@ -49,14 +53,20 @@ N-SDM settings can be edited by modifying the settings.csv file located in ./scr
 
 Position yourself at ./scripts/nsdm-project/main, where the main N-SDM bash file (nsdm.sh) is stored. We encourage you running N-SDM in a background no hangup mode to prevent the command from being aborted automatically if logging out or exiting the shell, such as: `nohup bash nsdm.sh > nsdm.out &`. You can follow the execution of N-SDM by checking nsdm.out.
 
-# References
-
 
 
 # Contributing
 
 If you have a suggestion that would make N-SDM better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Thanks!
+
+
+
+# Citation
+
+To cite N-SDM please use:
+
+Adde et al. (xxx). xxx. xxx. xx:xxx–xxx. https://doi.org/xxxx
 
 
 
@@ -69,5 +79,7 @@ Project Link: [https://https://github.com/AnAdde/N-SDM](https://https://github.c
 
 
 # Acknowledgments
+
+N-SDM is an ECOSPAT lab project https://www.unil.ch/ecospat/en/home.html
 
 Support by the Swiss Federal Office for the Environment with the www.valpar.ch project is gratefully acknowledged.
