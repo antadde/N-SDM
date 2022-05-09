@@ -1,4 +1,4 @@
-<img src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_bandeau.png" alt="HTTPie in action" width="100%"/>
+<img src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_bandeau.png" alt="N-SDM bandeau" width="100%"/>
 
 # About N-SDM
 
@@ -27,7 +27,7 @@ Before running N-SDM, you should make sure you have an appropriate set up with t
 
 # Example N-SDM run
 
-<img align="right" alt="GIF" src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_logo.png" width="300px"/>
+<img align="right" alt="N-SDM logo" src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_logo.png" width="300px"/>
 
 In this example N-SDM run we will model the current and future distributions of three species (Larix decidua, Capra Ibex and Cantharellus cibarius) at 100-m resolution across Switzerland by using a suite of more than 100 candidate covariates.
 
@@ -82,4 +82,9 @@ Project Link: [https://https://github.com/AnAdde/N-SDM](https://https://github.c
 
 N-SDM is an ECOSPAT lab project https://www.unil.ch/ecospat/en/home.html
 
+<img src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_bandeau.png" alt="N-SDM bandeau" width="100%"/>
+
 Support by the Swiss Federal Office for the Environment with the www.valpar.ch project is gratefully acknowledged.
+
+<img src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_bandeau.png" alt="N-SDM bandeau" width="100%"/>
+
