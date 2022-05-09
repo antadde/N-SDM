@@ -2,7 +2,7 @@
 % Please edit documentation in R/nsdm.prd.R
 \name{nsdm.prd}
 \alias{nsdm.prd}
-\title{Feed the predict functions depending on model type}
+\title{nsdm.prd}
 \usage{
 nsdm.prd(mod, tst)
 }

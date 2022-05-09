@@ -1,6 +1,9 @@
+#' nsdm.prd
+#'
 #' Feed the predict functions depending on model type
 #'
 #' @author Philipp Brun (philipp.brun@wsl.ch)
+#' @export
 
 nsdm.prd<-function(mod,tst){
 
