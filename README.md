@@ -85,7 +85,4 @@ N-SDM development has been conducted within the ECOSPAT lab https://www.unil.ch/
 
 Support by the Swiss Federal Office for the Environment with the www.valpar.ch project is gratefully acknowledged
 
-<img src="https://github.com/AnAdde/N-SDM/blob/main/images/ecospat_logo.jpg" align="left" width="17.5%"/>
-
-<img src="https://github.com/AnAdde/N-SDM/blob/main/images/valpar_logo.png" align="left" width="20%"/>
 
