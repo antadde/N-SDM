@@ -51,7 +51,7 @@ N-SDM settings can be edited by modifying the settings.csv file located in ./scr
 
 ## Running N-SDM
 
-Position yourself at ./scripts/nsdm-project/main, where the main N-SDM bash file (nsdm.sh) is stored. We encourage you running N-SDM in a background no hangup mode to prevent the command from being aborted automatically if logging out or exiting the shell, such as: `nohup bash nsdm.sh > nsdm.out &`. You can follow the execution of N-SDM by checking nsdm.out.
+Position yourself at `cd ./scripts/nsdm-project/main`, where the main N-SDM bash file (nsdm.sh) is stored. We encourage you running N-SDM in a background no hangup mode to prevent the command from being aborted automatically if logging out or exiting the shell, such as: `nohup bash nsdm.sh > nsdm.out &`. You can follow the execution of N-SDM by checking nsdm.out.
 
 
 
