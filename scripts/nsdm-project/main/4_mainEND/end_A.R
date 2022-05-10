@@ -56,7 +56,6 @@ level<-"glo"
 ## Loop on target algorithms
 pred_all<-list()
 for(model in models){
-
 # Retrieve evaluation table and identify best model
 eval_list<-nsdm.loadthis(model_name=model, species_name=ispi_name,
               read_path=paste0(scr_path,"/outputs/",project,"/d3_evals/glo"))

@@ -34,7 +34,7 @@ do.call("<-",list(parameters[i], as.numeric(values[i])))
 }
 
 # Additional settings
-ssl_id<-read.table(paste0(w_path,"outputs/",project,"/settings/tmp/ssl_id.txt"), )$V1
+ssl_id<-readLines(paste0(w_path,"outputs/",project,"/settings/tmp/ssl_id.txt"))
 cov_path<-paste0(w_path,"data/",project,"/covariates/")
 f_path<-paste0(w_path,"scripts/",project,"/functions/")
 spe_glo<-list.files(paste0(w_path,"data/",project,"/species/glo"), full.names=T, pattern=".rds")

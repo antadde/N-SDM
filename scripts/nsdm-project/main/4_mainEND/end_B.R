@@ -38,11 +38,7 @@ jobs<-c(paste0("PRE_",c("A","B")), paste0("GLO_",c("A", "B", "C")), paste0("LOC_
 sacct<-sacct[-which(!sacct$JobName %in% jobs),]
 sacct$species<-NA
 
-if("PRE_A" %in% unique(sacct$JobName)){
-sacct<-sacct[tail(which(match(sacct$JobName, "PRE_A")==1),1):nrow(sacct),]
-} else {
-sacct<-sacct[tail(which(match(sacct$JobName, "PRE_B")==1),1):nrow(sacct),]
-}
+sacct<-sacct[head(which(match(sacct$JobName, "GLO_A")==1),1):nrow(sacct),]
 
 j_na<-names(table(sacct$JobName))
 v_na<-table(sacct$JobName)
