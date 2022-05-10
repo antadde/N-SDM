@@ -1,4 +1,4 @@
-<img src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_bandeau.png" alt="N-SDM bandeau" width="100%"/>
+<img src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_bandeau_v2.png" alt="N-SDM bandeau" width="100%"/>
 
 # About N-SDM
 
