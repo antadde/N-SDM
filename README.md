@@ -43,11 +43,11 @@ Global-level species occurrence records were obtained from GBIF (https://www.gb
 
 ### Covariate data
 
-We will use a suite of 472 candidate covariates (Adde et al. in prep) derived from 42 individual parameters and belonging to 6 main categories (bioclimatic, land use and cover, edaphic, topographic, population density, transportation and vegetation). Note that some of these covariates were calculated using focal windows (e.g., land use and cover) and others are temporally dynamic. Once the .zip data file has been unzipped, detailed information on the covariates can be found in `./data/nsdm-project/covariates/covariates.xlsx`. Only bioclimatic covariates (n=19) were used for fitting the global-level model and all the others were used for the local model (Figure 1).
+We will use a suite of 453 candidate covariates (Adde et al. in prep) derived from 42 individual parameters and belonging to 6 main categories (bioclimatic, land use and cover, edaphic, topographic, population density, transportation and vegetation). Note that some of these covariates were calculated using focal windows (e.g., land use and cover) and others are temporally dynamic. Once the .zip data file has been unzipped, detailed information on the covariates can be found in `./data/nsdm-project/covariates/covariates.xlsx`. Only bioclimatic covariates (n=19) were used for fitting the global-level model and all the others were used for the local model (Figure 1).
 
 ## N-SDM settings
 
-N-SDM settings can be edited by modifying the settings.csv file located in ./scripts/nsdm-project/main/settings. You must edit this file to make N-SDM settings compatible with your computing environment (e.g. paths, HPC account, partition etc.). Be careful when saving settings.csv to use “;” as delimiter. In this same directory, the param-grid.xslx file allows specifying the grid for hyperparameter tunning. The pre-filled expert-table.xslx file allows for expert-based prefiltering of taxon-specific candidate covariates.
+N-SDM settings can be edited by modifying the settings.csv file located in ./scripts/nsdm-project/main/settings. You must edit this file to make N-SDM settings compatible with your computing environment (e.g. paths, HPC account, partition etc.). Be careful when saving settings.csv to use “;” as delimiter. In this same directory, the param-grid.xslx file allows specifying the grid for hyperparameter tunning. The pre-filled expert-table.xslx file allows for expert-based prefiltering of taxon-specific candidate covariates. For more details on N-SDM settings, please have a look at the N-SDM manuscript.
 
 ## Running N-SDM
 
