@@ -28,7 +28,7 @@ Before running N-SDM, you should make sure you have an appropriate set up with t
 
 <img align="right" alt="N-SDM logo" src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_logo_v2.png" width="300px"/>
 
-In this example N-SDM run we will model the current and future distributions of three species (Larix decidua, Capra Ibex and Cantharellus cibarius) at 100-m resolution across Switzerland.
+In this example N-SDM run we will model the current and future distributions of three species (Larix decidua, Capra Ibex and Cantharellus cibarius) across Switzerland by using 100-m resolution environmental covariates.
 
 ## Study area
 
