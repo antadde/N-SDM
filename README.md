@@ -33,7 +33,7 @@ In this example N-SDM run we will model the current and future distributions of 
 
 ## Study area
 
-Following the spatially-nested framework of N-SDM, two levels of analysis (local and global) were considered in this exmaple. The local-level area includes all of Switzerland. For the global-level area, we use a bounding box covering the European continent with coordinates 32,60N, 71,70N, 28,56W and 40,21E.
+Following the spatially-nested framework of N-SDM, two levels of analysis (local and global) were considered in this example. The local-level area includes all of Switzerland. For the global-level area, we use a bounding box covering the European continent with coordinates 32,60N, 71,70N, 28,56W and 40,21E.
 
 ## Data
 
