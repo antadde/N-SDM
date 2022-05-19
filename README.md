@@ -17,7 +17,7 @@ Before running N-SDM, you should make sure you have an appropriate set up with t
 
 4.	you have installed the nsdm R package `remotes::install_github("AnAdde/N-SDM/scripts/nsdm-project/functions", upgrade=FALSE)`
 
-5. [optional for running the N-SDM example] you have downloaded the 6GB zip file containing example species and covariate data in the ./data folder `curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/u7DTEE84oDH4f57/download`
+5. [optional for running the N-SDM example] you have downloaded the 6GB zip file containing example species and covariate data in the ./data folder `curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/BlN3GV7x8M8CCI7/download`
 
 6. [optional for running the N-SDM example] you have unzipped nsdm-project.zip in the data folder `unzip ./data/nsdm-project.zip -d ./data/nsdm-project/`
 
