@@ -66,7 +66,7 @@ ncores<-as.numeric(Sys.getenv('SLURM_CPUS_PER_TASK'))
 
 # Generate covariate info table
 nsdm.covinfo(cov_path=cov_path, save_path=paste0(w_path,"scripts/",project,"/main/settings/"),
-             time_cov=time_cov, focal_cov=focal_cov)
+             time_cov=cov_time, focal_cov=cov_focal)
 			 
 cov_info<-read_excel(paste0(w_path,"scripts/", project, "/main/settings/predictors-available.xlsx"))
 			 
@@ -79,7 +79,7 @@ r<-readRDS(m)
 r_msk<-raster::mask(r, msk_loc, inverse=TRUE)
 saveRDS(r_msk, gsub(".rds", "_msk.rds", m, fixed=T))
 nsdm.covinfo(cov_path=cov_path, save_path=paste0(w_path,"scripts/",project,"/main/settings/"),
-             time_cov=time_cov, focal_cov=focal_cov)			 
+             time_cov=cov_time, focal_cov=cov_focal)			 
 cov_info<-read_excel(paste0(w_path,"scripts/", project, "/main/settings/predictors-available.xlsx"))
 }
 }
@@ -189,7 +189,7 @@ print(paste0("Ready for spatiotemporal disaggregation of local data for ",length
 # Disaggregate local species data
 if(tmatch_loc==FALSE) spe_loc_pts$year<-NULL # no temporal matching
 if(disag_loc==TRUE){
-spe_loc_dis<-nsdm.disaggregate(pres=spe_loc_pts, rst=rst_loc, thindist=thindist, thinyear=10, max_uncertain=max_uncertain, min_occ=min_occ, ncores=ncores)
+spe_loc_dis<-nsdm.disaggregate(pres=spe_loc_pts, rst=rst_loc, thindist=thin_dist, thinyear=thin_time, max_uncertain=max_uncertain, min_occ=min_occ, ncores=ncores)
 } else { # if no disaggregation is requested
 spe_loc_dis<-spe_loc_pts
 }

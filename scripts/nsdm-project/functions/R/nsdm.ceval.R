@@ -46,15 +46,8 @@ nsdm.ceval<-function(f,pa,tesdat,crit,tre=numeric()){
     tdep = unlist(nsdm.all.metrics(tb[2,2],tb[2,1],tb[1,2],tb[1,1]))
 
    	# Boyce
-	  boyce_s_pe=try(ecospat.boyce(fit=f, obs=f[pa==1], PEplot = FALSE, rm.duplicate = TRUE, method = 'spearman'), TRUE)
-	  boyce_p_pe=try(ecospat.boyce(fit=f, obs=f[pa==1], PEplot = FALSE, rm.duplicate = TRUE, method = 'pearson'), TRUE)
-	  boyce_p_npe=try(ecospat.boyce(fit=f, obs=f[pa==1], PEplot = FALSE, rm.duplicate = FALSE, method = 'pearson'), TRUE)
-	  boyce_s_npe=try(ecospat.boyce(fit=f, obs=f[pa==1], PEplot = FALSE, rm.duplicate = FALSE, method = 'spearman'), TRUE)
-
-	  if(is.numeric(boyce_s_pe$cor)) { boyce_s_pe=boyce_s_pe$cor } else { boyce_s_pe=NA}
-	  if(is.numeric(boyce_p_pe$cor)) {boyce_p_pe=boyce_p_pe$cor } else { boyce_p_pe=NA}
-	  if(is.numeric(boyce_s_npe$cor)) { boyce_s_npe=boyce_s_npe$cor } else { boyce_s_npe=NA}
-	  if(is.numeric(boyce_p_npe$cor)) { boyce_p_npe=boyce_p_npe$cor } else { boyce_p_npe=NA}
+	boyce_s_pe=try(ecospat.boyce(fit=f, obs=f[pa==1], PEplot = FALSE, rm.duplicate = TRUE, method = 'spearman'), TRUE)
+    if(is.numeric(boyce_s_pe$cor)) { boyce_s_pe=boyce_s_pe$cor } else { boyce_s_pe=NA}
 	  
     # AUC
     z=prediction(f,pa)
@@ -69,8 +62,8 @@ nsdm.ceval<-function(f,pa,tesdat,crit,tre=numeric()){
 	score<-sum(score_vec)/length(score_vec)
 
     # Return results
-    weg=c(auc, aucS, rmse, boyce_s_pe, boyce_p_pe, boyce_s_npe, boyce_p_npe,  score, tre, tdep)
-    names(weg)[1:9]=c("AUC", "AUC_S", "RMSE", "Boyce_S_PE", "Boyce_P_PE", "Boyce_S_NPE", "Boyce_P_NPE", "Score", "threshold")
+    weg=c(auc, aucS, rmse, boyce_s_pe, score, tre, tdep)
+    names(weg)[1:6]=c("AUC", "AUC_S", "RMSE", "Boyce_S_PE", "Score", "threshold")
     
     return(unlist(weg))
   }

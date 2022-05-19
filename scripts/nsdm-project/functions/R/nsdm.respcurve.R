@@ -208,9 +208,9 @@ temp_m[,2,i]<-logit2prob(X1[[1]]$y)
 	}
 	}
 
-###################
-## GLM, GAM, MAX ##
-###################
+##############
+## GLM, GAM ##
+##############
 
 if(class(models@fits[[1]][[1]])[2]!="randomForest"  & class(models@fits[[1]][[1]])[1]!="lgb.Booster" & class(models@fits[[1]][[1]])[1]!="maxnet"){
 temp<-list() # list where results will be stored

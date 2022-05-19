@@ -36,7 +36,7 @@ arrayID<-eval(parse(text=arrayID))
 species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
 
 # Target RCP for future predictions
-rcps<-scenarios
+rcps<-proj_scenarios
 
 # Scale-nesting methods for combining GLO and LOC predictions
 nesting_methods<-nesting_methods
@@ -48,7 +48,7 @@ nesting_method <- array[arrayID,"nesting"]
 rcp<-array[arrayID,"scenarios"]
 
 # Target period for future predictions
-pers<-periods
+pers<-proj_periods
 
 for (per in pers){
 

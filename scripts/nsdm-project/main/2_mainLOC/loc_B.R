@@ -210,8 +210,8 @@ cat(paste0('\n\nVariable importance scores and response curves computed \n'))
 ### =========================================================================
 ## H.1.2 Prepare covariate data
 hab_df_loc<-nsdm.retrieve4pred(covstk=d1_covsels$covstk,
-                               observational=grep(paste0(observational, collapse="|"), names(d1_covsels$covstk), value=T),# Flatten observational covariates
-							   obsval="median",
+                               observational=grep(paste0(cov_obser, collapse="|"), names(d1_covsels$covstk), value=T),# Flatten observational covariates
+							   obsval=cov_observ_val,
 							   mask=mask_pred, # 0-1 mask to be applied on predictions
 							   scaleparam=attributes(d1_covsels$env_vars)[c("scaled:center","scaled:scale")]) # scaling parameters to be reapplied
 

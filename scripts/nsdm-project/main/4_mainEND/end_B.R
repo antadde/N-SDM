@@ -49,9 +49,9 @@ for(i in 1:length(j_na)){
 j_na_i<-j_na[i]
 if(round(v_na[i]/n_spe) == v_na[i]/n_spe){
 if(grepl("FUT_A", j_na_i) | grepl("FUT_C", j_na_i)){
-sacct$species[which(match(sacct$JobName, j_na_i)==1)]<-rep(species, each=length(mod_algo), times=length(periods)*length(scenarios))
+sacct$species[which(match(sacct$JobName, j_na_i)==1)]<-rep(species, each=length(mod_algo), times=length(proj_periods)*length(proj_scenarios))
 }else if(grepl("FUT_B", j_na_i) | grepl("FUT_D", j_na_i)){
-sacct$species[which(match(sacct$JobName, j_na_i)==1)]<-rep(species, each=1, times=length(periods)*length(scenarios))
+sacct$species[which(match(sacct$JobName, j_na_i)==1)]<-rep(species, each=1, times=length(proj_periods)*length(proj_scenarios))
 }else{
 sacct$species[which(match(sacct$JobName, j_na_i)==1)]<-rep(species, each=v_na[i]/n_spe)
 }

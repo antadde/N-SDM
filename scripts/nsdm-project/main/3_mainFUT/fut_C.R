@@ -45,10 +45,10 @@ models<-mod_algo
 nesting_methods<-nesting_methods
 
 # Target RCP for future predictions
-rcps<-scenarios
+rcps<-proj_scenarios
 
 # Target period for future predictions
-pers<-periods
+pers<-proj_periods
 
 # SBATCH array
 array<-expand.grid(nesting=nesting_methods, model=models, species=species, scenarios=rcps)
@@ -119,8 +119,8 @@ hab_stk_fut<-stack(hab_stk_fut, nsdm.fastraster(files=lr_remain, nsplits=ncores)
 ### =========================================================================
 ## E.1 Prepare covariate data for predictions
 hab_df_loc<-nsdm.retrieve4pred(covstk=hab_stk_fut,
-                               observational=grep(paste0(observational, collapse="|"), names(hab_stk_fut), value=T),# Flatten observational covariates
-							   obsval="median",
+                               observational=grep(paste0(cov_obser, collapse="|"), names(hab_stk_fut), value=T),# Flatten observational covariates
+							   obsval=cov_observ_val,
 							   mask=mask_pred, # mask to be applied on predictions
                                scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")]) # scaling parameters to be reapplied
 

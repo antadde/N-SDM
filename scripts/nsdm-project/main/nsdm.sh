@@ -76,10 +76,10 @@ mod_algo=$(awk 'BEGIN{FS=";"}/mod_algo/ {print $2}' ./settings/settings.csv)    
 n_algo=$(($(grep -o "'" <<<"$mod_algo" | grep -c .) / 2))                           # number of modelling algorithms evaluated
 nest_met=$(awk 'BEGIN{FS=";"}/nesting_methods/ {print $2}' ./settings/settings.csv) # modelling algorithms evaluated
 n_nesting=$(($(grep -o "'" <<<"$nest_met" | grep -c .) / 2))                        # number of nesting methods evaluated
-scenars=$(awk 'BEGIN{FS=";"}/scenarios/ {print $2}' ./settings/settings.csv)        # future scenarios evaluated
-n_scenarios=$(($(grep -o "'" <<<"$scenars" | grep -c .) / 2))                       # number of future scenarios evaluated
-periods=$(awk 'BEGIN{FS=";"}/periods/ {print $2}' ./settings/settings.csv)          # future periods evaluated
-n_periods=$(($(grep -o "'" <<<"$periods" | grep -c .) / 2))                         # number of future periods evaluated
+scenars=$(awk 'BEGIN{FS=";"}/proj_scenarios/ {print $2}' ./settings/settings.csv)   # alternative scenarios evaluated
+n_scenarios=$(($(grep -o "'" <<<"$scenars" | grep -c .) / 2))                       # number of alternative scenarios evaluated
+periods=$(awk 'BEGIN{FS=";"}/proj_periods/ {print $2}' ./settings/settings.csv)          # alternative periods evaluated
+n_periods=$(($(grep -o "'" <<<"$periods" | grep -c .) / 2))                         # number of alternative periods evaluated
 
 # Memory/Time/Cores/Array definitions
 ## PRE_B
@@ -167,9 +167,8 @@ rm -r $sop/tmp/$project/* 2>/dev/null
 fi
 
 # Start running jobs
-## Do local and/or future analyses?
-do_loc=$(awk -F ";" '$1 == "do_loc" { print $2}' ./settings/settings.csv) # Skip local analyses ?
-do_fut=$(awk -F ";" '$1 == "do_fut" { print $2}' ./settings/settings.csv) # Skip future analyses ?
+## Do future analyses?
+do_proj=$(awk -F ";" '$1 == "do_proj" { print $2}' ./settings/settings.csv) # Skip future analyses ?
 
 ## PRE_B
 cd $wp/scripts/$project/main/0_mainPRE
@@ -186,8 +185,6 @@ sbatch --wait --account=$acc --partition=$part --mem=$glo_C_m --time=$glo_C_t --
 echo GLO ensembling done
  
 ## LOC level
-if [ $do_loc = "TRUE" ]
-then
 cd $wp/scripts/$project/main/2_mainLOC
 sbatch --wait --account=$acc --partition=$part --mem=$loc_A_m --time=$loc_A_t --cpus-per-task=$loc_A_c --ntasks=1 --array [1-$loc_A_a] job_loc_A.sh
 echo LOC data preparation and covariate selection done
@@ -195,10 +192,9 @@ sbatch --wait --account=$acc --partition=$part --mem=$loc_B_m --time=$loc_B_t --
 echo LOC modelling done
 sbatch --wait --account=$acc --partition=$part --mem=$loc_C_m --time=$loc_C_t --cpus-per-task=$loc_C_c --ntasks=1 --array [1-$loc_C_a] job_loc_C.sh
 echo LOC ensembling and scale nesting done
-fi
 
 ## FUT predictions
-if [ $do_fut = "TRUE" ]
+if [ $do_proj = "TRUE" ]
 then
 cd $wp/scripts/$project/main/3_mainFUT
 sbatch --wait --account=$acc --partition=$part --mem=$fut_A_m --time=$fut_A_t --cpus-per-task=$fut_A_c --ntasks=1 --array [1-$fut_A_a] job_fut_A.sh

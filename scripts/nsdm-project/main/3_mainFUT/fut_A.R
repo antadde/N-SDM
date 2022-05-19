@@ -42,10 +42,10 @@ species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-ru
 models<-mod_algo
 
 # Target RCP for future predictions
-rcps<-scenarios
+rcps<-proj_scenarios
 
 # Target period for future predictions
-pers<-periods
+pers<-proj_periods
 
 # SBATCH array
 array<-expand.grid(model=models, species=species, scenarios=rcps)
