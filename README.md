@@ -45,7 +45,7 @@ We will use a suite of 453 candidate covariates (Adde et al. in prep) derived fr
 
 ## N-SDM settings
 
-N-SDM settings can be edited by modifying the settings.csv file located in ./scripts/nsdm-project/main/settings. You must edit this file to make N-SDM settings compatible with your computing environment (e.g. paths, HPC account, partition etc.). Be careful when saving settings.csv to use “;” as delimiter. In this same directory, the param-grid.xslx file allows specifying the grid for hyperparameter tunning. The pre-filled expert-table.xslx file allows for expert-based prefiltering of taxon-specific candidate covariates. For more details on N-SDM settings, please have a look at the N-SDM manuscript.
+N-SDM settings can be edited by modifying the "settings.csv" file located in ./scripts/nsdm-project/main/settings. You must edit this file to make N-SDM settings compatible with your computing environment (e.g. paths, HPC account, partition etc.). Be careful when saving "settings.csv" to use “;” as delimiters. In this same directory, the "param-grid.xslx" file allows specifying the grid for hyperparameter tunning and the pre-filled "expert-table.xslx" file allows for expert-based prefiltering of taxon-specific candidate covariates. For more details on N-SDM settings, please have a look at the N-SDM manuscript.
 
 ## Running N-SDM
 
