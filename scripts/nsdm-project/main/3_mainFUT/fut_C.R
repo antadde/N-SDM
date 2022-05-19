@@ -119,7 +119,7 @@ hab_stk_fut<-stack(hab_stk_fut, nsdm.fastraster(files=lr_remain, nsplits=ncores)
 ### =========================================================================
 ## E.1 Prepare covariate data for predictions
 hab_df_loc<-nsdm.retrieve4pred(covstk=hab_stk_fut,
-                               observational=grep(paste0(cov_obser, collapse="|"), names(hab_stk_fut), value=T),# Flatten observational covariates
+                               observational=grep(paste0(cov_observ, collapse="|"), names(hab_stk_fut), value=T),# Flatten observational covariates
 							   obsval=cov_observ_val,
 							   mask=mask_pred, # mask to be applied on predictions
                                scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")]) # scaling parameters to be reapplied
