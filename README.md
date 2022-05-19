@@ -42,7 +42,7 @@ Global-level species occurrence records were obtained from GBIF (https://www.gb
 
 ### Covariate data
 
-We will use a suite of 453 candidate covariates (Adde et al. in prep) derived from 42 individual parameters and belonging to 6 main categories (bioclimatic, land use and cover, edaphic, topographic, population density, transportation and vegetation). Note that some of these covariates were calculated using focal windows (e.g., land use and cover) and others are temporally dynamic. Once the .zip data file has been unzipped, detailed information on the covariates can be found in `./data/nsdm-project/covariates/covariates.xlsx`. Only bioclimatic covariates (n=19) were used for fitting the global-level model and all the others were used for the local model (Figure 1).
+We will use a suite of 453 candidate covariates (Adde et al. in prep) derived from 42 individual parameters and belonging to 6 main categories (bioclimatic, land use and cover, edaphic, topographic, population density, transportation and vegetation). Note that some of these covariates were calculated using focal windows (e.g., land use and cover) and others are temporally dynamic. Once the .zip data file has been unzipped, detailed information on the covariates can be found in `./data/nsdm-project/covariates/covariates.xlsx`. Only bioclimatic covariates were used for fitting the global-level model and all the others were used for the local model (Figure 1).
 
 ## N-SDM settings
 
