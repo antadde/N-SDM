@@ -1,7 +1,7 @@
 #############################################################################
-## 2_mainLOC: Pipeline for fitting local-level species distribution models
-## B: Modelling and predictions
-## Date: 25-09-2021
+## 2_mainLOC
+## B: modelling and predictions
+## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
 

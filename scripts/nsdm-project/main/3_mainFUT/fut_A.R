@@ -1,7 +1,7 @@
 #############################################################################
-## 3_mainFUT: Pipeline for predicting future species distributions
-## A: Compute global (bioclim) projections for future horizons
-## Date: 25-09-2021
+## 3_mainFUT
+## A: global-level projections
+## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
 

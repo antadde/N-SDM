@@ -1,7 +1,7 @@
 #############################################################################
-## 2_mainLOC: Pipeline for fitting local-level (bioclimatic) species distribution models
-## C: Ensembling and nesting
-## Date: 25-09-2021
+## 2_mainLOC
+## C: ensembling, nesting and mapping
+## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
 

@@ -1,7 +1,7 @@
 #############################################################################
-## 1_mainGLO: Pipeline for fitting global-level (bioclimatic) species distribution models
-## B: Modelling and predictions
-## Date: 25-09-2021
+## 1_mainGLO
+## B: modelling and predictions
+## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
 

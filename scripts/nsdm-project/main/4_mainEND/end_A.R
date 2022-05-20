@@ -1,7 +1,7 @@
 #############################################################################
-## 2_mainLOC: Pipeline for fitting local-level species distribution models
-## D: Evaluation of ensembles and nested-ensembles
-## Date: 25-09-2021
+## 4_mainEND
+## A: final evaluation ensembles of nested-ensembles
+## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
 

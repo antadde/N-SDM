@@ -1,7 +1,7 @@
 #############################################################################
-## 3_mainFUT: Pipeline for predicting future species distributions
-## C: Compute local (habitat) projections for future horizons
-## Date: 25-09-2021
+## 3_mainFUT
+## B: local-level projections
+## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
 

@@ -1,7 +1,7 @@
 #############################################################################
-## 2_mainLOC: Pipeline for fitting local-level species distribution models
-## A: Modelling dataset preparation and covariate selection
-## Date: 25-09-2021
+## 2_mainLOC
+## A: covariate extraction and covariate selection
+## Date: 20-05-2022
 ## Author: Antoine Adde
 #############################################################################
 

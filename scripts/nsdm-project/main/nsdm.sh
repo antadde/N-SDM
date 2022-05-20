@@ -1,5 +1,12 @@
 #!/bin/bash
 
+##########################
+## nsdm.sh
+## Core N-SDM script
+## Date: 20-05-2022
+## Author: Antoine Adde 
+##########################
+
 # Load required modules [cluster specific]
 module load gcc/9.3.0
 module load r/4.0.5

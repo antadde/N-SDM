@@ -1,7 +1,7 @@
 #############################################################################
-## 1_mainGLO: Pipeline for fitting global-level (bioclimatic) species distribution models
-## C: Mapping and ensembling
-## Date: 25-09-2021
+## 1_mainGLO
+## C: ensembling and mapping
+## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
 

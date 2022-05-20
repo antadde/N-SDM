@@ -1,7 +1,7 @@
 #############################################################################
-## 3_mainFUT: Pipeline for predicting future species distributions
-## D: Mapping and ensembling LOC predictions for future horizons
-## Date: 25-09-2021
+## 3_mainFUT
+## D: ensembling, nesting and mapping local-level projections
+## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
 

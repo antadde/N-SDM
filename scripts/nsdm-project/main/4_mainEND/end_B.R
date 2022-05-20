@@ -1,6 +1,7 @@
 #############################################################################
-## Pipeline sacct output analysis
-## Date: 25-09-2021
+## 4_mainEND
+## B: sacct output analysis
+## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
 project<-gsub("/main/4_mainEND","",gsub(".*scripts/","",getwd()))

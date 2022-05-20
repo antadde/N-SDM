@@ -1,9 +1,10 @@
 #############################################################################
-## 1_mainGLO: Pipeline for fitting global-level (bioclimatic) species distribution models
-## A: Covariate extraction and covariate selection
-## Date: 25-09-2021
+## 1_mainGLO
+## A: covariate extraction and covariate selection
+## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
+
 ### =========================================================================
 ### A- Preparation
 ### =========================================================================
