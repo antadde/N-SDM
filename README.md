@@ -50,7 +50,7 @@ Position yourself at `cd ./scripts/nsdm-project/main`, where the main N-SDM bash
 
 # Contributing
 
-If you have a suggestion that would make N-SDM better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+If you have a suggestion that would make N-SDM better, please fork the repository and create a pull request. You can also simply open an issue with the tag "enhancement".
 Thanks!
 
 # Citation
