@@ -12,7 +12,7 @@ Prerequisites for running N-SDM include:
 
 2.	the list of available modules in your system include gcc, r, proj, perl, curl, geos and gdal
 
-3.	you have cloned the AnAdde/N-SDM repository in your working directory `git clone https://github.com/AnAdde/N-SDM.git .`
+3.	you have cloned this GitHub repository (AnAdde/N-SDM) in your working directory `git clone https://github.com/AnAdde/N-SDM.git .`
 
 4.	you have installed the nsdm R package `remotes::install_github("AnAdde/N-SDM/scripts/nsdm-project/functions", upgrade=FALSE)`
 
