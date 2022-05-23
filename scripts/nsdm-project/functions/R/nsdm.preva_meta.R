@@ -3,7 +3,7 @@
 #' Not to be called directly by the user
 #'
 #' @author Philipp Brun (philipp.brun@wsl.ch)
-#'
+#' @export
 preva.meta=function(env=parent.frame(),type=character()){
 
   ### ------------------------

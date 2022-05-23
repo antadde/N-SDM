@@ -3,7 +3,7 @@
 #' Not to be called directly by the user
 #'
 #' @author Philipp Brun (philipp.brun@wsl.ch)
-#'
+#' @export
 nsdm.pseudoabsences<-setClass("nsdm.pseudoabsences",slots=c(meta="list", # Meta information
                                                             pa="numeric", # store presence/pseudoabsence information
 															years="numeric", # store year information

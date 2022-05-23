@@ -3,7 +3,7 @@
 #' Not to be called directly by the user
 #'
 #' @author Philipp Brun (philipp.brun@wsl.ch)
-#'
+#' @export
 preps=function(env=parent.frame(),call){
 
   env=as.list(env)

@@ -1,7 +1,7 @@
 #' Predict to data.frame or raster
 #'
 #' @author Philipp Brun (philipp.brun@wsl.ch)
-
+#' @export
 nsdm.df_or_rast=function(mod,nwdat,...){
 
   if("randomForest"%in%class(mod)){
