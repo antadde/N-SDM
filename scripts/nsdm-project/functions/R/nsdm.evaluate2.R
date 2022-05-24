@@ -9,13 +9,13 @@
 #' @param prevalence_correction Logical (TRUE FALSE) should imbalanced presence/absence data be upsampled to prevalence 0.5 for model evaluation.
 #' @param level A character string indicating the evaluated level (e.g. CH or EU)
 #' @param ncores Number of cores to be used during parallel operations
-#' @param tmp_path A character string indicating the path were to store temporary outputs
+#' @param tmp_path A character string indicating the path where to store gbm temporary outputs
 #'
 #' @return An object of class 'nsdm.evaluation'
 #' @author Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (aadde@unil.ch)
 #' @export
 
-nsdm.evaluate2<-function(x,tester=data.frame(),thres=numeric(),crit="pp=op",prevalence_correction=FALSE, level, ncores=ncores, tmp_path){
+nsdm.evaluate2<-function(x,tester=data.frame(),thres=numeric(),crit="pp=op",prevalence_correction=FALSE, level, ncores=ncores, tmp_path=NULL){
 
   ### ------------------------
   ### check tresholds
