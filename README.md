@@ -63,7 +63,7 @@ Thanks!
 
 Antoine Adde – aadde@unil.ch
 
-Project Link: [https://https://github.com/AnAdde/N-SDM](https://https://github.com/AnAdde/N-SDM)
+Project Link: [https://github.com/AnAdde/N-SDM](https://https://github.com/AnAdde/N-SDM)
 
 # Acknowledgments
 
