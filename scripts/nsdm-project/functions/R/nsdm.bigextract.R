@@ -95,7 +95,6 @@ if(t_match){
   return(xt)
   }, mc.cores=ncores))
   xt_pres_sta<-do.call(cbind, xt_pres)
-  names(xt_pres_sta)[grep("bioclim", names(xt_pres_sta))]<-grep("bio", cov_nomatch_diff_times$variable, value=T)
   }
   
   # Dynamic covariates
@@ -133,8 +132,6 @@ if(t_match){
 								   vectorize=F);  return(r)})
   ## Finalize
   xt_pres_dyn<- do.call(rbind, xt_pres)
-  # clean rename if needed
-  names(xt_pres_dyn)[grep("bioclim", names(xt_pres_dyn))]<-grep("bio", cov_tomatch_times$variable, value=T)
   }
   
   # Combine static and dynamic sets
@@ -154,8 +151,6 @@ if(t_match){
   }, mc.cores=ncores))
   ## Finalize
   xt_abs<-do.call(cbind, xt_abs)
-  # clean rename if needed
-  names(xt_abs)[grep("bioclim", names(xt_abs))]<-grep("bio", cov_nomatch_times$variable, value=T)
   
   ### ------------------------
   ### Extract mainGLO
