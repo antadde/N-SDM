@@ -79,13 +79,14 @@ prmod@fits[[1]][[1]]<-prmod2
 
 # A.2 List covariates	  
 cov<-unlist(strsplit(prmod@meta$env_vars,", "))
+cov<-gsub("^.*_", "", cov)
 			  
 ### =========================================================================
 ### B. Load future bioclimatic layers
 ### =========================================================================
 # B.1 List available layers
 lr_loc<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))$lr_loc
-lr_fut<-lr_loc[intersect(grep("/future/", lr_loc), grep(paste(per,rcp,sep="/"), lr_loc))]
+lr_fut<-lr_loc[intersect(grep("/future/", lr_loc), grep(paste(per, rcp,sep="/"), lr_loc))]
 lr_fut<-grep(paste0(cov,".rds", collapse="|"), lr_fut, value=T)
    
 # B.2 Load target layers
