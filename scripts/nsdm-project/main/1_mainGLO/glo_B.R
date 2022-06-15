@@ -197,7 +197,7 @@ cat(paste0('\n\nVariable importance scores and response curves computed \n'))
 ### H- Spatial predictions
 ### =========================================================================
 ## H.1 Prepare covariate data for predictions
-clim_df_loc<-nsdm.retrieve4pred(covstk=d1_covsels$covstk, # subset for selected covariates
+stk_df<-nsdm.retrieve4pred(covstk=d1_covsels$covstk, # subset for selected covariates
                                scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")]) # scaling parameters to be reapplied
 
 ## H.2 Clean workspace to free some memory before predicting
@@ -207,10 +207,10 @@ gc()
 
 ## H.3 Predict
 ndata_bck<-nsdm.predict(models=prmod,
-                        nwdata=clim_df_loc$covdf, # covariate data for predictions
+                        nwdata=stk_df$covdf, # covariate data for predictions
                         nsplits=ncores)
 						
-nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=clim_df_loc$covdf_ix),
+nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=stk_df$covdf_ix),
               model_name=model_name, species_name=ispi_name,
               save_path=paste0(scr_path,"/outputs/",project,"/d6_preds/glo"))
 

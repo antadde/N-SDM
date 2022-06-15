@@ -46,14 +46,11 @@ for(ispi_name in species){
 
 cat(paste0('Ready for GLO and LOC modelling dataset preparation for ', ispi_name, '...\n'))
 
-# Subset spe_loc and spe_glo data
-sp_dat_loc<-sp_dat$spe_loc_dis[sp_dat$spe_loc_dis$species==ispi_name,]
-sp_dat_glo<-sp_dat$spe_glo_dis[sp_dat$spe_glo_dis$species==ispi_name,]
-
 ### =========================================================================
 ### D- Sample background absences
 ### =========================================================================
 # D.1 GLO
+sp_dat_glo<-sp_dat$spe_glo_dis[sp_dat$spe_glo_dis$species==ispi_name,]
 pseu.abs_i_glo<-nsdm.pseuabs(n=n_back,
 							 rst_ref=rsts_ref$rst_glo,
 							 type=pa_po_glo,
@@ -63,6 +60,8 @@ pseu.abs_i_glo<-nsdm.pseuabs(n=n_back,
 cat(paste0('GLO dataset prepared (n_occ=',length(which(pseu.abs_i_glo@pa==1)),')...\n'))
                             
 # D.2 LOC
+if(n_levels>1){
+sp_dat_loc<-sp_dat$spe_loc_dis[sp_dat$spe_loc_dis$species==ispi_name,]
 pseu.abs_i_loc<-nsdm.pseuabs(n=n_back,
 							 rst_ref=rsts_ref$rst_loc,
 							 type=pa_po_loc,
@@ -71,30 +70,39 @@ pseu.abs_i_loc<-nsdm.pseuabs(n=n_back,
 						   
 cat(paste0('LOC dataset prepared (n_occ=',length(which(pseu.abs_i_loc@pa==1)),')...\n'))
 
-if(length(which(pseu.abs_i_loc@pa==1))==0 | length(which(pseu.abs_i_glo@pa==1))==0) next
+if(length(which(pseu.abs_i_loc@pa==1))==0) next}
+if(length(which(pseu.abs_i_glo@pa==1))==0) next
 
 # D.3 Save spatial points as shapefiles
 dir<-paste0(scr_path,"/outputs/",project,"/d0_datasets/shp/",ispi_name)
-dir.create(dir, recursive=T)							   
+dir.create(dir, recursive=T)
+if(n_levels<2) rsts_ref$rst_loc<-rsts_ref$rst_glo				   
 suppressWarnings(glo_pts<-spTransform(SpatialPointsDataFrame(coords=pseu.abs_i_glo@xy[which(pseu.abs_i_glo@pa==1),],
                                data=data.frame(pa=rep(1,length(which(pseu.abs_i_glo@pa==1)))),
                                proj4string=crs(rsts_ref$rst_glo)), crs(rsts_ref$rst_loc)))
+writeOGR(glo_pts, dir, paste0(ispi_name, "_glo"), driver = "ESRI Shapefile", overwrite=T)
 
+if(n_levels>1){
 suppressWarnings(loc_pts<-SpatialPointsDataFrame(coords=pseu.abs_i_loc@xy[which(pseu.abs_i_loc@pa==1),],
                               data=data.frame(pa=rep(1,length(which(pseu.abs_i_loc@pa==1)))),
                                proj4string=crs(rsts_ref$rst_loc)))
-
-writeOGR(glo_pts, dir, paste0(ispi_name, "_glo"), driver = "ESRI Shapefile", overwrite=T)
-writeOGR(loc_pts, dir, paste0(ispi_name, "_loc"), driver = "ESRI Shapefile", overwrite=T)
+writeOGR(loc_pts, dir, paste0(ispi_name, "_loc"), driver = "ESRI Shapefile", overwrite=T)}
 
 ### =========================================================================
 ### E- Save
 ### =========================================================================
-nsdm.savethis(object=list(group=unique(sp_dat_loc$class),
-                          pseu.abs_i_glo=pseu.abs_i_glo,
-                          pseu.abs_i_loc=pseu.abs_i_loc),
-                          species_name=ispi_name,
-                          save_path=paste0(scr_path,"/outputs/",project,"/d0_datasets/base"))
+if(n_levels>1){
+l<-list(group=unique(sp_dat_loc$class),
+        pseu.abs_i_glo=pseu.abs_i_glo,
+        pseu.abs_i_loc=pseu.abs_i_loc)
+} else {
+l<-list(group=unique(sp_dat_glo$class),
+        pseu.abs_i_glo=pseu.abs_i_glo)
+}
+		  						  
+nsdm.savethis(object=l,
+              species_name=ispi_name,
+              save_path=paste0(scr_path,"/outputs/",project,"/d0_datasets/base"))
 }
 
 print("Finished!")

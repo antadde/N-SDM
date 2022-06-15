@@ -54,7 +54,8 @@ cat(paste0('Ready for modelling dataset preparation and covariate selection for 
 ### =========================================================================
 # D.1 Retrieve loc list of candidate covariates and covinfo table
 lr<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
-lr_loc<-lr$lr_loc[!grepl("/future/", lr$lr_loc) & !grepl("/bioclim/", lr$lr_loc)]
+cov_info<-lr$cov_info
+lr_loc<-lr$lr_loc[intersect(grep("/future/", lr$lr_loc, invert=TRUE), grep(paste0("/",unique(cov_info$category[cov_info$level=="glo"]),"/"), lr$lr_loc, invert=T))]
 cov_info<-data.frame(lr$cov_info[match(lr_loc, lr$cov_info$file),])
 
 # D.2 Subset with list of expert-filtered candidate covariates, if available
@@ -154,7 +155,7 @@ cov.rk_i<-try(nsdm.covselrk(embed=cov.embed_i, # embedded results (S2)
 					
 cat('covariate selection with mainGLO forced S4: Final subsetting...\n')
 # F.4 Step 4: Final covariate subset
-hab_stk_loc<-try(nsdm.fastraster(files=na.omit(cov_info$file[match(cov.rk_i$var, gsub(".rds","",basename(cov_info$file)))])[1:max_thre], nsplits=ncores), silent=TRUE)
+hab_stk_loc<-try(nsdm.fastraster(files=na.omit(cov_info$file[match(cov.rk_i$var, gsub(".rds","",basename(cov_info$file)))][1:max_thre]), nsplits=ncores), silent=TRUE)
 cov.sub_i_cov <-try(nsdm.covsub(covdata=pseu.abs_i@env_vars,
             rasterdata=hab_stk_loc,
             ranks=cov.rk_i[-(which(cov.rk_i$var=="mainGLO")),], # ranking from S3

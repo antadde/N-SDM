@@ -36,19 +36,7 @@ args<-eval(parse(text=args))
 arrayID<-eval(parse(text=arrayID))
 
 ### =========================================================================
-### C- Covariate data
-### =========================================================================
-# Retrieve glo and loc lists of candidate covariates and covinfo table
-lr<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
-lr_glo<-lr$lr_glo[intersect(grep("/present/", lr$lr_glo), grep("/bioclim/", lr$lr_glo))]
-lr_loc<-lr$lr_loc[intersect(grep("/present/", lr$lr_loc), grep("/bioclim/", lr$lr_loc))]
-cov_info<-lr$cov_info
-
-# Retrieve glo and loc reference rasters
-rsts_ref<-readRDS(paste0(w_path,"outputs/",project,"/settings/ref-rasters.rds"))
-
-### =========================================================================
-### D- Species data
+### C- Species data
 ### =========================================================================
 # Target species arrayID
 species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
@@ -56,8 +44,43 @@ ispi_name<-species[arrayID]
 
 # Load species data
 sp_dat<-readRDS(paste0(scr_path,"/outputs/",project,"/d0_datasets/base/",ispi_name,"/",ispi_name,".rds"))
+group_name<-sp_dat$group
 
 cat(paste0('Ready for modelling dataset preparation and covariate selection for ', ispi_name, '...\n'))
+
+### =========================================================================
+### D- Covariate data
+### =========================================================================
+# Retrieve lists of candidate covariates and covinfo table
+lr<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
+cov_info<-lr$cov_info
+# Refine glo set
+lr_glo<-lr$lr_glo[grep("/present/", lr$lr_glo)]
+cov_info_glo<-data.frame(lr$cov_info[match(lr_glo, lr$cov_info$file),])
+# Refine loc set
+if(n_levels>1){
+lr_loc<-lr$lr_loc[intersect(grep("/present/", lr$lr_loc), grep(paste0("/",unique(cov_info_glo$category),"/"), lr$lr_loc))]
+cov_info_loc<-data.frame(lr$cov_info[match(lr_loc, lr$cov_info$file),])
+}
+
+
+# Subset with list of expert-filtered candidate covariates, if available
+expert_tab<-try(read_excel(expert_table, .name_repair = "minimal"), silent=T)
+if(class(expert_tab) != "try-error"){
+colnames(expert_tab)<-gsub("\\s*\\([^\\)]+\\)","",as.character(colnames(expert_tab)))
+dup_ix<-which(duplicated(colnames(expert_tab)))
+if(length(dup_ix)>0) expert_tab<-expert_tab[,-which(duplicated(colnames(expert_tab)))]
+expert_tab<-data.frame(expert_tab[which(expert_tab[,group_name]=="1"),])
+## glo
+cov_info_glo<-merge(cov_info_glo, expert_tab)
+if(n_levels>1){
+## loc
+cov_info_loc<-merge(cov_info_loc, expert_tab)
+}
+}
+
+# Retrieve glo and loc reference rasters
+rsts_ref<-readRDS(paste0(w_path,"outputs/",project,"/settings/ref-rasters.rds"))
 
 ### =========================================================================
 ### E- Covariate extraction
@@ -66,27 +89,33 @@ cat(paste0('Ready for modelling dataset preparation and covariate selection for 
 pseu.abs_i_glo<-nsdm.bigextract(cov=gsub(".rds", ".fst", lr_glo),
                                 data=sp_dat$pseu.abs_i_glo,
 							    rst_ref=rsts_ref$rst_glo,
-							    cov_info=cov_info,
+							    cov_info=cov_info_glo,
 							    t_match=tmatch_glo,
 							    nsplits=ncores)
 
 pseu.abs_i_glo_copy<-pseu.abs_i_glo
                          
 # E.2 LOC
+if(n_levels>1){
 pseu.abs_i_loc<-nsdm.bigextract(cov=gsub(".rds", ".fst", lr_loc),
                                data=sp_dat$pseu.abs_i_loc,
 							   rst_ref=rsts_ref$rst_loc,
-							   cov_info=cov_info,
+							   cov_info=cov_info_loc,
 							   t_match=FALSE,
 							   p_int=pint_glo,
 							   nsplits=ncores)
-				   							 
+							   
 # E.3 Combine GLO and LOC data
 pa<-c(pseu.abs_i_glo@pa, pseu.abs_i_loc@pa)
 pseu.abs_i_glo@pa<-pa
+m_ord<-match(cov_info_loc$variable, cov_info_glo$variable) # make sure glo and loc covariate are in the same order
+names(pseu.abs_i_glo@env_vars)[m_ord]<-names(pseu.abs_i_loc@env_vars) # rename
 env_vars<-scale(rbind(pseu.abs_i_glo@env_vars, pseu.abs_i_loc@env_vars)) # keep scaling parameters to backtransform predictions later
-pseu.abs_i_glo@env_vars<-data.frame(env_vars)
-pseu.abs_i_glo@xy<-matrix() # empty xy matrix for safety (mix of 2 coord systems)
+pseu.abs_i_glo@env_vars<-data.frame(env_vars)							   
+} else {
+env_vars<-scale(pseu.abs_i_glo@env_vars) # keep scaling parameters to backtransform predictions later
+pseu.abs_i_glo@env_vars<-data.frame(env_vars)							   
+}
 
 # E.4 Define weights
 wi<-which(pseu.abs_i_glo@pa==1)
@@ -95,12 +124,22 @@ wt[wi]<-round((length(pseu.abs_i_glo@pa)-length(wi))/length(wi))
 if(unique(wt[wi]==0)) wt[wi]<-1
 
 # E.5 Save modelling set
-nsdm.savethis(object=list(group=sp_dat$group,
-                          pseu.abs_i_glo_copy=pseu.abs_i_glo_copy,
-                          pseu.abs_i_glo=pseu.abs_i_glo,
-                          pseu.abs_i_loc=pseu.abs_i_loc,
-						  weights=wt,
-						  env_vars=env_vars),
+if(n_levels>1){
+l<-list(group=sp_dat$group,
+        pseu.abs_i_glo_copy=pseu.abs_i_glo_copy,
+        pseu.abs_i_glo=pseu.abs_i_glo,
+        pseu.abs_i_loc=pseu.abs_i_loc,
+		weights=wt,
+		env_vars=env_vars)
+} else {
+l<-list(group=sp_dat$group,
+        pseu.abs_i_glo_copy=pseu.abs_i_glo_copy,
+        pseu.abs_i_glo=pseu.abs_i_glo,
+		weights=wt,
+		env_vars=env_vars)
+}
+
+nsdm.savethis(l,
               species_name=ispi_name,
 			  compression=TRUE,
               save_path=paste0(scr_path,"/outputs/",project,"/d0_datasets/glo"))
@@ -116,10 +155,14 @@ counter <- sum(counter, 1)
 
 # F.1 Step 1: Filtering for colinearity
 cat('covariate selection S1: Filtering...\n')
+foc<-unique(cov_info_glo[which(cov_info_glo$focal!="NA"),"cada"])
+if(length(foc)==0) foc<-NULL
 cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i_glo@pa, # pa vector
                              covdata=pseu.abs_i_glo@env_vars, # data.frame of environmental covariates extracted at pa
                              weights=wt, # weight vector
-                             datasets=rep("bioclim", length(pseu.abs_i_glo@env_vars)),
+                             datasets=cov_info_glo$cada,
+							 variables=gsub("_NA", "", paste(cov_info_glo$variable, cov_info_glo$attribute, sep="_")), 
+                             focals=foc, # datasets with focal window selection
                              method=sel_met, # univariate ranking method to be used
                              corcut=cor_cut), silent=TRUE) # correlation cutoff for colinearity
 
@@ -135,12 +178,14 @@ cat('covariate selection S3: Ranking...\n')
 cov.rk_i<-try(nsdm.covselrk(embed=cov.embed_i, # embedded results (S2)
                         species_name=ispi_name), silent=TRUE)
 
-cat('covariate selection S4: Final subsetting...\n')
 # F.4 Step 4: Final covariate subset
-clim_stk_loc<-nsdm.fastraster(grep(paste0("_",min(pint_glo),"_",max(pint_glo),"_"), lr_loc, value=T), ncores)
-names(clim_stk_loc)<-gsub(".*_", "", names(clim_stk_loc))
+cat('covariate selection S4: Final subsetting...\n')
+if(n_levels>1){
+stk<-try(nsdm.fastraster(files=na.omit(cov_info_loc$file[match(cov.rk_i$var, gsub(".rds","",basename(cov_info_loc$file)))][1:max_thre]), nsplits=ncores), silent=TRUE)
+} else {
+stk<-try(nsdm.fastraster(files=na.omit(cov_info_glo$file[match(cov.rk_i$var, gsub(".rds","",basename(cov_info_glo$file)))][1:max_thre]), nsplits=ncores), silent=TRUE)}
 cov.sub_i<-try(nsdm.covsub(covdata=pseu.abs_i_glo@env_vars,
-            rasterdata=clim_stk_loc,
+            rasterdata=stk,
             ranks=cov.rk_i, # ranking from S3
             thre=ceiling(log2(table(pseu.abs_i_glo@pa)['1'])), # target number of covariates (log2 nobs)
 			max.thre=max_thre), silent=TRUE) # max number of possible covariates in model
@@ -150,11 +195,11 @@ cat(paste0("an error occured; tentative number ", counter, " for covariate selec
 }
 			
 # update with cov.sub outputs
-clim_stk_loc<-cov.sub_i$rasterdata
+stk<-cov.sub_i$rasterdata
 pseu.abs_i_glo@env_vars<-cov.sub_i$covdata
 
 # F.5 Save covariate selection results
-nsdm.savethis(object=list(pseu.abs_i=pseu.abs_i_glo, filter=names(cov.filter_i), embed=cov.embed_i, ranking=cov.rk_i,covstk=clim_stk_loc),
+nsdm.savethis(object=list(pseu.abs_i=pseu.abs_i_glo, filter=names(cov.filter_i), embed=cov.embed_i, ranking=cov.rk_i, covstk=stk),
               species_name=ispi_name,
               save_path=paste0(scr_path,"/outputs/",project,"/d1_covsels/glo"))
 

@@ -5,17 +5,22 @@ scr_path;/work/FAC/FGSE/IDYST/aguisan/valpar/wd_test/scratch/;0_global;path to s
 svp_path;/work/FAC/FGSE/IDYST/aguisan/valpar/wd_test/save/;0_general;path to saving directory
 lib_path;/work/FAC/FBM/DEE/aguisan/default/rlib/4.0/;0_global;path to R libraries directory
 clear_sop;TRUE;0_global;clear the scratch directory before starting a new run? (TRUE or FALSE)
+n_levels;2;0_global;"number of nested level(s) (1=GLO; 2=GLO+LOC)"
 n_spe;3;1_speciesdata;total number of species evaluated
 n_mx_spe;100;1_speciesdata;maximum number of species evaluated at the same time for a single N-SDM run (usefull to prevent scratch saturation)
 forced_species;force-sp.csv;1_speciesdata;[optional] name of the .csv file stored in the the /scripts/project/main/settings folder containing the names of species to be modelled (one per row)
 pa_po_loc;po;1_speciesdata;presence only (po) or presence absence (pa) for local data
 pa_po_glo;po;1_speciesdata;presence only (po) or presence absence (pa) for global data
-min_occ;50;1_speciesdata;minimum number of occurrences required for modelling a species
+min_occ_loc;50;1_speciesdata;minimum number of occurrences required for modelling a species for local level
+min_occ_glo;50;1_speciesdata;minimum number of occurrences required for modelling a species for global level
 disag_loc;TRUE;1_speciesdata;do spatial and/or temporal disagregation of local species data (TRUE or FALSE)
 disag_glo;TRUE;1_speciesdata;do spatial and/or temporal disagregation of global species data (TRUE or FALSE)
-thin_dist;200;1_speciesdata;[optional] distance for spatial thinning of species occurrence data  (in projection system unit)
-thin_time;5;1_speciesdata;[optional] time interval for temporal thinning of species occurrence data (in years)
-max_uncertain;250;1_speciesdata;[optional] cutoff threshold for maximum coordinate uncertainty in species occurrence data
+thin_dist_loc;200;1_speciesdata;[optional] distance for spatial thinning of loac species occurrence data  (in projection system unit)
+thin_time_loc;5;1_speciesdata;[optional] time interval for temporal thinning of local species occurrence data (in years)
+max_uncertain_loc;250;1_speciesdata;[optional] cutoff threshold for maximum coordinate uncertainty in local species occurrence data (in projection system unit)
+thin_dist_glo;0.008333333;1_speciesdata;[optional] distance for spatial thinning of global species occurrence data  (in projection system unit)
+thin_time_glo;NULL;1_speciesdata;[optional] time interval for temporal thinning of global species occurrence data (in years)
+max_uncertain_glo;NULL;1_speciesdata;[optional] cutoff threshold for maximum coordinate uncertainty in global species occurrence data (in projection system unit)
 back_strat;random;1_speciesdata;"[if pa_po_loc or _glo = ""po""] the strategy for generating pseudoabsences. Only the ""random"" option is available at the time of N-SDM release"
 n_back;10000;1_speciesdata;"[if pa_po_loc or _glo = ""po""] the number of background absences to be generated"
 mask_loc;swissmaskWGS84.rds;2_covariatedata;binary (0-1) .rds raster mask stored in the /data/project/mask folder used for identifying the local-level area (pixel value=1)

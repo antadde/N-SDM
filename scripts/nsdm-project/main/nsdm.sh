@@ -37,7 +37,7 @@ mkdir -p $sop/tmp/$project/ 2>/dev/null
 mkdir -p $wp/outputs/$project/settings/tmp/ 2>/dev/null
 mkdir -p $wp/outputs/$project/sacct/ 2>/dev/null
 
-# Open necessary permissions
+# Permissions
 chmod -R 777 $wp/data/$project 2>/dev/null
 chmod -R 777 $wp/scripts/$project 2>/dev/null
 chmod -R 777 $wp/outputs/$project 2>/dev/null
@@ -174,6 +174,9 @@ rm -r $sop/tmp/$project/* 2>/dev/null
 fi
 
 # Start running jobs
+## n_levels of analyses (1=GLO; 2=GLO+LOC)?
+n_levels=$(awk -F ";" '$1 == "n_levels" { print $2}' ./settings/settings.csv) # Skip future analyses ?
+
 ## Do future analyses?
 do_proj=$(awk -F ";" '$1 == "do_proj" { print $2}' ./settings/settings.csv) # Skip future analyses ?
 
@@ -190,7 +193,9 @@ sbatch --wait --account=$acc --partition=$part --mem=$glo_B_m --time=$glo_B_t --
 echo GLO modelling done
 sbatch --wait --account=$acc --partition=$part --mem=$glo_C_m --time=$glo_C_t --cpus-per-task=$glo_C_c --ntasks=1 --array [1-$glo_C_a] job_glo_C.sh
 echo GLO ensembling done
- 
+
+if [ $n_levels -gt 1 ]
+then 
 ## LOC level
 cd $wp/scripts/$project/main/2_mainLOC
 sbatch --wait --account=$acc --partition=$part --mem=$loc_A_m --time=$loc_A_t --cpus-per-task=$loc_A_c --ntasks=1 --array [1-$loc_A_a] job_loc_A.sh
@@ -199,6 +204,7 @@ sbatch --wait --account=$acc --partition=$part --mem=$loc_B_m --time=$loc_B_t --
 echo LOC modelling done
 sbatch --wait --account=$acc --partition=$part --mem=$loc_C_m --time=$loc_C_t --cpus-per-task=$loc_C_c --ntasks=1 --array [1-$loc_C_a] job_loc_C.sh
 echo LOC ensembling and scale nesting done
+fi
 
 ## FUT predictions
 if [ $do_proj = "TRUE" ]
@@ -222,7 +228,7 @@ sacct --starttime $dt -u $own --format JobID,JobName,Elapsed,NCPUs,TotalCPU,CPUT
 Rscript end_B.R 1>/dev/null 2>&1
 echo Sacct outputs analysis done
 
-# Open permissions
+# Permissions
 chmod -R 777 $wp/scripts/$project/main
 
 # rsync to saving location before cleaning scratch folder

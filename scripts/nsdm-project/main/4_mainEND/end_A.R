@@ -136,6 +136,7 @@ pred_all[[model]]<-pop
 
 GLO_preds<-simplify2array(pred_all)
 
+if(n_levels>1){
 ### =========================================================================
 ### LOC MULTIPLY
 ### =========================================================================
@@ -319,6 +320,7 @@ pred_all[[model]]<-pop
 }
 LOC_covariate_preds<-simplify2array(pred_all)
 }
+}
 
 ### =========================================================================
 ### D- Evaluate ensemble predictions
@@ -335,6 +337,7 @@ score<-nsdm.ceval(f=rowMeans(as.data.frame(target[,z,]), na.rm=T),
 scores[[z]]<-score}
 scores_ensemble[["GLO"]]<-scores	
 
+if(n_levels>1){
 # Swiss-level ensemble without nesting
 if("multiply" %in% nesting_methods){
 target<-LOC_multiply_preds
@@ -377,6 +380,7 @@ score<-nsdm.ceval(f=sqrt(rowMeans(as.data.frame(target[,z,]), na.rm=T)*glo_prob2
                    crit=eval_crit)
 scores[[z]]<-score}
 scores_ensemble[["MUL"]]<-scores	
+}
 }
 
 #### Save scores

@@ -35,6 +35,8 @@ sacct$JobName[ix2rep]<-sacct$JobName[ix4rep]
 sacct$JobName<-toupper(sacct$JobName)
 sacct<-sacct[-ix4rep,]
 jobs<-c(paste0("PRE_",c("A","B")), paste0("GLO_",c("A", "B", "C")), paste0("LOC_", c("A", "B", "C")), paste0("FUT_", c("A", "B", "C", "D")))
+if(n_levels<2) jobs<-jobs[-grep("LOC",jobs)]
+if(do_proj=="FALSE") jobs<-jobs[-grep("FUT",jobs)]
 
 sacct<-sacct[-which(!sacct$JobName %in% jobs),]
 sacct$species<-NA
