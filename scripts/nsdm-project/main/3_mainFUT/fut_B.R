@@ -39,19 +39,19 @@ species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-ru
 models<-mod_algo
 
 # Target RCP for future predictions
-rcps<-proj_scenarios
+scenars<-proj_scenarios
 
 # Target period for future predictions
 pers<-proj_periods
 
 # SBATCH array
-array<-expand.grid(species=species, scenarios=rcps)
+array<-expand.grid(species=species, scenarios=scenars)
 ispi_name <- array[arrayID,"species"]
-rcp<-array[arrayID,"scenarios"]
+scenar<-array[arrayID,"scenarios"]
 
 for (per in pers){
 
-cat(paste('Ready for mapping and ensembling', rcp, per, 'future GLO predictions obtained for', ispi_name, '...\n', sep=" "))
+cat(paste('Ready for mapping and ensembling', scenar, per, 'future GLO predictions obtained for', ispi_name, '...\n', sep=" "))
 
 ### =========================================================================
 ### C- Save prediction raster
@@ -59,7 +59,7 @@ cat(paste('Ready for mapping and ensembling', rcp, per, 'future GLO predictions 
 for(i in 1:length(mod_algo)){
 # C.1 Load raw prediction data
 model_name<-mod_algo[i]
-pred_path<-paste0(scr_path,"/outputs/",project,"/d13_preds-fut/glo/",rcp,"/",per)
+pred_path<-paste0(scr_path,"/outputs/",project,"/d13_preds-fut/glo/",scenar,"/",per)
 full_pred_path<-paste0(paste(pred_path, ispi_name, model_name, sep="/"))
 pred_file<-list.files(full_pred_path, pattern=".rds", full.names=TRUE)
 pred<-readRDS(pred_file)
@@ -70,12 +70,12 @@ map_i<-nsdm.map(template=pred$template,
                 species_name=ispi_name,
 				model_name=model_name,
 				level="glo",
-				rcp_name=rcp,
+				scenar_name=scenar,
 				period_name=per,
                 pred=pred$ndata_bck) 
 
 # C.3 Save
-nsdm.savemap(maps=map_i, species_name=ispi_name, model_name=model_name, format="rds", save_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/glo/",rcp,"/",per))
+nsdm.savemap(maps=map_i, species_name=ispi_name, model_name=model_name, format="rds", save_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/glo/",scenar,"/",per))
 cat(paste0(model_name,' predictions saved \n'))
 }
 
@@ -85,16 +85,16 @@ cat(paste0(model_name,' predictions saved \n'))
 ensemble_glo<-nsdm.ensemble(model_names= mod_algo, # models for ensembling
                            species_name=ispi_name,
 						   level="glo",
-						   rcp_name=rcp,
+						   scenar_name=scenar,
 						   period_name=per,
-                           map_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/glo/",rcp,"/",per), # path where prediction rasters are stored
+                           map_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/glo/",scenar,"/",per), # path where prediction rasters are stored
                            score_path=paste0(scr_path,"/outputs/",project,"/d3_evals/glo"), # path where model evaluation tables are stored
                            weighting=do_weighting, # use weights when ensembling
                            weight_metric=weight_metric, # evaluation metric for weighting/discarding
                            discthre=disc_thre) # threshold under which to discard a model
 
-nsdm.savemap(maps=ensemble_glo$ensemble, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/glo/",rcp,"/",per))
-nsdm.savemap(maps=ensemble_glo$ensemble_cv, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d16_ensembles-cv-fut/glo/",rcp,"/",per))
+nsdm.savemap(maps=ensemble_glo$ensemble, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/glo/",scenar,"/",per))
+nsdm.savemap(maps=ensemble_glo$ensemble_cv, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d16_ensembles-cv-fut/glo/",scenar,"/",per))
 
 }
 

@@ -45,22 +45,22 @@ models<-mod_algo
 nesting_methods<-nesting_methods
 
 # Target RCP for future predictions
-rcps<-proj_scenarios
+scenars<-proj_scenarios
 
 # Target period for future predictions
 pers<-proj_periods
 
 # SBATCH array
-array<-expand.grid(nesting=nesting_methods, model=models, species=species, scenarios=rcps)
+array<-expand.grid(nesting=nesting_methods, model=models, species=species, scenarios=scenars)
 ispi_name <- array[arrayID,"species"]
 model_name <- array[arrayID,"model"]
 nesting_method <- array[arrayID,"nesting"]
-rcp<-array[arrayID,"scenarios"]
+scenar<-array[arrayID,"scenarios"]
 
 
 for (per in pers){
 
-cat(paste('Ready for', rcp, per, toupper(model_name),  'future LOC predictions of', ispi_name, ' using the ',nesting_method,' method for scale-nesting ...\n'))
+cat(paste('Ready for', scenar, per, toupper(model_name),  'future LOC predictions of', ispi_name, ' using the ',nesting_method,' method for scale-nesting ...\n'))
 
 ### =========================================================================
 ### C- Load LOC model
@@ -88,45 +88,59 @@ cov<-unlist(strsplit(prmod@meta$env_vars,", "))
 ### =========================================================================
 ### D- Load future layers
 ### =========================================================================
-# D.1 List available layers
-lr_loc<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))$lr_loc
-lr_fut<-lr_loc[intersect(grep("/future/", lr_loc), grep(paste(per,rcp,sep="/"), lr_loc))]
-lr_fut<-grep(paste0(cov,".rds", collapse="|"), lr_fut, value=T)
-		   
+# Retrieve list of candidate covariates and covinfo table
+lr<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
+cov_info<-lr$cov_info
+cov_info$ID<-paste(cov_info$cada, cov_info$variable, cov_info$attribute, cov_info$focal, sep="_")
+cov_ID<-cov_info$ID[match(cov, gsub(".rds", "", basename(cov_info$file)))]
+cov_info_pres<-cov_info[cov_info$ID %in% cov_ID & cov_info$period=="present",]
+cov_info_pres<-cov_info_pres[which(cov_info_pres$start_year=="NA" | (cov_info_pres$start_year==min(pint_loc) & cov_info_pres$end_year==max(pint_loc))),]
+cov_info_pres
+lr_pres_ID<-cov_info_pres$ID
+
+# D.1 List available future layers for cov_ID
+cov_info_fut<-cov_info[cov_info$ID %in% cov_ID & cov_info$period=="future" & cov_info$scenario==scenar & cov_info$start_year==gsub("_.*", "", per) & cov_info$end_year==gsub(".*_", "", per),]
+lr_fut<-cov_info_fut$file
+lr_fut_ID<-cov_info_fut$ID
+lr_fut_names<-gsub(".rds", "", basename(cov_info_pres$file))[match(lr_fut_ID, lr_pres_ID)]
+
 # D.2 Load target future layers if available
-hab_stk_fut<-stack()
+stk_fut<-stack()
 if(length(lr_fut)>0){
-hab_stk_fut<-nsdm.fastraster(files=lr_fut, nsplits=ncores)
-names(hab_stk_fut)<-gsub(".*_", "", names(hab_stk_fut)) # Rename to match with glo names
-hab_stk_fut<-hab_stk_fut[[which(names(hab_stk_fut) %in% cov_glo)]]}
-
-# D.3 Load future GLO output if needed
-if("mainGLO" %in% cov){
-glo_out<-list.files(paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/glo/",rcp,"/",per,"/",ispi_name), pattern=".rds", full.names = TRUE)
-hab_stk_fut<-stack(hab_stk_fut, readRDS(glo_out))
-names(hab_stk_fut)[nlayers(hab_stk_fut)]<-"mainGLO"
+stk_fut<-nsdm.fastraster(files=lr_fut, nsplits=ncores)
+names(stk_fut)<-lr_fut_names
 }
 
-# D.4 Complete with (past) "static" layers if needed
-remainders<-setdiff(cov, names(hab_stk_fut))
+# D.3 Complete with (past) "static" layers if needed
+remainders<-setdiff(lr_pres_ID, lr_fut_ID)
 if(length(remainders)>0){
-lr_remain<-grep(paste0(remainders,".rds", collapse="|"), lr_loc, value=T)
-hab_stk_fut<-stack(hab_stk_fut, nsdm.fastraster(files=lr_remain, nsplits=ncores))
+lr_remain<-cov_info_pres[cov_info_pres$ID %in% remainders,]$file
+lr_remain_names<-gsub(".rds", "", basename(lr_remain))
+stk_remain<-nsdm.fastraster(files=lr_remain, nsplits=ncores)
+names(stk_remain)<-lr_remain_names
+stk_fut<-stack(stk_fut, stk_remain)
 }
- 
+
+# D.4 Load future GLO output if needed
+if("mainGLO" %in% cov){
+glo_out<-list.files(paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/glo/",scenar,"/",per,"/",ispi_name), pattern=".rds", full.names = TRUE)
+stk_fut<-stack(stk_fut, readRDS(glo_out))
+names(stk_fut)[nlayers(stk_fut)]<-"mainGLO"
+}
+
 ### =========================================================================
 ### E- Spatial predictions
 ### =========================================================================
 ## E.1 Prepare covariate data for predictions
-hab_df_loc<-nsdm.retrieve4pred(covstk=hab_stk_fut,
-                               observational=grep(paste0(cov_observ, collapse="|"), names(hab_stk_fut), value=T),# Flatten observational covariates
+hab_df_loc<-nsdm.retrieve4pred(covstk=stk_fut,
+                               observational=grep(paste0(cov_observ, collapse="|"), names(stk_fut), value=T),# Flatten observational covariates
 							   obsval=cov_observ_val,
 							   mask=mask_pred, # mask to be applied on predictions
                                scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")]) # scaling parameters to be reapplied
 
 ## E.2 Clean workspace to free some memory before predicting
-template<-hab_stk_fut[[1]]
-rm(d0_datasets, hab_stk_fut)
+template<-stk_fut[[1]]
+rm(d0_datasets, stk_fut)
 gc()
 
 ## E.3 Predict
@@ -137,7 +151,7 @@ ndata_bck<-nsdm.predict(models=prmod,
 ## E.4 Save
 nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=hab_df_loc$covdf_ix),
               model_name=model_name, species_name=ispi_name,
-              save_path=paste0(scr_path,"/outputs/",project,"/d13_preds-fut/loc/",nesting_method,"/",rcp,"/",per))
+              save_path=paste0(scr_path,"/outputs/",project,"/d13_preds-fut/loc/",nesting_method,"/",scenar,"/",per))
 }
 
 cat(paste0('Predictions calculated and saved \n'))

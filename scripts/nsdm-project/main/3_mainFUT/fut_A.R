@@ -41,30 +41,30 @@ species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-ru
 # Target model algorithms
 models<-mod_algo
 
-# Target RCP for future predictions
-rcps<-proj_scenarios
+# Target scenario for future predictions
+scenars<-proj_scenarios
 
 # Target period for future predictions
 pers<-proj_periods
 
 # SBATCH array
-array<-expand.grid(model=models, species=species, scenarios=rcps)
+array<-expand.grid(model=models, species=species, scenarios=scenars)
 ispi_name <- array[arrayID,"species"]
 model_name <- array[arrayID,"model"]
-rcp<-array[arrayID,"scenarios"]
+scenar<-array[arrayID,"scenarios"]
 
 for (per in pers){
 
-cat(paste('Ready for', rcp, per, toupper(model_name),  'future GLO predictions for', ispi_name, '...\n', sep=" "))
+cat(paste('Ready for', scenar, per, toupper(model_name),  'future GLO predictions for', ispi_name, '...\n', sep=" "))
 
 ### =========================================================================
-### C- Load GLO (bioclimatic) model
+### C- Load GLO model
 ### =========================================================================
-# C.1.1 Load GLO (bioclimatic) data
+# C.1.1 Load GLO data
 d0_datasets<-nsdm.loadthis(species_name=ispi_name,
               read_path=paste0(scr_path,"/outputs/",project,"/d0_datasets/glo"))
 
-# A.1.2 Load GLO (bioclimatic) model
+# A.1.2 Load GLO model
 prmod<-nsdm.loadthis(model_name=model_name, species_name=ispi_name,
               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/glo"))
 
@@ -79,32 +79,52 @@ prmod@fits[[1]][[1]]<-prmod2
 
 # A.2 List covariates	  
 cov<-unlist(strsplit(prmod@meta$env_vars,", "))
-cov<-gsub("^.*_", "", cov)
 			  
 ### =========================================================================
-### B. Load future bioclimatic layers
+### B. Load future layers
 ### =========================================================================
-# B.1 List available layers
-lr_loc<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))$lr_loc
-lr_fut<-lr_loc[intersect(grep("/future/", lr_loc), grep(paste(per, rcp,sep="/"), lr_loc))]
-lr_fut<-grep(paste0(cov,".rds", collapse="|"), lr_fut, value=T)
-   
-# B.2 Load target layers
-clim_stk_fut<-nsdm.fastraster(files=lr_fut, nsplits=ncores)
-names(clim_stk_fut)<-gsub(".*_", "", names(clim_stk_fut))
-clim_stk_fut<-clim_stk_fut[[which(names(clim_stk_fut) %in% cov)]]
-lr_fut<-grep(paste0(cov,".rds", collapse="|"), lr_fut, value=T)
+# Retrieve list of candidate covariates and covinfo table
+lr<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
+cov_info<-lr$cov_info
+cov_info$ID<-paste(cov_info$cada, cov_info$variable, cov_info$attribute, cov_info$focal, sep="_")
+cov_ID<-cov_info$ID[match(cov, gsub(".rds", "", basename(cov_info$file)))]
+cov_info_pres<-cov_info[cov_info$ID %in% cov_ID & cov_info$period=="present",]
+cov_info_pres<-cov_info_pres[which(cov_info_pres$start_year=="NA" | (cov_info_pres$start_year==min(pint_glo) & cov_info_pres$end_year==max(pint_glo))),]
+lr_pres_ID<-cov_info_pres$ID
+
+# B.1 List available future layers for cov_ID
+cov_info_fut<-cov_info[cov_info$ID %in% cov_ID & cov_info$period=="future" & cov_info$scenario==scenar & cov_info$start_year==gsub("_.*", "", per) & cov_info$end_year==gsub(".*_", "", per),]
+lr_fut<-cov_info_fut$file
+lr_fut_ID<-cov_info_fut$ID
+lr_fut_names<-gsub(".rds", "", basename(cov_info_pres$file))[match(lr_fut_ID, lr_pres_ID)]
+
+# B.2 Load target future layers if available
+stk_fut<-stack()
+if(length(lr_fut)>0){
+stk_fut<-nsdm.fastraster(files=lr_fut, nsplits=ncores)
+names(stk_fut)<-lr_fut_names
+}
+
+# B.3 Complete with (past) "static" layers if needed
+remainders<-setdiff(lr_pres_ID, lr_fut_ID)
+if(length(remainders)>0){
+lr_remain<-cov_info_pres[cov_info_pres$ID %in% remainders,]$file
+lr_remain_names<-gsub(".rds", "", basename(lr_remain))
+stk_remain<-nsdm.fastraster(files=lr_remain, nsplits=ncores)
+names(stk_remain)<-lr_remain_names
+stk_fut<-stack(stk_fut, stk_remain)
+}
 
 ### =========================================================================
 ### C- Spatial predictions
 ### =========================================================================
 ## C.1 Prepare covariate data for predictions
-clim_df_loc<-nsdm.retrieve4pred(covstk=clim_stk_fut, # subset for selected covariates
+clim_df_loc<-nsdm.retrieve4pred(covstk=stk_fut, # subset for selected covariates
                                scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")]) # scaling parameters to be reapplied
 
 ## C.2 Clean workspace to free some memory before predicting
-template<-clim_stk_fut[[1]]
-rm(d0_datasets, clim_stk_fut)
+template<-stk_fut[[1]]
+rm(d0_datasets, stk_fut)
 gc()
 
 ## C.3 Predict
@@ -115,7 +135,7 @@ ndata_bck<-nsdm.predict(models=prmod,
 ## C.4 Save
 nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=clim_df_loc$covdf_ix),
               model_name=model_name, species_name=ispi_name,
-              save_path=paste0(scr_path,"/outputs/",project,"/d13_preds-fut/glo/",rcp,"/",per))
+              save_path=paste0(scr_path,"/outputs/",project,"/d13_preds-fut/glo/",scenar,"/",per))
 }
 
 cat(paste0('Predictions calculated and saved \n'))

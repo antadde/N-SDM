@@ -36,23 +36,23 @@ arrayID<-eval(parse(text=arrayID))
 species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
 
 # Target RCP for future predictions
-rcps<-proj_scenarios
+scenars<-proj_scenarios
 
 # Scale-nesting methods for combining GLO and LOC predictions
 nesting_methods<-nesting_methods
 
 # SBATCH array
-array<-expand.grid(nesting=nesting_methods, species=species, scenarios=rcps)
+array<-expand.grid(nesting=nesting_methods, species=species, scenarios=scenars)
 ispi_name <- array[arrayID,"species"]
 nesting_method <- array[arrayID,"nesting"]
-rcp<-array[arrayID,"scenarios"]
+scenar<-array[arrayID,"scenarios"]
 
 # Target period for future predictions
 pers<-proj_periods
 
 for (per in pers){
 
-cat(paste('Ready for mapping and ensembling', rcp, per, 'future LOC predictions obtained for', ispi_name, 'under', nesting_method, 'nesting method...\n', sep=" "))
+cat(paste('Ready for mapping and ensembling', scenar, per, 'future LOC predictions obtained for', ispi_name, 'under', nesting_method, 'nesting method...\n', sep=" "))
 
 ### =========================================================================
 ### C- Save prediction raster
@@ -60,7 +60,7 @@ cat(paste('Ready for mapping and ensembling', rcp, per, 'future LOC predictions 
 for(i in 1:length(mod_algo)){
 # Load raw prediction data
 model_name<-mod_algo[i]
-pred_path<-paste0(scr_path,"/outputs/",project,"/d13_preds-fut/loc/",nesting_method,"/",rcp,"/",per)
+pred_path<-paste0(scr_path,"/outputs/",project,"/d13_preds-fut/loc/",nesting_method,"/",scenar,"/",per)
 full_pred_path<-paste0(paste(pred_path, ispi_name, model_name, sep="/"))
 pred_file<-list.files(full_pred_path, pattern=".rds", full.names=TRUE)
 pred<-readRDS(pred_file)
@@ -71,13 +71,13 @@ map_i<-nsdm.map(template=pred$template,
                 species_name=ispi_name,
 				model_name=model_name,
 				level="loc",
-				rcp_name=rcp,
+				scenar_name=scenar,
 				period_name=per,
 				nesting_name=nesting_method,
                 pred=pred$ndata_bck) 
 
 # Save
-nsdm.savemap(maps=map_i, species_name=ispi_name, model_name=model_name, format="rds", save_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/loc/",nesting_method,"/",rcp,"/",per))
+nsdm.savemap(maps=map_i, species_name=ispi_name, model_name=model_name, format="rds", save_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/loc/",nesting_method,"/",scenar,"/",per))
 cat(paste0(model_name,' predictions saved \n'))
 }
 
@@ -87,17 +87,17 @@ cat(paste0(model_name,' predictions saved \n'))
 ensemble_loc<-nsdm.ensemble(model_names= mod_algo, # models for ensembling
                            species_name=ispi_name,
 						   level="loc",
-						   rcp_name=rcp,
+						   scenar_name=scenar,
 				           period_name=per,
 				           nesting_name=nesting_method,
-                           map_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/loc/",nesting_method,"/",rcp,"/",per), # path where prediction rasters are stored
+                           map_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/loc/",nesting_method,"/",scenar,"/",per), # path where prediction rasters are stored
                            score_path=paste0(scr_path,"/outputs/",project,"/d3_evals/loc/", nesting_method), # path where model evaluation tables are stored
                            weighting=do_weighting, # use weights when ensembling
                            weight_metric=weight_metric, # evaluation metric for weighting/discarding
                            discthre=disc_thre) # threshold under which to discard a model
 
-nsdm.savemap(maps=ensemble_loc$ensemble, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/loc/",nesting_method,"/",rcp,"/",per))
-nsdm.savemap(maps=ensemble_loc$ensemble_cv, species_name=ispi_name, model_name=NULL, format="rds", save_path=paste0(scr_path,"/outputs/",project,"/d16_ensembles-cv-fut/loc/",nesting_method,"/",rcp,"/",per))
+nsdm.savemap(maps=ensemble_loc$ensemble, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/loc/",nesting_method,"/",scenar,"/",per))
+nsdm.savemap(maps=ensemble_loc$ensemble_cv, species_name=ispi_name, model_name=NULL, format="rds", save_path=paste0(scr_path,"/outputs/",project,"/d16_ensembles-cv-fut/loc/",nesting_method,"/",scenar,"/",per))
 
 ### =========================================================================
 ### E- Combine LOC and GLO predictions
@@ -105,16 +105,16 @@ nsdm.savemap(maps=ensemble_loc$ensemble_cv, species_name=ispi_name, model_name=N
 # E.1 "Multiply" nesting
 if(nesting_method=="multiply"){
   # response
-  ensemble_glo<-readRDS(list.files(paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/glo/",rcp,"/",per,"/",ispi_name), pattern=".rds", full.names = TRUE))
+  ensemble_glo<-readRDS(list.files(paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/glo/",scenar,"/",per,"/",ispi_name), pattern=".rds", full.names = TRUE))
   ensemble_nested<-sqrt(ensemble_glo*ensemble_loc$ensemble)
   names(ensemble_nested)<-names(ensemble_loc$ensemble)
   # # cv
-  ensemble_glo_cv<-readRDS(list.files(paste0(scr_path,"/outputs/",project,"/d16_ensembles-cv-fut/glo/",rcp,"/",per,"/",ispi_name), pattern=".rds", full.names = TRUE))
+  ensemble_glo_cv<-readRDS(list.files(paste0(scr_path,"/outputs/",project,"/d16_ensembles-cv-fut/glo/",scenar,"/",per,"/",ispi_name), pattern=".rds", full.names = TRUE))
   ensemble_nested_cv<-raster::mean(raster::stack(ensemble_loc$ensemble_cv, ensemble_glo_cv))
   names(ensemble_nested_cv)<-names(ensemble_loc$ensemble_cv)
   # Save
-nsdm.savemap(map=ensemble_nested, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d17_nested-ensembles-fut/",nesting_method,"/",rcp,"/",per))
-nsdm.savemap(map=ensemble_nested_cv, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d18_nested-ensembles-cv-fut/",nesting_method,"/",rcp,"/",per))
+nsdm.savemap(map=ensemble_nested, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d17_nested-ensembles-fut/",nesting_method,"/",scenar,"/",per))
+nsdm.savemap(map=ensemble_nested_cv, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d18_nested-ensembles-cv-fut/",nesting_method,"/",scenar,"/",per))
 
 } 
 
@@ -123,8 +123,8 @@ if(nesting_method=="covariate"){
 ensemble_nested<-ensemble_loc$ensemble
 ensemble_nested_cv<-ensemble_loc$ensemble_cv
 # Save
-nsdm.savemap(map=ensemble_nested, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d17_nested-ensembles-fut/",nesting_method,"/",rcp,"/",per))
-nsdm.savemap(map=ensemble_nested_cv, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d18_nested-ensembles-cv-fut/",nesting_method,"/",rcp,"/",per))
+nsdm.savemap(map=ensemble_nested, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d17_nested-ensembles-fut/",nesting_method,"/",scenar,"/",per))
+nsdm.savemap(map=ensemble_nested_cv, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d18_nested-ensembles-cv-fut/",nesting_method,"/",scenar,"/",per))
 }
 
 }
