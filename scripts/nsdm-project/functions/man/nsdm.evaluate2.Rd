@@ -12,7 +12,7 @@ nsdm.evaluate2(
   prevalence_correction = FALSE,
   level,
   ncores = ncores,
-  tmp_path
+  tmp_path = NULL
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ nsdm.evaluate2(
 
 \item{ncores}{Number of cores to be used during parallel operations}
 
-\item{tmp_path}{A character string indicating the path were to store temporary outputs}
+\item{tmp_path}{A character string indicating the path where to store gbm temporary outputs}
 }
 \value{
 An object of class 'nsdm.evaluation'
