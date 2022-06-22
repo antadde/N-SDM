@@ -55,11 +55,11 @@ cat(paste0('Ready for modelling dataset preparation and covariate selection for 
 lr<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
 cov_info<-lr$cov_info
 # Refine glo set
-lr_glo<-lr$lr_glo[grep("/present/", lr$lr_glo)]
+lr_glo<-lr$lr_glo[grep("/future/", lr$lr_glo, invert=TRUE)]
 cov_info_glo<-data.frame(lr$cov_info[match(lr_glo, lr$cov_info$file),])
 # Refine loc set
 if(n_levels>1){
-lr_loc<-lr$lr_loc[intersect(grep("/present/", lr$lr_loc), grep(paste0("/",unique(cov_info_glo$category),"/"), lr$lr_loc))]
+lr_loc<-lr$lr_loc[intersect(grep("/future/", lr$lr_loc, invert=TRUE), grep(paste0("/",unique(cov_info_glo$category),"/"), lr$lr_loc))]
 cov_info_loc<-data.frame(lr$cov_info[match(lr_loc, lr$cov_info$file),])
 }
 
@@ -73,9 +73,11 @@ if(length(dup_ix)>0) expert_tab<-expert_tab[,-which(duplicated(colnames(expert_t
 expert_tab<-data.frame(expert_tab[which(expert_tab[,group_name]=="1"),])
 ## glo
 cov_info_glo<-merge(cov_info_glo, expert_tab)
+lr_glo<-cov_info_glo$file
 if(n_levels>1){
 ## loc
 cov_info_loc<-merge(cov_info_loc, expert_tab)
+lr_loc<-cov_info_loc$file
 }
 }
 
@@ -101,8 +103,7 @@ pseu.abs_i_loc<-nsdm.bigextract(cov=gsub(".rds", ".fst", lr_loc),
                                data=sp_dat$pseu.abs_i_loc,
 							   rst_ref=rsts_ref$rst_loc,
 							   cov_info=cov_info_loc,
-							   t_match=FALSE,
-							   p_int=pint_glo,
+							   t_match=tmatch_loc,
 							   nsplits=ncores)
 							   
 # E.3 Combine GLO and LOC data
@@ -117,13 +118,16 @@ env_vars<-scale(pseu.abs_i_glo@env_vars) # keep scaling parameters to backtransf
 pseu.abs_i_glo@env_vars<-data.frame(env_vars)							   
 }
 
-# E.4 Define weights
+# E.4 Update cov_info table
+cov_info_glo<-na.omit(cov_info_glo[match(colnames(pseu.abs_i_glo@env_vars), gsub(".rds","",basename(cov_info_glo$file))),])
+
+# E.5 Define weights
 wi<-which(pseu.abs_i_glo@pa==1)
 wt<-rep(1,length(pseu.abs_i_glo@pa))
 wt[wi]<-round((length(pseu.abs_i_glo@pa)-length(wi))/length(wi))
 if(unique(wt[wi]==0)) wt[wi]<-1
 
-# E.5 Save modelling set
+# E.6 Save modelling set
 if(n_levels>1){
 l<-list(group=sp_dat$group,
         pseu.abs_i_glo_copy=pseu.abs_i_glo_copy,

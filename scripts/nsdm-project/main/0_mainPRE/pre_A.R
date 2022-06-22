@@ -114,11 +114,16 @@ names(r)
 }, mc.cores=ncores)}
 
 # Create local and global reference rasters
-rst_glo<-readRDS(lr_glo[1])
+## for glo if bioclim layer available use it; else first one
+if(length(grep("bio1", lr_glo, value=T))>0){
+rst_glo<-readRDS(grep("bio1", lr_glo, value=T)[1])
+}else{
+rst_glo<-readRDS(lr_glo[1])}
+
 ## for loc if bioclim layer available use it; else first one
 if(n_levels>1){
-if(length(grep("2010_bio1", lr_loc, value=T))>0){
-rst_loc<-readRDS(grep("2010_bio1", lr_loc, value=T)[1])
+if(length(grep("bio1", lr_loc, value=T))>0){
+rst_loc<-readRDS(grep("bio1", lr_loc, value=T)[1])
 }else{
 rst_loc<-readRDS(lr_loc[1])}
 }
