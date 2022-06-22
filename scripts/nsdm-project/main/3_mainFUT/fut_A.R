@@ -88,8 +88,8 @@ lr<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
 cov_info<-lr$cov_info
 cov_info$ID<-paste(cov_info$cada, cov_info$variable, cov_info$attribute, cov_info$focal, sep="_")
 cov_ID<-cov_info$ID[match(cov, gsub(".rds", "", basename(cov_info$file)))]
-cov_info_pres<-cov_info[cov_info$ID %in% cov_ID & cov_info$period=="present",]
-cov_info_pres<-cov_info_pres[which(cov_info_pres$start_year=="NA" | (cov_info_pres$start_year==min(pint_glo) & cov_info_pres$end_year==max(pint_glo))),]
+cov_info_pres<-cov_info[cov_info$ID %in% cov_ID & cov_info$period!="future",]
+# cov_info_pres<-cov_info_pres[which(cov_info_pres$start_year=="NA" | (cov_info_pres$start_year==min(pint_glo) & cov_info_pres$end_year==max(pint_glo))),]
 lr_pres_ID<-cov_info_pres$ID
 
 # B.1 List available future layers for cov_ID
