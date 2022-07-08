@@ -11,7 +11,7 @@
 project<-gsub("/main/3_mainFUT","",gsub(".*scripts/","",getwd()))
 
 # Load nsdm settings
-load(paste0(gsub("scripts","outputs",gsub("/main/3_mainFUT","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/3_mainFUT","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -36,7 +36,7 @@ args<-eval(parse(text=args))
 arrayID<-eval(parse(text=arrayID))
 
 # Target species
-species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
+species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 
 # Target model algorithms
 models<-mod_algo
@@ -89,7 +89,7 @@ cov<-unlist(strsplit(prmod@meta$env_vars,", "))
 ### D- Load future layers
 ### =========================================================================
 # Retrieve list of candidate covariates and covinfo table
-lr<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
+lr<-readRDS(paste0(w_path,"tmp/",project,"/settings/covariates-list.rds"))
 cov_info<-lr$cov_info
 cov_info$ID<-paste(cov_info$cada, cov_info$variable, cov_info$attribute, cov_info$focal, sep="_")
 cov_ID<-cov_info$ID[match(cov, gsub(".rds", "", basename(cov_info$file)))]

@@ -11,7 +11,7 @@
 project<-gsub("/main/1_mainGLO","",gsub(".*scripts/","",getwd()))
 
 # Load nsdm settings
-load(paste0(gsub("scripts","outputs",gsub("/main/1_mainGLO","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/1_mainGLO","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -39,7 +39,7 @@ arrayID<-eval(parse(text=arrayID))
 ### C- Species data
 ### =========================================================================
 # Target species arrayID
-species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
+species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 ispi_name<-species[arrayID]
 
 # Load species data
@@ -52,7 +52,7 @@ cat(paste0('Ready for modelling dataset preparation and covariate selection for 
 ### D- Covariate data
 ### =========================================================================
 # Retrieve lists of candidate covariates and covinfo table
-lr<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
+lr<-readRDS(paste0(w_path,"tmp/",project,"/settings/covariates-list.rds"))
 cov_info<-lr$cov_info
 # Refine glo set
 lr_glo<-lr$lr_glo[grep("/future/", lr$lr_glo, invert=TRUE)]
@@ -82,7 +82,7 @@ lr_loc<-cov_info_loc$file
 }
 
 # Retrieve glo and loc reference rasters
-rsts_ref<-readRDS(paste0(w_path,"outputs/",project,"/settings/ref-rasters.rds"))
+rsts_ref<-readRDS(paste0(w_path,"tmp/",project,"/settings/ref-rasters.rds"))
 
 ### =========================================================================
 ### E- Covariate extraction
@@ -115,11 +115,10 @@ env_vars<-scale(rbind(pseu.abs_i_glo@env_vars, pseu.abs_i_loc@env_vars)) # keep 
 pseu.abs_i_glo@env_vars<-data.frame(env_vars)							   
 } else {
 env_vars<-scale(pseu.abs_i_glo@env_vars) # keep scaling parameters to backtransform predictions later
-pseu.abs_i_glo@env_vars<-data.frame(env_vars)							   
-}
-
+pseu.abs_i_glo@env_vars<-data.frame(env_vars)
 # E.4 Update cov_info table
-cov_info_glo<-na.omit(cov_info_glo[match(colnames(pseu.abs_i_glo@env_vars), gsub(".rds","",basename(cov_info_glo$file))),])
+cov_info_glo<-na.omit(cov_info_glo[match(colnames(pseu.abs_i_glo@env_vars), gsub(".rds","",basename(cov_info_glo$file))),])					   
+}
 
 # E.5 Define weights
 wi<-which(pseu.abs_i_glo@pa==1)
@@ -165,7 +164,7 @@ cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i_glo@pa, # pa vector
                              covdata=pseu.abs_i_glo@env_vars, # data.frame of environmental covariates extracted at pa
                              weights=wt, # weight vector
                              datasets=cov_info_glo$cada,
-							 variables=gsub("_NA", "", paste(cov_info_glo$variable, cov_info_glo$attribute, sep="_")), 
+							 varnames=gsub("_NA", "", paste(cov_info_glo$variable, cov_info_glo$attribute, sep="_")), 
                              focals=foc, # datasets with focal window selection
                              method=sel_met, # univariate ranking method to be used
                              corcut=cor_cut), silent=TRUE) # correlation cutoff for colinearity

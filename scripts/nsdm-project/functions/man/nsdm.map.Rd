@@ -12,7 +12,7 @@ nsdm.map(
   model_name,
   level = NA,
   nesting_name = NA,
-  scenar_name = NA,
+  rcp_name = NA,
   period_name = NA
 )
 }
@@ -25,15 +25,7 @@ nsdm.map(
 
 \item{species_name}{A character string indicating the name of the taxon for which models are fitted}
 
-\item{model_name}{A character vector indicating the name of the modelling algorithm(s) for which predicted values are provided}
-
-\item{level}{A character vector indicating the name of the level considered (e.g., glo or loc)}
-
-\item{nesting_name}{A character vector indicating the name of the nesting strategy for which predicted values are provided}
-
-\item{scenar_name}{A character vector indicating the name of the scenario for which predicted values are provided}
-
-\item{period_name}{A character vector indicating the name of the period for which predicted values are provided}
+\item{model_name}{A character vector indicating the name(s) of the modelling algorithm(s) for which predicted values are provided}
 }
 \value{
 A list of rasters filled with predicted values

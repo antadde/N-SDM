@@ -11,7 +11,7 @@
 project<-gsub("/main/2_mainLOC","",gsub(".*scripts/","",getwd()))
 
 # Load nsdm settings
-load(paste0(gsub("scripts","outputs",gsub("/main/2_mainLOC","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/2_mainLOC","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -36,7 +36,7 @@ args<-eval(parse(text=args))
 arrayID<-eval(parse(text=arrayID))
 
 # Target species
-species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
+species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 
 # Target model algorithms
 models<-mod_algo
@@ -209,6 +209,12 @@ cat(paste0('\n\nVariable importance scores and response curves computed \n'))
 ### H- Spatial predictions
 ### =========================================================================
 ## H.1.2 Prepare covariate data
+if(length(cov_observ)>0){
+cov_obs<-grep(paste0(cov_observ, collapse="|"), names(d1_covsels$covstk), value=T)
+} else {
+cov_obs<-NULL
+}
+
 hab_df_loc<-nsdm.retrieve4pred(covstk=d1_covsels$covstk,
                                observational=grep(paste0(cov_observ, collapse="|"), names(d1_covsels$covstk), value=T),# Flatten observational covariates
 							   obsval=cov_observ_val,

@@ -11,6 +11,7 @@ nsdm.bigextract(
   cov_info,
   t_match = FALSE,
   tmatch_scheme = "npts",
+  p_int = NULL,
   ex_pint = TRUE,
   nzvt = 10,
   nsplits = ncores
@@ -28,6 +29,8 @@ nsdm.bigextract(
 \item{t_match}{Logical for doing temporal matching (TRUE) or not (FALSE)}
 
 \item{tmatch_scheme}{A character string for the name of temporal matching scheme considered ("npts"=nearest previous time slice or "nts"=nearest time slice)}
+
+\item{p_int}{Numeric interval for identifying period interval (e.g. 1981:2010 for historical climate normals)}
 
 \item{ex_pint}{Logical for considering period interval covariates as static (TRUE) or not (FALSE)}
 

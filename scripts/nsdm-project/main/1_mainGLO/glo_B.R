@@ -11,7 +11,7 @@
 project<-gsub("/main/1_mainGLO","",gsub(".*scripts/","",getwd()))
 
 # Load nsdm settings
-load(paste0(gsub("scripts","outputs",gsub("/main/1_mainGLO","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/1_mainGLO","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -36,7 +36,7 @@ args<-eval(parse(text=args))
 arrayID<-eval(parse(text=arrayID))
 
 # Target species
-species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
+species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 
 # Target model algorithms
 models<-mod_algo
@@ -197,8 +197,17 @@ cat(paste0('\n\nVariable importance scores and response curves computed \n'))
 ### H- Spatial predictions
 ### =========================================================================
 ## H.1 Prepare covariate data for predictions
+if(length(cov_observ)>0){
+cov_obs<-grep(paste0(cov_observ, collapse="|"), names(d1_covsels$covstk), value=T)
+} else {
+cov_obs<-NULL
+}
+
 stk_df<-nsdm.retrieve4pred(covstk=d1_covsels$covstk, # subset for selected covariates
-                               scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")]) # scaling parameters to be reapplied
+                           observational=cov_obs,# Flatten observational covariates
+						   obsval=cov_observ_val,
+						   mask=mask_pred, # 0-1 mask to be applied on predictions
+                           scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")]) # scaling parameters to be reapplied
 
 ## H.2 Clean workspace to free some memory before predicting
 template<-d1_covsels$covstk[[1]]

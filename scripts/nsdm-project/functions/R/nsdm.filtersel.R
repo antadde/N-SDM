@@ -5,6 +5,7 @@
 #' @param covdata A data.frame containing covariate data
 #' @param pa A vector of presences (1) and absences (0)
 #' @param datasets A character vector indicating the names of the datasets (for each candidate covariate)
+#' @param varnames A character vector indicating the names of the variables. Only useful if one variable is supplied with multiple attributes (e.g. min, max, mean) and focal sizes
 #' @param weights A numeric vector of weights of length pa
 #' @param focals A character vector indicating which datasets include focals
 #' @param method A character string indicating the target method for covariate ranking (default=quadratic glm p-values)
@@ -15,10 +16,10 @@
 #' @author Antoine Adde (aadde@unil.ch)
 #' @export
 
-nsdm.filtersel <- function(covdata, pa, datasets, variables=NULL, weights=NULL, focals=NULL, method, force=NULL, corcut=0){
+nsdm.filtersel <- function(covdata, pa, datasets, varnames=NULL, weights=NULL, focals=NULL, method, force=NULL, corcut=0){
 # Split candidate covariates by datasets
 covdata.candidates <- split.default(data.frame(covdata), datasets)
-if(length(variables)>0) variables.candidates<- split.default(variables, datasets)
+if(length(varnames)>0) variables.candidates<- split.default(varnames, datasets)
 
 ## Level 0 for focals, if any
 if(length(focals>0)){

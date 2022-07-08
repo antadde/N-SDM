@@ -11,7 +11,7 @@
 project<-gsub("/main/1_mainGLO","",gsub(".*scripts/","",getwd()))
 
 # Load nsdm settings
-load(paste0(gsub("scripts","outputs",gsub("/main/1_mainGLO","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/1_mainGLO","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -33,7 +33,7 @@ args<-eval(parse(text=args))
 arrayID<-eval(parse(text=arrayID))
 
 # Target species
-species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
+species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 ispi_name<-species[arrayID]
 
 cat(paste0('Ready for mapping and ensembling GLO predictions obtained for ', ispi_name, ' ...\n'))

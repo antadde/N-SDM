@@ -8,7 +8,7 @@ nsdm.filtersel(
   covdata,
   pa,
   datasets,
-  variables = NULL,
+  varnames = NULL,
   weights = NULL,
   focals = NULL,
   method,
@@ -22,6 +22,8 @@ nsdm.filtersel(
 \item{pa}{A vector of presences (1) and absences (0)}
 
 \item{datasets}{A character vector indicating the names of the datasets (for each candidate covariate)}
+
+\item{varnames}{A character vector indicating the names of the variables. Only useful if one variable is supplied with multiple attributes (e.g. min, max, mean) and focal sizes}
 
 \item{weights}{A numeric vector of weights of length pa}
 

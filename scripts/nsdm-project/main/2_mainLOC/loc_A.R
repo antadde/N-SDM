@@ -11,7 +11,7 @@
 project<-gsub("/main/2_mainLOC","",gsub(".*scripts/","",getwd()))
 
 # Load nsdm settings
-load(paste0(gsub("scripts","outputs",gsub("/main/2_mainLOC","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/2_mainLOC","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -39,7 +39,7 @@ arrayID<-eval(parse(text=arrayID))
 ### C- species data
 ### =========================================================================
 # Target species
-species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
+species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 ispi_name<-species[arrayID]
 
 # Load species data
@@ -53,7 +53,7 @@ cat(paste0('Ready for modelling dataset preparation and covariate selection for 
 ### D- Covariate data
 ### =========================================================================
 # D.1 Retrieve loc list of candidate covariates and covinfo table
-lr<-readRDS(paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
+lr<-readRDS(paste0(w_path,"tmp/",project,"/settings/covariates-list.rds"))
 cov_info<-lr$cov_info
 lr_loc<-lr$lr_loc[intersect(grep("/future/", lr$lr_loc, invert=TRUE), grep(paste0("/",unique(cov_info$category[cov_info$level=="glo"]),"/"), lr$lr_loc, invert=T))]
 cov_info<-data.frame(lr$cov_info[match(lr_loc, lr$cov_info$file),])
@@ -70,7 +70,7 @@ lr_loc<-cov_info$file
 }
 
 # Retrieve glo and loc reference rasters
-rsts_ref<-readRDS(paste0(w_path,"outputs/",project,"/settings/ref-rasters.rds"))
+rsts_ref<-readRDS(paste0(w_path,"tmp/",project,"/settings/ref-rasters.rds"))
 
 cat(paste0('Covariate data listed \n'))
 
@@ -87,7 +87,6 @@ pseu.abs_i<-nsdm.bigextract(cov=c(gsub(".rds", ".fst", lr_loc), glo_out),
 							cov_info=cov_info,
 							t_match=tmatch_loc,
 							tmatch_scheme=tmatch_scheme_loc,
-							p_int=pint_loc,
 							ex_pint=FALSE,
 							nsplits=ncores)
 
@@ -185,14 +184,14 @@ pseu.abs_i@env_vars<-subset(pseu.abs_i@env_vars, select=-c(mainGLO))
 # G.1 Step 1: Filtering for colinearity
 cat('covariate selection without mainGLO S1: Filtering...\n')
 cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i@pa, # pa vector
-                                 covdata=pseu.abs_i@env_vars, # data.frame of environmental covariates extracted at pa
-                                 weights=wt, # weight vector
-                                 datasets=cov_info$cada,  
-                                 variables=c(gsub("_NA", "", paste(cov_info$variable, cov_info$attribute, sep="_"))), 
-                                 focals=unique(cov_info[which(cov_info$focal!="NA"),"cada"]), # datasets with focal window selection
-                                 method=sel_met, # univariate ranking method to be used
-                                 corcut=cor_cut), silent=TRUE) # correlation cutoff for colinearity
-							 
+                             covdata=pseu.abs_i@env_vars, # data.frame of environmental covariates extracted at pa
+                             weights=wt, # weight vector
+                             datasets=cov_info$cada,  
+							 variables=gsub("_NA", "", paste(cov_info$variable, cov_info$attribute, sep="_")), 
+                             focals=unique(cov_info[which(cov_info$focal!="NA"),"category"]), # categories with focal window selection
+                             method=sel_met, # univariate ranking method to be used
+                             corcut=cor_cut), silent=TRUE) # correlation cutoff for colinearity
+
 # G.2 Step 2: Model-specific embedding
 cat('covariate selection without mainGLO S2: Embedding...\n')
 cov.embed_i<-try(nsdm.embedsel(pa=pseu.abs_i@pa,

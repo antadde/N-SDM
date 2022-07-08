@@ -11,7 +11,7 @@
 project<-gsub("/main/0_mainPRE","",gsub(".*scripts/","",getwd()))
 
 # Load N-SDM settings
-load(paste0(gsub("scripts","outputs",gsub("/main/0_mainPRE","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/0_mainPRE","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -32,14 +32,14 @@ require(nsdm)
 ncores<-as.numeric(Sys.getenv('SLURM_CPUS_PER_TASK'))
 
 # Retrieve reference rasters
-rsts_ref<-readRDS(paste0(w_path,"outputs/",project,"/settings/ref-rasters.rds"))
+rsts_ref<-readRDS(paste0(w_path,"tmp/",project,"/settings/ref-rasters.rds"))
 
 ### =========================================================================
 ### C- species data
 ### =========================================================================
 # Load species data
-sp_dat<-readRDS(paste0(w_path,"outputs/",project,"/settings/species-occurences.rds"))
-species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
+sp_dat<-readRDS(paste0(w_path,"tmp/",project,"/settings/species-occurences.rds"))
+species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 
 # Loop over species
 for(ispi_name in species){

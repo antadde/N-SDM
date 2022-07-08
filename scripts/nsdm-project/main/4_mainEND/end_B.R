@@ -7,7 +7,7 @@
 project<-gsub("/main/4_mainEND","",gsub(".*scripts/","",getwd()))
 
 # Load nsdm.ine settings
-load(paste0(gsub("scripts","outputs",gsub("/main/4_mainEND","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/4_mainEND","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -22,10 +22,10 @@ setwd(w_path)
 require(nsdm)
 
 # Target species
-species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
+species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 
 # Retrieve and preprocess sacct outputs
-sacct<-read.csv2(list.files(paste0("outputs/",project,"/sacct/"), pattern=paste0(ssl_id,"_",run_id,"_sacct"), recursive=T, full.names=T))
+sacct<-read.csv2(list.files(paste0("tmp/",project,"/sacct/"), pattern=paste0(ssl_id,"_",run_id,"_sacct"), recursive=T, full.names=T))
 sacct<-sacct[-grep("extern", unlist(sacct), fixed=T),]
 sacct<-read.table(text=sacct, skip = 1,
           fill=TRUE, col.names=c("JobID", "JobName", "Elapsed", "NCPUs", "TotalCPU", "CPUTime", "ReqMem", "MaxRSS", "MaxDiskRead", "MaxDiskWrite", "State", "ExitCode"))

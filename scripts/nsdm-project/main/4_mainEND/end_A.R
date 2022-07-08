@@ -11,7 +11,7 @@
 project<-gsub("/main/4_mainEND","",gsub(".*scripts/","",getwd()))
 
 # Load nsdm.ine settings
-load(paste0(gsub("scripts","outputs",gsub("/main/4_mainEND","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/4_mainEND","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -33,7 +33,7 @@ args<-eval(parse(text=args))
 arrayID<-eval(parse(text=arrayID))
 
 # SBATCH array
-species<-readRDS(paste0(w_path,"outputs/",project,"/settings/tmp/species-list-run.rds"))
+species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 ispi_name <- species[arrayID]
 
 # Scale-nesting methods for combining GLO and LOC predictions

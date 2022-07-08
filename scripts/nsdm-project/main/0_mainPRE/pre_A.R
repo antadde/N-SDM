@@ -35,7 +35,7 @@ do.call("<-",list(parameters[i], as.numeric(values[i])))
 }
 
 # Additional settings
-ssl_id<-readLines(paste0(w_path,"outputs/",project,"/settings/tmp/ssl_id.txt"))
+ssl_id<-readLines(paste0(w_path,"tmp/",project,"/settings/tmp/ssl_id.txt"))
 cov_path<-paste0(w_path,"data/",project,"/covariates/")
 spe_glo<-list.files(paste0(w_path,"data/",project,"/species/glo"), full.names=T, pattern=".rds")
 if(n_levels>1) spe_loc<-list.files(paste0(w_path,"data/",project,"/species/loc"), full.names=T, pattern=".rds")
@@ -49,7 +49,7 @@ if(length(mask_pred)>0) mask_pred<-paste0(w_path,"data/",project,"/masks/", mask
 
 # Save settings
 rm(settings, parameters, values, i)
-save.image(paste0(w_path,"outputs/",project,"/settings/nsdm-settings.RData"))
+save.image(paste0(w_path,"tmp/",project,"/settings/nsdm-settings.RData"))
 
 print(paste0("N-SDM settings defined"))
 
@@ -136,7 +136,7 @@ l<-list(rst_loc=rst_loc, rst_glo=rst_glo)
 l<-list(rst_glo=rst_glo)}
 
 saveRDS(l,  
-        paste0(w_path,"outputs/",project,"/settings/ref-rasters.rds"))
+        paste0(w_path,"tmp/",project,"/settings/ref-rasters.rds"))
 		
 ## covariates list and info
 if(n_levels>1){
@@ -145,7 +145,7 @@ l2<-list(lr_loc=lr_loc, lr_glo=lr_glo, cov_info=cov_info)
 l2<-list(lr_glo=lr_glo, cov_info=cov_info)}
 
 saveRDS(l2, 
-        paste0(w_path,"outputs/",project,"/settings/covariates-list.rds"))
+        paste0(w_path,"tmp/",project,"/settings/covariates-list.rds"))
 
 print(paste0("Covariate settings defined"))
 
@@ -250,16 +250,16 @@ l3<-list(spe_loc_dis=spe_loc_dis, spe_glo_dis=spe_glo_dis)
 l3<-list(spe_glo_dis=spe_glo_dis)}
 
 saveRDS(l3,
-        paste0(w_path,"outputs/",project,"/settings/species-occurences.rds"))
+        paste0(w_path,"tmp/",project,"/settings/species-occurences.rds"))
 		
 ## species list
 saveRDS(species,  
-        paste0(w_path,"outputs/",project,"/settings/species-list.rds"))
+        paste0(w_path,"tmp/",project,"/settings/species-list.rds"))
 		
 ## number of cluster runs needed
 spe_runs<-length(splitIndices(length(species), length(species)/n_mx_spe))
-writeLines(as.character(spe_runs),        paste0(w_path,"outputs/",project,"/settings/tmp/spe_runs.txt"))
-writeLines(as.character(length(species)), paste0(w_path,"outputs/",project,"/settings/tmp/n_spe.txt"))
+writeLines(as.character(spe_runs),        paste0(w_path,"tmp/",project,"/settings/tmp/spe_runs.txt"))
+writeLines(as.character(length(species)), paste0(w_path,"tmp/",project,"/settings/tmp/n_spe.txt"))
 
 print(paste0("Species data and settings defined"))
 

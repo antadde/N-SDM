@@ -30,17 +30,17 @@ acc=$(awk -F ";" '$1 == "account" { print $2}' ./settings/settings.csv)         
 part=$(awk -F ";" '$1 == "partition" { print $2}' ./settings/settings.csv)                        # HPC partition
 
 # Clean and/or create output directories
-rm -r $wp/outputs/$project/* 2>/dev/null
+rm -r $wp/tmp/$project/* 2>/dev/null
 mkdir -p $svp/outputs/$project/ 2>/dev/null
 mkdir -p $sop/outputs/$project/ 2>/dev/null
 mkdir -p $sop/tmp/$project/ 2>/dev/null
-mkdir -p $wp/outputs/$project/settings/tmp/ 2>/dev/null
-mkdir -p $wp/outputs/$project/sacct/ 2>/dev/null
+mkdir -p $wp/tmp/$project/settings/tmp/ 2>/dev/null
+mkdir -p $wp/tmp/$project/sacct/ 2>/dev/null
 
 # Permissions
 chmod -R 777 $wp/data/$project 2>/dev/null
 chmod -R 777 $wp/scripts/$project 2>/dev/null
-chmod -R 777 $wp/outputs/$project 2>/dev/null
+chmod -R 777 $wp/tmp/$project 2>/dev/null
 
 # Clean existing 0_mainPRE log files if any
 rm $wp/scripts/$project/main/0_mainPRE/*.err 2>/dev/null
@@ -48,7 +48,7 @@ rm $wp/scripts/$project/main/0_mainPRE/*.out 2>/dev/null
 
 # Create N-SDM unique identifier
 ssl_id=$(openssl rand -hex 3)
-echo $ssl_id > $wp/outputs/$project/settings/tmp/ssl_id.txt
+echo $ssl_id > $wp/tmp/$project/settings/tmp/ssl_id.txt
 
 echo Welcome to this new $project run $ssl_id
 
@@ -57,14 +57,14 @@ pre_A_m=$(awk -F ";" '$1 == "pre_A_m" { print $2}' ./settings/settings.csv)     
 pre_A_t=$(awk -F ";" '$1 == "pre_A_t" { print $2}' ./settings/settings.csv)                           # time
 pre_A_c=$(awk -F ";" '$1 == "pre_A_c" { print $2}' ./settings/settings.csv)                           # cores
 sbatch --wait --account=$acc --partition=$part --mem=$pre_A_m --time=$pre_A_t --cpus-per-task=$pre_A_c --ntasks=1 ./0_mainPRE/job_pre_A.sh
-echo N-SDM settings defined and species occurence data for "$(cat $wp/outputs/$project/settings/tmp/n_spe.txt)" species disaggregated 
+echo N-SDM settings defined and species occurence data for "$(cat $wp/tmp/$project/settings/tmp/n_spe.txt)" species disaggregated 
 
 ### Loop over spe_runs (n_spe/n_spe_max_hpc) to prevent scratch path saturation
-spe_runs="$(cat $wp/outputs/$project/settings/tmp/spe_runs.txt)"
+spe_runs="$(cat $wp/tmp/$project/settings/tmp/spe_runs.txt)"
 
 for i in $(seq 1 $spe_runs)
 do
-echo $i > $wp/outputs/$project/settings/tmp/run_id.txt
+echo $i > $wp/tmp/$project/settings/tmp/run_id.txt
 echo "Starting N-SDM run $i out of $spe_runs runs"
 
 # Retrieve time/date
@@ -76,7 +76,7 @@ Rscript ./0_mainPRE/nsdm_update.R 1>/dev/null 2>&1
 echo N-SDM settings updated
 
 # Update n_spe (number of species to be modelled in this run)
-n_spe="$(cat $wp/outputs/$project/settings/tmp/n_spe.txt)"
+n_spe="$(cat $wp/tmp/$project/settings/tmp/n_spe.txt)"
 
 # Dimensions for array definitions
 mod_algo=$(awk 'BEGIN{FS=";"}/mod_algo/ {print $2}' ./settings/settings.csv)        # modelling algorithms evaluated
@@ -224,7 +224,7 @@ fi
 cd $wp/scripts/$project/main/4_mainEND
 sbatch --wait --account=$acc --partition=$part --mem=$end_A_m --time=$end_A_t --cpus-per-task=$end_A_c --ntasks=1 --array [1-$end_A_a] job_end_A.sh
 echo Final evaluation done
-sacct --starttime $dt -u $own --format JobID,JobName,Elapsed,NCPUs,TotalCPU,CPUTime,ReqMem,MaxRSS,MaxDiskRead,MaxDiskWrite,State,ExitCode > $wp/outputs/$project/sacct/"${ssl_id}_${i}_sacct.txt"
+sacct --starttime $dt -u $own --format JobID,JobName,Elapsed,NCPUs,TotalCPU,CPUTime,ReqMem,MaxRSS,MaxDiskRead,MaxDiskWrite,State,ExitCode > $wp/tmp/$project/sacct/"${ssl_id}_${i}_sacct.txt"
 Rscript end_B.R 1>/dev/null 2>&1
 echo Sacct outputs analysis done
 
@@ -233,16 +233,16 @@ chmod -R 777 $wp/scripts/$project/main
 
 # rsync to saving location before cleaning scratch folder
 cd $sop/outputs/$project/
-find d2_models/ -name '*glm.rds' -o -name '*gam.rds' -o -name '*rf.rds' -o -name '*max.rds' -o -name '*gbm.rds' -o -name '*esm.rds' > $wp/outputs/$project/settings/tmp/modfiles.txt
-rsync -a --files-from=$wp/outputs/$project/settings/tmp/modfiles.txt . $svp/outputs/$project
+find d2_models/ -name '*glm.rds' -o -name '*gam.rds' -o -name '*rf.rds' -o -name '*max.rds' -o -name '*gbm.rds' -o -name '*esm.rds' > $wp/tmp/$project/settings/tmp/modfiles.txt
+rsync -a --files-from=$wp/tmp/$project/settings/tmp/modfiles.txt . $svp/outputs/$project
 rsync -a --exclude={'d1_covsels','d2_models','d6_preds','d13_preds-fut','d14_maps-fut','d17_nested-ensembles-fut','d18_nested-ensembles-cv-fut'} $sop/outputs/$project/ $svp/outputs/$project
 echo Main outputs sync to saving location
 done
 
 # Download, (pre-fill) and save ODMAP protocol
-mkdir $wp/outputs/$project/ODMAP 2>/dev/null
-curl -o $wp/outputs/$project/ODMAP/ODMAP.xlsx https://damariszurell.github.io/files/Zurell_etal_ODMAP.v1.0_TableS1.xlsx 2>/dev/null
-rsync -a $wp/outputs/$project/ODMAP $svp/outputs/$project
+mkdir $wp/tmp/$project/ODMAP 2>/dev/null
+curl -o $wp/tmp/$project/ODMAP/ODMAP.xlsx https://damariszurell.github.io/files/Zurell_etal_ODMAP.v1.0_TableS1.xlsx 2>/dev/null
+rsync -a $wp/tmp/$project/ODMAP $svp/outputs/$project
 echo ODMAP protocol generated
 
 echo Finished!

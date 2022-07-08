@@ -6,7 +6,7 @@ svp_path;/work/FAC/FGSE/IDYST/aguisan/valpar/wd_test/save/;0_general;path to sav
 lib_path;/work/FAC/FBM/DEE/aguisan/default/rlib/4.0/;0_global;path to R libraries directory
 clear_sop;TRUE;0_global;clear the scratch directory before starting a new run? (TRUE or FALSE)
 n_levels;2;0_global;"number of nested level(s) (1=GLO; 2=GLO+LOC)"
-n_spe;3;1_speciesdata;total number of species evaluated
+n_spe;1;1_speciesdata;total number of species evaluated
 n_mx_spe;100;1_speciesdata;maximum number of species evaluated at the same time for a single N-SDM run (usefull to prevent scratch saturation)
 forced_species;force-sp.csv;1_speciesdata;[optional] name of the .csv file stored in the the /scripts/project/main/settings folder containing the names of species to be modelled (one per row)
 pa_po_loc;po;1_speciesdata;presence only (po) or presence absence (pa) for local data
@@ -33,8 +33,6 @@ tmatch_glo;FALSE;2_covariatedata;do temporal matching for global-level analyses?
 tmatch_loc;TRUE;2_covariatedata;do temporal matching for local-level analyses? (TRUE or FALSE)
 tmatch_scheme_glo;npts;2_covariatedata;"[if tmatch_glo = TRUE] scheme for temporal matching of global-level data. Two options are available at the time of N-SDM release: nearest-previous time slice ""npts""or nearest time slice ""nts"""
 tmatch_scheme_loc;nts;2_covariatedata;"[if tmatch_loc = TRUE] scheme for temporal matching of local-level data. Two options are available at the time of N-SDM release: nearest-previous time slice ""npts""or nearest time slice ""nts"""
-pint_glo;1981:2010;2_covariatedata;[if cov_time covariates are provided] period interval used with pseudoabsences and applied for current predictions (global level)
-pint_loc;2013:2018;2_covariatedata;[if cov_time covariates are provided] period interval used with pseudoabsences and applied for current predictions (local level)
 sel_met;GLM;3_covariate selection;"univariate ranking method used for colinearity filtering. Only the ""GLM"" option has been validated at the time of N-SDM release. Explore the nsdm.covfilter.R function for more options"
 cor_cut;0.7;3_covariate selection;Pearson correlation coefficient cutoff threshold used for colinearity filtering
 max_thre;12;3_covariate selection;maximum possible number of covariates in a single model
