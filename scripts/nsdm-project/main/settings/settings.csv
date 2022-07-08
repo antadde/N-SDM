@@ -6,7 +6,7 @@ svp_path;/work/FAC/FGSE/IDYST/aguisan/valpar/wd_test/save/;0_general;path to sav
 lib_path;/work/FAC/FBM/DEE/aguisan/default/rlib/4.0/;0_global;path to R libraries directory
 clear_sop;TRUE;0_global;clear the scratch directory before starting a new run? (TRUE or FALSE)
 n_levels;2;0_global;"number of nested level(s) (1=GLO; 2=GLO+LOC)"
-n_spe;1;1_speciesdata;total number of species evaluated
+n_spe;3;1_speciesdata;total number of species evaluated
 n_mx_spe;100;1_speciesdata;maximum number of species evaluated at the same time for a single N-SDM run (usefull to prevent scratch saturation)
 forced_species;force-sp.csv;1_speciesdata;[optional] name of the .csv file stored in the the /scripts/project/main/settings folder containing the names of species to be modelled (one per row)
 pa_po_loc;po;1_speciesdata;presence only (po) or presence absence (pa) for local data
