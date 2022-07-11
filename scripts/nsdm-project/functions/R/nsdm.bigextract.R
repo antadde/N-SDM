@@ -49,7 +49,7 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
    a$diff<-a$end_year-a$start_year
    a_ix<-which(a$end_year==max(a$end_year))
    if(length(a_ix)>1) a_ix<-a_ix[which(a$diff[a_ix]==max(a$diff[a_ix]))]
-   if(table(a$diff)[1]>1){a$int<-"no_int"}else{a$int<-"int"}
+   if(table(a$diff)[1]>1){a$int<-"no_int"; a$int[which.max(a$end_year)]<-"int"} else {a$int<-"int"}
    p_ints_t_i<-data.frame(dataset=dt, start_year=a$start_year[a_ix], end_year=a$end_year[a_ix], int=a$int[a_ix])
    p_ints_t<-rbind(p_ints_t, p_ints_t_i)
    }
@@ -149,11 +149,18 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
   xt_pres<-lapply(1:length(maxless), function(w){xt_pres[w,y_pos[[w]]]})
   # clean rename
   pers<-paste(unique(cov_tomatch_times[,1]), unique(cov_tomatch_times[,2]), sep="_")
+  
   xt_pres<-lapply(xt_pres, function(r){
-  names(r)<-stri_replace_all_regex(names(r),
+  for(d in p_ints_t$dataset){
+  ix<-grep(d, names(r))
+  names(r)[ix]<-stri_replace_all_regex(names(r),
                                    pattern=c(pers),
-                                   replacement=rep(paste(min(p_int), max(p_int), sep="_"),length(pers)),
-								   vectorize=F);  return(r)})
+                                   replacement=rep(paste(p_ints_t[p_ints_t$dataset==d && p_ints_t$int=="int","start_year"],
+								                         p_ints_t[p_ints_t$dataset==d && p_ints_t$int=="int","end_year"], sep="_"), length(pers)),
+								   vectorize=F)
+  }
+  return(r)})
+  
   ## Finalize
   xt_pres_dyn<- do.call(rbind, xt_pres)
   }
