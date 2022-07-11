@@ -23,8 +23,10 @@ if(length(mask)>0){
 m<-readRDS(mask)
 tbm<-which(m[]==0)
 tbr<-which(covdf_ix %in% tbm)
+if(length(tbr)>1){
 covdf<-covdf[-tbr,]
 covdf_ix<-covdf_ix[-tbr]
+}
 }
 
 # If any, set observational covariates to specified value at all locations
