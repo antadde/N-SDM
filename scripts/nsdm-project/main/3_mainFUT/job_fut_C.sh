@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=FUT_C
+#SBATCH --job-name=fut_C
 #SBATCH --output=%x_%A-%a.out
 #SBATCH --error=%x_%A-%a.err
 

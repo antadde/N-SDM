@@ -133,7 +133,7 @@ cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i@pa, # pa vector
                              covdata=pseu.abs_i@env_vars, # data.frame of environmental covariates extracted at pa
                              weights=wt, # weight vector
                              datasets=c(cov_info$cada, "mainGLO"),  
-							 variables=c(gsub("_NA", "", paste(cov_info$variable, cov_info$attribute, sep="_")), "mainGLO"), 
+							 varnames=c(gsub("_NA", "", paste(cov_info$variable, cov_info$attribute, sep="_")), "mainGLO"), 
                              focals=unique(cov_info[which(cov_info$focal!="NA"),"cada"]), # datasets with focal window selection
                              method=sel_met, # univariate ranking method to be used
                              corcut=cor_cut,

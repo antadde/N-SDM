@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=LOC_B
+#SBATCH --job-name=loc_B
 #SBATCH --output=%x_%A-%a.out
 #SBATCH --error=%x_%A-%a.err
 

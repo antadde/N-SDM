@@ -9,7 +9,7 @@ nsdm.ensemble(
   species_name,
   level = NA,
   nesting_name = NA,
-  rcp_name = NA,
+  scenar_name = NA,
   period_name = NA,
   map_path,
   score_path = NULL,
@@ -22,6 +22,14 @@ nsdm.ensemble(
 \item{model_names}{A character string indicating the modelling algorithms to ensemble}
 
 \item{species_name}{A character string indicating the name of the taxon}
+
+\item{level}{A character vector indicating the name of the level considered (e.g., glo or loc)}
+
+\item{nesting_name}{A character vector indicating the name of the nesting strategy for which predicted values are provided}
+
+\item{scenar_name}{A character vector indicating the name of the scenario for which predicted values are provided}
+
+\item{period_name}{A character vector indicating the name of the period for which predicted values are provided}
 
 \item{map_path}{A character string indicating the path where algorithm-specific prediction surfaces are stored}
 

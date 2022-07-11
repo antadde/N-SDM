@@ -175,10 +175,10 @@ fi
 
 # Start running jobs
 ## n_levels of analyses (1=GLO; 2=GLO+LOC)?
-n_levels=$(awk -F ";" '$1 == "n_levels" { print $2}' ./settings/settings.csv) # Skip future analyses ?
+n_levels=$(awk -F ";" '$1 == "n_levels" { print $2}' ./settings/settings.csv)
 
 ## Do future analyses?
-do_proj=$(awk -F ";" '$1 == "do_proj" { print $2}' ./settings/settings.csv) # Skip future analyses ?
+do_proj=$(awk -F ";" '$1 == "do_proj" { print $2}' ./settings/settings.csv)
 
 ## PRE_B
 cd $wp/scripts/$project/main/0_mainPRE
@@ -206,7 +206,7 @@ sbatch --wait --account=$acc --partition=$part --mem=$loc_C_m --time=$loc_C_t --
 echo LOC ensembling and scale nesting done
 fi
 
-## FUT predictions
+## FUT projections
 if [ $do_proj = "TRUE" ]
 then
 cd $wp/scripts/$project/main/3_mainFUT
@@ -214,10 +214,13 @@ sbatch --wait --account=$acc --partition=$part --mem=$fut_A_m --time=$fut_A_t --
 echo individual FUT GLO predictions done
 sbatch --wait --account=$acc --partition=$part --mem=$fut_B_m --time=$fut_B_t --cpus-per-task=$fut_B_c --ntasks=1 --array [1-$fut_B_a] job_fut_B.sh
 echo FUT GLO ensembling done
+if [ $n_levels -gt 1 ]
+then
 sbatch --wait --account=$acc --partition=$part --mem=$fut_C_m --time=$fut_C_t --cpus-per-task=$fut_C_c --ntasks=1 --array [1-$fut_C_a] job_fut_C.sh
 echo individual FUT LOC predictions done
 sbatch --wait --account=$acc --partition=$part --mem=$fut_D_m --time=$fut_D_t --cpus-per-task=$fut_D_c --ntasks=1 --array [1-$fut_D_a] job_fut_D.sh
 echo FUT LOC ensembling and scale nesting done
+fi
 fi
 
 ## END analyses
