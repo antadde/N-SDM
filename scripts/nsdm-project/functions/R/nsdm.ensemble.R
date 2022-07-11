@@ -9,12 +9,16 @@
 #' @param discthre A numeric value for the threshold for weight_metric under which to discard an algorithm
 #' @param weighting Logical. If TRUE, weight individual algorithms by weight_metric
 #' @param weight_metric A character string indicating the name of the metric used for weighting or discarding
+#' @param level A character vector indicating the name of the level considered (e.g., glo or loc)
+#' @param nesting_name A character vector indicating the name of the nesting strategy for which predicted values are provided
+#' @param scenar_name A character vector indicating the name of the scenario for which predicted values are provided
+#' @param period_name A character vector indicating the name of the period for which predicted values are provided
 #'
 #' @return A list of two rasters: "ensemble" (average) and "ensemble_cv" (coefficient of variation)
 #' @author Antoine Adde (aadde@unil.ch)
 #' @export
 
-nsdm.ensemble <- function(model_names, species_name, level=NA, nesting_name=NA, rcp_name=NA, period_name=NA, map_path, score_path=NULL, discthre=NULL, weighting=FALSE, weight_metric="Score"){
+nsdm.ensemble <- function(model_names, species_name, level=NA, nesting_name=NA, scenar_name=NA, period_name=NA, map_path, score_path=NULL, discthre=NULL, weighting=FALSE, weight_metric="Score"){
   
 # Retrieve prediction maps
 stack_map<-raster::stack()
@@ -104,8 +108,8 @@ ensemble_mn<-round(ensemble_mn)
 storage.mode(ensemble_cv[]) = "integer"
 storage.mode(ensemble_mn[]) = "integer"
 
-names(ensemble_mn)<-gsub("_NA", "", paste(ispi_name, level, nesting_name, rcp_name, period_name, "ensemble", sep="_"))
-names(ensemble_cv)<-gsub("_NA", "", paste(ispi_name, level, nesting_name, rcp_name, period_name, "ensemble_cv", sep="_"))
+names(ensemble_mn)<-gsub("_NA", "", paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble", sep="_"))
+names(ensemble_cv)<-gsub("_NA", "", paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble_cv", sep="_"))
 
 return(list(ensemble=ensemble_mn, ensemble_cv=ensemble_cv))
 }
