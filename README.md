@@ -2,23 +2,23 @@
 
 # About N-SDM
 
-Bringing together leading-edge species distribution modelling (SDM) techniques into one high-performance computing (HPC) pipeline, we developed N-SDM, an SDM platform mainly written in R language aimed at delivering reproducible outputs for standard biodiversity assessments. A key characteristic of N-SDM is that it has been built around a spatially-nested framework intended to facilitate the combined use of species occurrence data retrieved from multiple sources and at different spatial scales. In practice, this is done in N-SDM by combining two models fitted with scale-specific species and covariate data (e.g.: global and local). Among other benefits, this strategy allows addressing the potential issue of niche truncation. A second key characteristic of N-SDM is that it has been explicitly designed for HPC environments, filling the gap in the availability of SDM platforms directly connectable to computing clusters. Among several others, the set of state-of-the-art SDM features embodied in N-SDM includes a newly devised covariate selection procedure, five modelling algorithms, an algorithm-specific hyperparameter grid search and the ensemble of small models approach. Finally, N-SDM has been designed to be easily customizable and allows to directly benefit from the inputs of both the computational modelling community and species experts.
+Uniting species distribution modelling (SDM) techniques into one high-performance computing (HPC) pipeline, we developed N-SDM, an SDM platform aimed at delivering reproducible outputs for standard biodiversity assessments. N-SDM was built around a spatially-nested framework, intended at facilitating the combined use of species occurrence data retrieved from multiple sources and at various spatial scales. N-SDM allows combining two models fitted with species and covariate data retrieved from global to local scales, which is useful for addressing the issue of spatial niche truncation. The set of state-of-the-art SDM features embodied in N-SDM includes a newly devised covariate selection procedure, five modelling algorithms, an algorithm-specific hyperparameter grid search and the ensemble of small-models approach. N-SDM is designed to be run on HPC environments, allowing the parallel processing of thousands of species at the same time.
 
 # Prerequisites
 
 Prerequisites for running N-SDM include:
 
-1.	you are working on a Linux HPC cluster equipped with the Slurm workload manager
+1.	Linux cluster computer equipped with the Slurm workload manager
 
-2.	the list of available modules in your system include gcc, r, proj, perl, curl, geos and gdal
+2.	availability of the modules (with versions used for N-SDM development) gcc (9.3.0), r (4.0.5), proj (5.2.0), perl (5.32.1), curl (7.76.1), geos (3.8.1) and gdal (2.4.4)
 
-3.	you have cloned this GitHub repository (N-SDM/N-SDM) in your working directory `git clone https://github.com/N-SDM/N-SDM.git .`
+3.	a clone of the N-SDM/N-SDM GitHub repository in the working directory `git clone https://github.com/N-SDM/N-SDM.git .`
 
-4.	you have installed the nsdm R package `remotes::install_github("N-SDM/N-SDM/scripts/nsdm-project/functions", upgrade=FALSE)`
+4.	an installation of the nsdm R package `remotes::install_github("N-SDM/N-SDM/scripts/nsdm-project/functions", upgrade=FALSE)`
 
-5. [optional for running the N-SDM example] you have downloaded the 6GB zip file containing example species and covariate data in the ./data folder `curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/BlN3GV7x8M8CCI7/download`
+5. [optional for running the N-SDM example] download the 6GB zip file containing example species and covariate data in the ./data folder `curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/BlN3GV7x8M8CCI7/download`
 
-6. [optional for running the N-SDM example] you have unzipped nsdm-project.zip in the data folder `unzip ./data/nsdm-project.zip -d ./data/nsdm-project/`
+6. [optional for running the N-SDM example] unzip nsdm-project.zip in the data folder `unzip ./data/nsdm-project.zip -d ./data/nsdm-project/`
 
 # Example N-SDM run
 
@@ -28,7 +28,7 @@ We will run an applied example aimed at illustrating the main operations and per
 
 ## Study area
 
-Following the spatially-nested framework described earlier (see Figure 1 and section “Highlighted features” in the N-SDM Software Note), we distinguished between “local” and “global” -level study areas. The local-level one included all of Switzerland, with a total area of ≈ 40,000 km². For the global-level one, we used a bounding box covering the European continent, with coordinates 32,60N, 71,70N, 28,56W and 40,21E.
+Following the spatially-nested framework (see Figure 1 and section “Highlighted features” of the N-SDM software note for details), we distinguished between “local-” and “global-” level study areas. The local-level area included all of Switzerland, with a total area of ≈ 40,000 km². For the global-level area, we used a bounding box covering the European continent, ranging from 32,60 °N to 71,70 °N, and from 28,56 °W to 40,21 °E, for an area of ≈ 10 Mio. km².
 
 ## Data
 
@@ -61,7 +61,7 @@ Thanks!
 
 # Contact
 
-Antoine Adde – aadde@unil.ch
+Antoine Adde – antoine.adde@unil.ch
 
 Project Link: [https://github.com/N-SDM/N-SDM](https://https://github.com/N-SDM/N-SDM)
 
@@ -69,9 +69,9 @@ Project Link: [https://github.com/N-SDM/N-SDM](https://https://github.com/N-SDM/
 
 N-SDM development has been conducted within the ECOSPAT lab https://www.unil.ch/ecospat/en/home.html.
 
-Financial support through the Action Plan of the Swiss Biodiversity Strategy via the Federal Office for the Environment and the www.Valpar.ch project is gratefully acknowledged.
+We gratefully acknowledge financial support through the Action Plan of the Swiss Biodiversity Strategy by the Federal Office for the Environment (FOEN) for financing the Valpar.ch and SwissCatchment projects.
 
-The Swiss Species Information Center InfoSpecies (www.infospecies.ch) supplied Swiss-level species occurrence data and we acknowledge their support regarding the database.
+The Swiss Species Information Center InfoSpecies (www.infospecies.ch) supplied Swiss-level species occurrence data and expertise on species’ ecology, and we acknowledge their support regarding the database.
 
 This research was enabled in part by the support provided by the Scientific Computing and Research Unit of Lausanne University (https://www.unil.ch/ci/dcsr).
 
