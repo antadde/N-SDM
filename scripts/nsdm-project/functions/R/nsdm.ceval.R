@@ -58,12 +58,12 @@ nsdm.ceval<-function(f,pa,tesdat,crit,tre=numeric()){
 	aucS=(2*auc)-1 # rescale AUC to -1 +1
 
 	# # Consensus score
-	score_vec<-na.omit(c(aucS, boyce_s_pe, tdep["TSS"]))
+	score_vec<-na.omit(c(aucS, boyce_s_pe, tdep["maxTSS"]))
 	score<-sum(score_vec)/length(score_vec)
 
     # Return results
     weg=c(auc, aucS, rmse, boyce_s_pe, score, tre, tdep)
-    names(weg)[1:6]=c("AUC", "AUC_S", "RMSE", "Boyce_S_PE", "Score", "threshold")
+    names(weg)[1:6]=c("AUC", "AUC_S", "RMSE", "CBI", "Score", "threshold")
     
     return(unlist(weg))
   }

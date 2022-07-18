@@ -197,6 +197,6 @@ nsdm.all.metrics=function(a,b,c,d){
         tss(a,b,c,d),
         kappa(a,b,c,d),
 		sedi(a,b,c,d))
-  names(out)=c("Sensitivity","Specificity","Accuracy","PPV","NPV","Jaccard","TSS","Kappa","SEDI")
+  names(out)=c("maxSensitivity","maxSpecificity","maxAccuracy","maxPPV","maxNPV","maxJaccard","maxTSS","maxKappa","maxSEDI")
   return(out)
 }

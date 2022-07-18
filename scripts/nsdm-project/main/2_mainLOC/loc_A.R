@@ -136,8 +136,8 @@ cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i@pa, # pa vector
 							 varnames=c(gsub("_NA", "", paste(cov_info$variable, cov_info$attribute, sep="_")), "mainGLO"), 
                              focals=unique(cov_info[which(cov_info$focal!="NA"),"cada"]), # datasets with focal window selection
                              method=sel_met, # univariate ranking method to be used
-                             corcut=cor_cut,
-							 force=c("mainGLO")), silent=TRUE) # correlation cutoff for colinearity
+                             corcut=cor_cut, # correlation cutoff for colinearity
+							 force=c("mainGLO")), silent=TRUE)  
 
 # F.2 Step 2: Model-specific embedding
 cat('covariate selection with mainGLO forced S2: Embedding...\n')

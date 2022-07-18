@@ -17,7 +17,7 @@ embed$species<-species_name
 if(length(which(table(embed$var) == length(unique(embed$model))))>0){
 # if so, do intersect ranking
 intersect.tmp<-embed[embed$var %in% names(which(table(embed$var) == length(unique(embed$model)))),]
-intersect.tmp<-aggregate(intersect.tmp[,c("rank")], list(intersect.tmp$var), mean); colnames(intersect.tmp)<-c("var","rank")
+intersect.tmp<-aggregate(intersect.tmp[,c("rank")], list(intersect.tmp$var), sum); colnames(intersect.tmp)<-c("var","rank")
 intersect.sel<-data.frame(intersect.tmp[order(intersect.tmp$rank, decreasing = FALSE),], rank.f = 1:nrow(intersect.tmp), species=species_name)
 # else skip to union ranking
 } else { intersect.sel<-data.frame(var=NA, rank=0, rank.f=0, species=species_name)}

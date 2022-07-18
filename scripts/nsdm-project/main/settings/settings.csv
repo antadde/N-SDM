@@ -44,7 +44,7 @@ best_thre_esm;0.5;4_modelling_esm;"[if ""esm"" included in mod_algo] cutoff thre
 replicate_type;splitsample;4_modelling_evaluation;"cross-validation strategy. Only the ""splitsample"" option is available at the time of N-SDM release"
 reps;25;4_modelling_evaluation;number of cross-validation replicates
 eval_crit;maxTSS;4_modelling_evaluation;"criteria for threshold dependant evaluation metrics. Only the ""maxTSS"" option is available at the time of N-SDM release"
-best_met;Score;4_modelling_evaluation;"model evaluation metric used for identifying best models. Available options include ""AUC"", ""AUC'"", ""Boyce"", ""Score"", ""Sensitivity"", ""Specificity"", ""Accuracy"", ""PPV"", ""NPV"", ""Jaccard"", ""TSS"", ""Kappa"", ""SEDI"""
+best_met;Score;4_modelling_evaluation;"model evaluation metric used for identifying best models. Available options include ""AUC"", ""AUC'"", ""Boyce"", ""Score"", ""maxSensitivity"", ""maxSpecificity"", ""maxAccuracy"", ""maxPPV"", ""maxNPV"", ""maxJaccard"", ""maxTSS"", ""maxKappa"", ""maxSEDI"""
 do_weighting;FALSE;5_ensembling;weight modelling algorithms by the value of weight_metric when ensembling? (TRUE or FALSE)
 weight_metric;Score;5_ensembling;evaluation metric used for weighting and discarding models in the ensembling process
 disc_thre;0.4;5_ensembling;cutoff threshold for weight_met at which a model is discarded from the ensembling process
