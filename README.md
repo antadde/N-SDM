@@ -1,4 +1,4 @@
-<img src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" width="100%"/>
+<img src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" width="100%"/>
 
 # About N-SDM
 
@@ -12,9 +12,9 @@ Prerequisites for running N-SDM include:
 
 2.	the list of available modules in your system include gcc, r, proj, perl, curl, geos and gdal
 
-3.	you have cloned this GitHub repository (AnAdde/N-SDM) in your working directory `git clone https://github.com/AnAdde/N-SDM.git .`
+3.	you have cloned this GitHub repository (N-SDM/N-SDM) in your working directory `git clone https://github.com/N-SDM/N-SDM.git .`
 
-4.	you have installed the nsdm R package `remotes::install_github("AnAdde/N-SDM/scripts/nsdm-project/functions", upgrade=FALSE)`
+4.	you have installed the nsdm R package `remotes::install_github("N-SDM/N-SDM/scripts/nsdm-project/functions", upgrade=FALSE)`
 
 5. [optional for running the N-SDM example] you have downloaded the 6GB zip file containing example species and covariate data in the ./data folder `curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/BlN3GV7x8M8CCI7/download`
 
@@ -22,7 +22,7 @@ Prerequisites for running N-SDM include:
 
 # Example N-SDM run
 
-<img align="right" alt="N-SDM logo" src="https://github.com/AnAdde/N-SDM/blob/main/images/n-sdm_logo_v2.png" width="30%"/>
+<img align="right" alt="N-SDM logo" src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_logo_v2.png" width="30%"/>
 
 We will run an applied example aimed at illustrating the main operations and performances of N-SDM by modelling the habitat suitability of three species (Larix decidua, Capra Ibex and Cantharellus cibarius) at 100-m resolution across Switzerland for both current (1980–2021) and future (2070–2100) periods.
 
@@ -63,7 +63,7 @@ Thanks!
 
 Antoine Adde – aadde@unil.ch
 
-Project Link: [https://github.com/AnAdde/N-SDM](https://https://github.com/AnAdde/N-SDM)
+Project Link: [https://github.com/N-SDM/N-SDM](https://https://github.com/N-SDM/N-SDM)
 
 # Acknowledgments
 
