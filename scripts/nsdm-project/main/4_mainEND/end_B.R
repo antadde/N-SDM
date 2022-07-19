@@ -63,7 +63,7 @@ sacct$species[which(match(sacct$JobName, j_na_i)==1)]<-"ALL"
 }
 }
 
-spth<-paste0(scr_path,"/outputs/",project,"/d18_sacct/",paste0(ssl_id,"_run_",run_id))
+spth<-paste0(scr_path,"/outputs/",project,"/d19_sacct/",paste0(ssl_id,"_run_",run_id))
 dir.create(spth, recursive=T)
 fwrite(sacct, paste0(spth,"/sacct_table_",ssl_id,"_run_",run_id,".csv"))
 
@@ -93,7 +93,7 @@ mem_mn$m_mn<-mem_mn$x/1000^3
 mem_mx$m_mx<-mem_mx$x/1000^3
 
 nsdm.savethis(object=list(mem_mn, mem_mx, times_sm, times_mx), species=paste0(ssl_id,"_run_",run_id),
-              save_path=paste0(scr_path,"/outputs/",project,"/d18_sacct"))
+              save_path=paste0(scr_path,"/outputs/",project,"/d19_sacct"))
 
 # Plots
 pals<-c(
