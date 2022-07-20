@@ -52,7 +52,6 @@ nsdm.flex2<-function(x=numeric(),
     pa=x@pa
     env_vars=x@env_vars
     taxon=x@meta$taxon
-	xy=data.frame(x@xy)
   }
 
   # check and prepare data and output

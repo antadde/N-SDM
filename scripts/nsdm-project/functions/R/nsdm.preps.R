@@ -70,7 +70,7 @@ preps=function(env=parent.frame(),call){
   ### ----------------------
 
   # partition observations according to replicate type
-  dat=cbind(data.frame(Presence=env$pa),env$env_vars, env$xy)
+  dat=cbind(data.frame(Presence=env$pa),env$env_vars)
 
   obschoice<-list()
   testing<-list()
