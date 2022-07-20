@@ -128,17 +128,19 @@ while(TRUE){
 counter <- sum(counter, 1)
 
 # F.1 Step 1: Filtering for colinearity
+foc<-unique(cov_info[which(cov_info$focal!="NA"),"cada"])
 cat('covariate selection with mainGLO forced S1: Filtering...\n')
+if(length(foc)==0) foc<-NULL
 cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i@pa, # pa vector
                              covdata=pseu.abs_i@env_vars, # data.frame of environmental covariates extracted at pa
                              weights=wt, # weight vector
                              datasets=c(cov_info$cada, "mainGLO"),  
 							 varnames=c(gsub("_NA", "", paste(cov_info$variable, cov_info$attribute, sep="_")), "mainGLO"), 
-                             focals=unique(cov_info[which(cov_info$focal!="NA"),"cada"]), # datasets with focal window selection
+                             focals=foc, # datasets with focal window selection
                              method=sel_met, # univariate ranking method to be used
-                             corcut=cor_cut, # correlation cutoff for colinearity
-							 force=c("mainGLO")), silent=TRUE)  
-
+                             corcut=cor_cut,
+							 force=c("mainGLO")), silent=TRUE) # correlation cutoff for colinearity
+							 
 # F.2 Step 2: Model-specific embedding
 cat('covariate selection with mainGLO forced S2: Embedding...\n')
 cov.embed_i<-try(nsdm.embedsel(pa=pseu.abs_i@pa,
@@ -182,15 +184,17 @@ counter <- sum(counter, 1)
 pseu.abs_i@env_vars<-subset(pseu.abs_i@env_vars, select=-c(mainGLO))
 
 # G.1 Step 1: Filtering for colinearity
+foc<-unique(cov_info[which(cov_info$focal!="NA"),"cada"])
 cat('covariate selection without mainGLO S1: Filtering...\n')
+if(length(foc)==0) foc<-NULL
 cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i@pa, # pa vector
-                             covdata=pseu.abs_i@env_vars, # data.frame of environmental covariates extracted at pa
-                             weights=wt, # weight vector
-                             datasets=cov_info$cada,  
-							 variables=gsub("_NA", "", paste(cov_info$variable, cov_info$attribute, sep="_")), 
-                             focals=unique(cov_info[which(cov_info$focal!="NA"),"category"]), # categories with focal window selection
-                             method=sel_met, # univariate ranking method to be used
-                             corcut=cor_cut), silent=TRUE) # correlation cutoff for colinearity
+                                covdata=pseu.abs_i@env_vars, # data.frame of environmental covariates extracted at pa
+                                weights=wt, # weight vector
+                                datasets=cov_info$cada,
+							    varnames=gsub("_NA", "", paste(cov_info$variable, cov_info$attribute, sep="_")), 
+                                focals=foc, # datasets with focal window selection
+                                method=sel_met, # univariate ranking method to be used
+                                corcut=cor_cut), silent=TRUE) # correlation cutoff for colinearity
 
 # G.2 Step 2: Model-specific embedding
 cat('covariate selection without mainGLO S2: Embedding...\n')
@@ -212,7 +216,7 @@ cov.sub_i_mul <-try(nsdm.covsub(covdata=pseu.abs_i@env_vars,
             ranks=cov.rk_i, # ranking from S3
             thre=ceiling(log2(table(pseu.abs_i@pa)['1'])), # target number of covariates
 			max.thre=max_thre # max number of possible covariates in model
-			), silent=TRUE) # buffer extraction radius for glo.out
+			), silent=TRUE)
 			
 covstk_res[["mul"]]<-cov.sub_i_mul$rasterdata
 covdata_res[["mul"]]<-cov.sub_i_mul$covdata

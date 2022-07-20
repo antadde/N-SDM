@@ -4,17 +4,17 @@
 ## nsdm.sh
 ## Core N-SDM script
 ## Date: 20-05-2022
-## Author: Antoine Adde 
+## Author: Antoine Adde (antoine.adde@unil.ch)
 ##########################
 
-# Load required modules [cluster specific]
-module load gcc/9.3.0
-module load r/4.0.5
-module load proj/5.2.0
-module load perl
-module load curl
-module load geos/3.8.1
-module load gdal/2.4.4-proj-5.2.0
+# Load required modules
+module load $(awk -F ";" '$1 == "module_gcc" { print $2}' ./settings/settings.csv)
+module load $(awk -F ";" '$1 == "module_r" { print $2}' ./settings/settings.csv)
+module load $(awk -F ";" '$1 == "module_proj" { print $2}' ./settings/settings.csv)
+module load $(awk -F ";" '$1 == "module_perl" { print $2}' ./settings/settings.csv)
+module load $(awk -F ";" '$1 == "module_curl" { print $2}' ./settings/settings.csv)
+module load $(awk -F ";" '$1 == "module_geos" { print $2}' ./settings/settings.csv)
+module load $(awk -F ";" '$1 == "module_gdal" { print $2}' ./settings/settings.csv)
 
 # Retrieve main paths
 wp=$(awk -F ";" '$1 == "w_path" { print $2}' ./settings/settings.csv)    # working path
@@ -238,11 +238,13 @@ chmod -R 777 $wp/scripts/$project/main
 cd $sop/outputs/$project/
 find d2_models/ -name '*glm.rds' -o -name '*gam.rds' -o -name '*rf.rds' -o -name '*max.rds' -o -name '*gbm.rds' -o -name '*esm.rds' > $wp/tmp/$project/settings/tmp/modfiles.txt
 rsync -a --files-from=$wp/tmp/$project/settings/tmp/modfiles.txt . $svp/outputs/$project
-rsync -a --exclude={'d1_covsels','d2_models','d6_preds','d13_preds-fut','d14_maps-fut','d17_nested-ensembles-fut','d18_nested-ensembles-cv-fut'} $sop/outputs/$project/ $svp/outputs/$project
+echo $(awk -F ";" '$1 == "rsync_exclude" { print $2}' $wp/scripts/$project/main/settings/settings.csv) | sed 's/,/\n/g' > $wp/tmp/$project/settings/tmp/exclfiles.txt
+rsync -a --exclude-from="$wp/tmp/$project/settings/tmp/exclfiles.txt" $sop/outputs/$project/ $svp/outputs/$project
 echo Main outputs sync to saving location
 done
 
-# Download, (pre-fill) and save ODMAP protocol
+
+# Download and save ODMAP protocol
 mkdir $wp/tmp/$project/ODMAP 2>/dev/null
 curl -o $wp/tmp/$project/ODMAP/ODMAP.xlsx https://damariszurell.github.io/files/Zurell_etal_ODMAP.v1.0_TableS1.xlsx 2>/dev/null
 rsync -a $wp/tmp/$project/ODMAP $svp/outputs/$project
