@@ -1,2 +1,2 @@
 # N-SDM data
- Folder where input data are stored.
+ Folder where input data are stored
