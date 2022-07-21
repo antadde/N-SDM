@@ -113,7 +113,9 @@ outerloop<-length(mod@tesdat)
 tmp_path_gbm<-paste0(scr_path,"/tmp/",project,"/gbm")
 pred<-list()
 for(k in 1:outerloop){
-if("lgb.Booster" %in% class(mod@fits[[k]][[1]])){mod@fits[[k]][[1]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod","1","_",level,".rds"))}
+if("lgb.Booster" %in% class(mod@fits[[k]][[1]])){
+mod@fits[[k]][[1]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod","1","_",level,".rds"))
+testa_GLO[[k]]<- testa_GLO[[k]][,-which(colnames(testa_GLO[[k]]) %in% c("X","Y"))]}
 if(class(mod@fits[[k]])=="try-error"){
 pred_i<-rep(NA, nrow(testa_GLO[[k]]))
 } else {
@@ -202,13 +204,17 @@ y<-x[,-which(colnames(x)=="Presence"),drop=FALSE]
 outerloop<-length(mod@tesdat)
 tmp_path_gbm<-paste0(scr_path,"/tmp/",project,"/gbm")
 pred<-list()
+glo_prob<-list(); glo_out<-readRDS(list.files(paste0(scr_path,"outputs/",project,"/d8_ensembles/glo/", ispi_name), pattern=".rds", full.names=T)) # store glo probabilities for multiply strategy evaluation
 for(k in 1:outerloop){
-if("lgb.Booster" %in% class(mod@fits[[k]][[1]])){mod@fits[[k]][[1]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod","1","_",level,".rds"))}
+if("lgb.Booster" %in% class(mod@fits[[k]][[1]])){
+mod@fits[[k]][[1]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod","1","_",level,".rds"))
+testa_LOC_multiply[[k]]<- testa_LOC_multiply[[k]][,-which(colnames(testa_LOC_multiply[[k]]) %in% c("X","Y"))]}
 if(class(mod@fits[[k]])=="try-error"){
 pred_i<-rep(NA, nrow(testa_LOC_multiply[[k]]))
 } else {
 pred_i<-nsdm.prd(mod@fits[[k]][[1]], testa_LOC_multiply[[k]])}
 pred[[k]]<-pred_i
+glo_prob[[k]]<-raster::extract(glo_out, data.frame(mod@tesdat[[k]]$X,mod@tesdat[[k]]$Y))/100
 }
 pop_n<-do.call(cbind, pred)
 pop[[n]]<-pop_n
@@ -295,15 +301,15 @@ y<-x[,-which(colnames(x)=="Presence"),drop=FALSE]
 outerloop<-length(mod@tesdat)
 tmp_path_gbm<-paste0(scr_path,"/tmp/",project,"/gbm")
 pred<-list()
-glo_prob<-list() # stole glo probabilities covariate for multiply strategy
 for(k in 1:outerloop){
-if("lgb.Booster" %in% class(mod@fits[[k]][[1]])){mod@fits[[k]][[1]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod","1","_",level,".rds"))}
+if("lgb.Booster" %in% class(mod@fits[[k]][[1]])){
+mod@fits[[k]][[1]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod","1","_",level,".rds"))
+testa_LOC_covariate[[k]]<- testa_LOC_covariate[[k]][,-which(colnames(testa_LOC_covariate[[k]]) %in% c("X","Y"))]}
 if(class(mod@fits[[k]])=="try-error"){
 pred_i<-rep(NA, nrow(testa_LOC_covariate[[k]]))
 } else {
 pred_i<-nsdm.prd(mod@fits[[k]][[1]], testa_LOC_covariate[[k]])}
 pred[[k]]<-pred_i
-glo_prob[[k]]<-(testa_LOC_covariate[[k]]$mainGLO * attr(mat, "scaled:scale")["mainGLO"] + attr(mat, "scaled:center")["mainGLO"])/100
 }
 pop_n<-do.call(cbind, pred)
 pop[[n]]<-pop_n
