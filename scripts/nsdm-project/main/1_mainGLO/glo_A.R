@@ -107,8 +107,9 @@ pseu.abs_i_loc<-nsdm.bigextract(cov=gsub(".rds", ".fst", lr_loc),
 							   nsplits=ncores)
 							   
 # E.3 Combine GLO and LOC data
-pa<-c(pseu.abs_i_glo@pa, pseu.abs_i_loc@pa)
-pseu.abs_i_glo@pa<-pa
+pseu.abs_i_glo@pa<-c(pseu.abs_i_glo@pa, pseu.abs_i_loc@pa)
+pseu.abs_i_glo@years<-c(pseu.abs_i_glo@years, pseu.abs_i_loc@years)
+pseu.abs_i_glo@xy<-rbind(pseu.abs_i_glo@xy, pseu.abs_i_loc@xy)
 m_ord<-match(cov_info_loc$variable, cov_info_glo$variable) # make sure glo and loc covariate are in the same order
 names(pseu.abs_i_glo@env_vars)[m_ord]<-names(pseu.abs_i_loc@env_vars) # rename
 env_vars<-scale(rbind(pseu.abs_i_glo@env_vars, pseu.abs_i_loc@env_vars)) # keep scaling parameters to backtransform predictions later
