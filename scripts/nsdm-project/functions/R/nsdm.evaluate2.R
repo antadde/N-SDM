@@ -92,15 +92,16 @@ nsdm.evaluate2<-function(x,tester=data.frame(),thres=numeric(),crit="pp=op",prev
   # parallelize over replicates
   lis<-mclapply(1:length(x@fits), mc.preschedule = FALSE, function(g){
 
-    lisa<-list()
-    # Loop over model types
-    for(j in 1:length(x@fits[[1]])){
+  lisa<-list()
+  
+  # Loop over model types
+  for(j in 1:length(x@fits[[1]])){
 
-      # Make prediction
+      # Make predictions
 	  if("lgb.Booster" %in% class(x@fits[[g]][[j]])){
-	  x@fits[[g]][[j]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", taxon,"_rep",g,"_mod",j,"_",level,".rds"))}
-      
-	  pred=nsdm.prd(x@fits[[g]][[j]],testa[[g]])
+	  x@fits[[g]][[j]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", taxon,"_rep",g,"_mod",j,"_",level,".rds"))
+      testa[[g]]<- testa[[g]][,-which(colnames(testa[[g]]) %in% c("X","Y"))]}
+	  pred=nsdm.prd(x@fits[[g]][[j]], testa[[g]])
       scores<-NULL
 	  
       # Evaluate (with external threshold if available)

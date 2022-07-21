@@ -101,7 +101,8 @@ if(nrow(grid.list[["rf"]])>1){
 for(p in 1:nrow(params_rf)){
 param_rf<-params_rf[p,]
 #multi_rf<-nsdm.multi("ranger",list(formula=Presence~.,num.trees=param_rf$num.trees, mtry=param_rf$mtry, min.node.size = param_rf$min.node.size, num.threads=nthreads), tag=paste0("rf-",p))
-multi_rf<-nsdm.multi("randomForest",list(formula=Presence~.,ntree=as.numeric(param_rf$num.trees), mtry=floor(sqrt(length(covariate_names))), nodesize = as.numeric(param_rf$min.node.size), classwt=c("0"=min(weights), "1"=max(weights))), tag=paste0("rf-",p), weight=weighting)
+form_rf<-as.formula(paste("Presence~", paste(covariate_names, collapse=" + ")))
+multi_rf<-nsdm.multi("randomForest",list(formula=form_rf,ntree=as.numeric(param_rf$num.trees), mtry=floor(sqrt(length(covariate_names))), nodesize = as.numeric(param_rf$min.node.size), classwt=c("0"=min(weights), "1"=max(weights))), tag=paste0("rf-",p), weight=weighting)
 modinp<-append(modinp, multi_rf)
 }
 }
