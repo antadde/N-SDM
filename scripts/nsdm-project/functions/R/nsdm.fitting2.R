@@ -67,7 +67,7 @@ nsdm.flex2<-function(x=numeric(),
 
       if(mod_args[[j]]@mod=="maxnet"){
 
-        mod_args[[j]]@args$data<-lis$train[[x]][,-which(colnames(lis$train[[x]])=="Presence")]
+        mod_args[[j]]@args$data<-lis$train[[x]][,-which(colnames(lis$train[[x]]) %in% c("Presence", "X", "Y"))]
         mod_args[[j]]@args$p<-lis$train[[x]][,"Presence"]
 
         modi[[j]]<-try(do.call(mod_args[[j]]@mod, mod_args[[j]]@args), TRUE)
@@ -89,13 +89,13 @@ nsdm.flex2<-function(x=numeric(),
         wt=rep(1,length(lis$train[[x]][,"Presence"]))
         wt[wi]<-round((length(wt)-length(wi))/length(wi))
 		
-        mod_args[[j]]@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])=="Presence")]), 
+        mod_args[[j]]@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])%in% c("Presence", "X", "Y"))]), 
                                              label = lis$train[[x]][,"Presence"],
 											 weight=wt)
 											 
 		} else {
 		
-		       mod_args[[j]]@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])=="Presence")]), 
+		       mod_args[[j]]@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])%in% c("Presence", "X", "Y"))]), 
                                              label = lis$train[[x]][,"Presence"])
 		}  
 		
