@@ -23,13 +23,14 @@ nsdm.summary=function(object){
   #cat("\nMean skill: \n")
 
   mats=list()
-  for(i in 1:length(object@performance)){
-    mats[[i]]=do.call("cbind",object@performance[[i]])
+  for(k in 1:length(object@performance)){
+  perf_k<-object@performance[[k]]
+  mats[[k]]=do.call("cbind",perf_k)
   }
   
-  mn=rowMeans(do.call(cbind, mats), na.rm = TRUE)
+  mn=do.call(cbind, lapply(mats, rowMeans, na.rm = TRUE))
   mn=as.matrix(mn)
-  colnames(mn)=colnames(mats[[1]])
+  colnames(mn)=names(object@performance)
 
   return(mn)
 

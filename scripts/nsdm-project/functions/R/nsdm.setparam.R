@@ -69,7 +69,7 @@ multis_gam_fx<-list()
 for(p in 1:nrow(params_gam_fx)){
 param_gam<-params_gam_fx[p,]
 form_gam<-as.formula(paste0("Presence~ " ,paste(paste0("s(",covariate_names,", k=", as.numeric(param_gam),", fx=TRUE)"),collapse=" + ")))
-multi_gam<-nsdm.multi("mgcv_gam", list(formula=form_gam, family="binomial", method="REML", select=FALSE),tag=paste0("gam-",p+nrow(params_gam_auto)), weight=weighting)
+multi_gam<-nsdm.multi("mgcv_gam_fx", list(formula=form_gam, family="binomial", method="REML", select=FALSE),tag=paste0("gam-",p+nrow(params_gam_auto)), weight=weighting)
 multis_gam_fx<-append(multis_gam_fx, multi_gam)
 }
 modinp<-append(multis_gam_auto,multis_gam_fx)
@@ -100,7 +100,6 @@ if(nrow(grid.list[["rf"]])>1){
 
 for(p in 1:nrow(params_rf)){
 param_rf<-params_rf[p,]
-#multi_rf<-nsdm.multi("ranger",list(formula=Presence~.,num.trees=param_rf$num.trees, mtry=param_rf$mtry, min.node.size = param_rf$min.node.size, num.threads=nthreads), tag=paste0("rf-",p))
 form_rf<-as.formula(paste("Presence~", paste(covariate_names, collapse=" + ")))
 multi_rf<-nsdm.multi("randomForest",list(formula=form_rf,ntree=as.numeric(param_rf$num.trees), mtry=floor(sqrt(length(covariate_names))), nodesize = as.numeric(param_rf$min.node.size), classwt=c("0"=min(weights), "1"=max(weights))), tag=paste0("rf-",p), weight=weighting)
 modinp<-append(modinp, multi_rf)
