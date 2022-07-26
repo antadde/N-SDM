@@ -62,9 +62,7 @@ nsdm.flex3<-function(x=numeric(),
   # loop over model types
 	
   for(j in 1:length(mod_args)){
-  
-  print(j)
-  
+   
   mod_args_j=mod_args[[j]]
   
   # Retrieve computation time
