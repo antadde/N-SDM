@@ -48,8 +48,7 @@ for(i in 1:length(model_names)){
     res[esm_ix,"model_name"]<-esm_names
   } else {
   if(length(score)>1){
-    smev<-do.call(cbind,score)
-    score_val<-sort(smev[weight_metric,],decreasing=T)[1]
+    score_val<-sort(score[weight_metric,],decreasing=T)[1]
     ## store outputs
     res[i,"score"]<-score_val
     res[i,"model_name"]<-model_name
