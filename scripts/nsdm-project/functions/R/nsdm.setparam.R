@@ -70,7 +70,7 @@ multis_gam_fx<-list()
 for(p in 1:nrow(params_gam_fx)){
 param_gam<-params_gam_fx[p,]
 form_gam<-as.formula(paste0("Presence~ " ,paste(paste0("s(",covariate_names,", k=", as.numeric(param_gam),", fx=TRUE)"),collapse=" + ")))
-multi_gam<-nsdm.multi("mgcv_gam_fx", list(formula=form_gam, family="binomial", method="REML", select=FALSE),tag=paste0("gam-",p+nrow(params_gam_auto)), weight=weighting)
+multi_gam<-nsdm.multi("mgcv_gam", list(formula=form_gam, family="binomial", method="REML", select=FALSE),tag=paste0("gam-",p+nrow(params_gam_auto)), weight=weighting)
 multis_gam_fx<-append(multis_gam_fx, multi_gam)
 }
 modinp<-append(multis_gam_auto,multis_gam_fx)
