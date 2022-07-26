@@ -46,6 +46,7 @@ modinp<-append(modinp, multi_glm)
 ## GAM
 if(model_name=="gam"){
 mgcv_gam<<-mgcv::bam
+mgcv_gam_fx<<-mgcv::bam
 
 ## with penalization
 if(nrow(grid.list[["gam.auto"]])>1){

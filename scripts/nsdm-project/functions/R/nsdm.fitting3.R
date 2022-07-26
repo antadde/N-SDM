@@ -41,7 +41,7 @@ nsdm.flex3<-function(x=numeric(),
 
  # Check supplied model types
   for(i in 1:length(mod_args)){
-    if(!(mod_args[[i]]@mod%in%c("glm","gam","gbm","maxnet","randomForest","mgcv_gam","lightgbm","ranger"))){
+    if(!(mod_args[[i]]@mod%in%c("glm","gam","gbm","maxnet","randomForest","mgcv_gam","mgcv_gam_fx","lightgbm","ranger"))){
       warning(paste(mod_args[[i]]@mod,"not in focal model functions. You might run in to problems when evaluating/predicting..."))
     }
   }
@@ -62,6 +62,8 @@ nsdm.flex3<-function(x=numeric(),
   # loop over model types
 	
   for(j in 1:length(mod_args)){
+  
+  print(j)
   
   mod_args_j=mod_args[[j]]
   
