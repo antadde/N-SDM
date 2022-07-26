@@ -215,17 +215,17 @@ temp_m[,2,i]<-logit2prob(X1[[1]]$y)
 if(class(models@fits[[1]][[1]])[2]!="randomForest"  & class(models@fits[[1]][[1]])[1]!="lgb.Booster" & class(models@fits[[1]][[1]])[1]!="maxnet"){
 temp<-list() # list where results will be stored
 
-for(m in 1:length(models@fits[[1]])){ # Loop over models (1 in regular cases but much more in esm settings)
+for(m in 1:length(models@fits)){ # Loop over models (1 in regular cases but much more in esm settings)
 
 # Duplicate Data for loop reuse
 Data2<-Data
   
 # Retrieve model fit
-model<-models@fits[[1]][[m]]	  
+model<-models@fits[[m]][[1]]		  
   
 # In case of esm model uses its name its index for naming and subset Data
 if(model_name=="esm"){
-model_nameu<-names(models@fits[[1]])[m]
+model_nameu<-names(models@fits)[m]
 Data2<-Data2[,(gsub(".*[(]([^.]+)[,].*", "\\1", rownames(model$R)[c(2,5)]))]
 }else{
 model_nameu<-model_name}

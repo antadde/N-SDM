@@ -12,14 +12,14 @@ nsdm.varimp <- function(models){
 
 imp_scaled_f<-list() # list where results will be stored
   
-for(m in 1:length(models@fits[[1]])){ # Loop over models (1 in regular cases but much more in esm settings)
+for(m in 1:length(models@fits)){ # Loop over models (1 in regular cases but much more in esm settings)
 
 # Retrieve model fit
-model<-models@fits[[1]][[m]]	  
+model<-models@fits[[m]][[1]]	  
   
 # In case of esm model uses its name its index for naming and subset Data
 if(model_name=="esm"){
-  model_nameu<-names(models@fits[[1]])[m]
+  model_nameu<-names(models@fits)[m]
 }else{
   model_nameu<-model_name}
 

@@ -17,10 +17,10 @@ ndata_bck_f<-list() # list where results will be stored
 # Split indices for parallel predict
 splits_ix<-parallel::splitIndices(nrow(nwdata), nsplits)
 
-for(m in 1:length(models@fits[[1]])){ # Loop over models (only 1 in regular cases but more in esm settings)
+for(m in 1:length(models@fits)){ # Loop over models (1 in regular cases but much more in esm settings)
   
 # Retrieve model fit
-model<-models@fits[[1]][[m]]
+model<-models@fits[[m]][[1]]
 
 # Reorder covariates to match model order (needed for gbm booster ..)
 cov<-unlist(strsplit(models@meta$env_vars,", "))
@@ -28,9 +28,9 @@ nwdata <- nwdata[,cov]
 
 # In case of esm model uses its name its index for naming
 if(model_name=="esm"){
-  model_nameu<-names(models@fits[[1]])[m]
+model_nameu<-names(models@fits)[m]
 }else{
-  model_nameu<-model_name}  
+  model_nameu<-model_name}
 
 ## GLM
 if(c("glm") %in% class(model) & !("gam") %in% class(model)){
