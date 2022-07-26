@@ -42,7 +42,7 @@ for(i in 1:length(model_names)){
   if(model_name=="esm"){
     esm_ix<-grep("_esm",names(stack_map))
     esm_names<-paste("esm", stri_extract_first_regex(names(stack_map)[esm_ix], "[0-9]+"), sep="-")
-    score_val<-do.call(cbind,score)[weight_metric,esm_names]
+    score_val<-score[weight_metric,esm_names]
     ## store outputs
     res[esm_ix,"score"]<-score_val
     res[esm_ix,"model_name"]<-esm_names
