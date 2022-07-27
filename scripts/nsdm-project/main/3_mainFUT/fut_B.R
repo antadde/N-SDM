@@ -66,7 +66,7 @@ pred<-readRDS(pred_file)
 
 # C.2 Predict 
 map_i<-nsdm.map(template=pred$template,
-                nona_ix=pred$nona_ix, # indices for non-na cells (stored in clim_df_loc)
+                nona_ix=pred$nona_ix,
                 species_name=ispi_name,
 				model_name=model_name,
 				level="glo",
@@ -82,16 +82,16 @@ cat(paste0(model_name,' predictions saved \n'))
 ### =========================================================================
 ### D- Ensemble predictions
 ### =========================================================================
-ensemble_glo<-nsdm.ensemble(model_names= mod_algo, # models for ensembling
+ensemble_glo<-nsdm.ensemble(model_names= mod_algo,
                            species_name=ispi_name,
 						   level="glo",
 						   scenar_name=scenar,
 						   period_name=per,
-                           map_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/glo/",scenar,"/",per), # path where prediction rasters are stored
-                           score_path=paste0(scr_path,"/outputs/",project,"/d3_evals/glo"), # path where model evaluation tables are stored
-                           weighting=do_weighting, # use weights when ensembling
-                           weight_metric=weight_metric, # evaluation metric for weighting/discarding
-                           discthre=disc_thre) # threshold under which to discard a model
+                           map_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/glo/",scenar,"/",per), 
+                           score_path=paste0(scr_path,"/outputs/",project,"/d3_evals/glo"),
+                           weighting=do_weighting,
+                           weight_metric=weight_metric, 
+                           discthre=disc_thre)
 
 nsdm.savemap(maps=ensemble_glo$ensemble, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/glo/",scenar,"/",per))
 nsdm.savemap(maps=ensemble_glo$ensemble_cv, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d16_ensembles-cv-fut/glo/",scenar,"/",per))

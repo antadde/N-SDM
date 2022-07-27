@@ -4,9 +4,13 @@
 ## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
+
+### =========================================================================
+### A- Preparation
+### =========================================================================
 project<-gsub("/main/4_mainEND","",gsub(".*scripts/","",getwd()))
 
-# Load nsdm.ine settings
+# Load nsdm settings
 load(paste0(gsub("scripts","tmp",gsub("/main/4_mainEND","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
@@ -21,10 +25,16 @@ setwd(w_path)
 # Load nsdm package
 require(nsdm)
 
+### =========================================================================
+### B- Definitions
+### =========================================================================
+
 # Target species
 species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 
-# Retrieve and preprocess sacct outputs
+### =========================================================================
+### C- Retrieve and preprocess sacct outputs
+### =========================================================================
 sacct<-read.csv2(list.files(paste0("tmp/",project,"/sacct/"), pattern=paste0(ssl_id,"_",run_id,"_sacct"), recursive=T, full.names=T))
 sacct<-sacct[-grep("extern", unlist(sacct), fixed=T),]
 sacct<-read.table(text=sacct, skip = 1,
@@ -70,7 +80,9 @@ fwrite(sacct, paste0(spth,"/sacct_table_",ssl_id,"_run_",run_id,".csv"))
 sacct$JobName<- factor(sacct$JobName, levels = jobs)
 sacct$Elapsed<-60 * hours(times(sacct$Elapsed)) + minutes(times(sacct$Elapsed))
 
-# Synthetize sacct info
+### =========================================================================
+### D- Synthetize sacct info
+### =========================================================================
 n_spe<-length(species)
 times_sm<-aggregate(times(sacct$Elapsed), list(sacct$JobName, sacct$species), sum)
 times_mx<-aggregate(times(sacct$Elapsed), list(sacct$JobName, sacct$species), max)
@@ -95,7 +107,9 @@ mem_mx$m_mx<-mem_mx$x/1000^3
 nsdm.savethis(object=list(mem_mn, mem_mx, times_sm, times_mx), species=paste0(ssl_id,"_run_",run_id),
               save_path=paste0(scr_path,"/outputs/",project,"/d19_sacct"))
 
-# Plots
+### =========================================================================
+### E- Plots
+### =========================================================================
 pals<-c(
 get_palette(palette = "Greys", length(grep("PRE", unique(sacct$JobName)))),
 get_palette(palette = "Blues", length(grep("GLO", unique(sacct$JobName)))),

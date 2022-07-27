@@ -110,12 +110,12 @@ pseu.abs_i_loc<-nsdm.bigextract(cov=gsub(".rds", ".fst", lr_loc),
 pseu.abs_i_glo@pa<-c(pseu.abs_i_glo@pa, pseu.abs_i_loc@pa)
 pseu.abs_i_glo@years<-c(pseu.abs_i_glo@years, pseu.abs_i_loc@years)
 pseu.abs_i_glo@xy<-rbind(pseu.abs_i_glo@xy, pseu.abs_i_loc@xy)
-m_ord<-match(cov_info_loc$variable, cov_info_glo$variable) # make sure glo and loc covariate are in the same order
-names(pseu.abs_i_glo@env_vars)[m_ord]<-names(pseu.abs_i_loc@env_vars) # rename
-env_vars<-scale(rbind(pseu.abs_i_glo@env_vars, pseu.abs_i_loc@env_vars)) # keep scaling parameters to backtransform predictions later
+m_ord<-match(cov_info_loc$variable, cov_info_glo$variable)
+names(pseu.abs_i_glo@env_vars)[m_ord]<-names(pseu.abs_i_loc@env_vars) 
+env_vars<-scale(rbind(pseu.abs_i_glo@env_vars, pseu.abs_i_loc@env_vars))
 pseu.abs_i_glo@env_vars<-data.frame(env_vars)							   
 } else {
-env_vars<-scale(pseu.abs_i_glo@env_vars) # keep scaling parameters to backtransform predictions later
+env_vars<-scale(pseu.abs_i_glo@env_vars)
 pseu.abs_i_glo@env_vars<-data.frame(env_vars)
 # E.4 Update cov_info table
 cov_info_glo<-na.omit(cov_info_glo[match(colnames(pseu.abs_i_glo@env_vars), gsub(".rds","",basename(cov_info_glo$file))),])					   
@@ -161,25 +161,25 @@ counter <- sum(counter, 1)
 cat('covariate selection S1: Filtering...\n')
 foc<-unique(cov_info_glo[which(cov_info_glo$focal!="NA"),"cada"])
 if(length(foc)==0) foc<-NULL
-cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i_glo@pa, # pa vector
-                             covdata=pseu.abs_i_glo@env_vars, # data.frame of environmental covariates extracted at pa
-                             weights=wt, # weight vector
+cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i_glo@pa, 
+                             covdata=pseu.abs_i_glo@env_vars, 
+                             weights=wt,
                              datasets=cov_info_glo$cada,
 							 varnames=gsub("_NA", "", paste(cov_info_glo$variable, cov_info_glo$attribute, sep="_")), 
-                             focals=foc, # datasets with focal window selection
-                             method=sel_met, # univariate ranking method to be used
-                             corcut=cor_cut), silent=TRUE) # correlation cutoff for colinearity
+                             focals=foc,
+                             method=sel_met, 
+                             corcut=cor_cut), silent=TRUE) 
 
 # F.2 Step 2: Model-specific embedding
 cat('covariate selection S2: Embedding...\n')
 cov.embed_i<-try(nsdm.embedsel(pa=pseu.abs_i_glo@pa,
-                           covdata=cov.filter_i, # filtered covariate set from Step 1
+                           covdata=cov.filter_i,
                            weights=wt,
                            nthreads=ncores), silent=TRUE)
 
 # F.3 Step 3: Overall ranking
 cat('covariate selection S3: Ranking...\n')
-cov.rk_i<-try(nsdm.covselrk(embed=cov.embed_i, # embedded results (S2)
+cov.rk_i<-try(nsdm.covselrk(embed=cov.embed_i,
                         species_name=ispi_name), silent=TRUE)
 
 # F.4 Step 4: Final covariate subset
@@ -191,8 +191,8 @@ stk<-try(nsdm.fastraster(files=na.omit(cov_info_glo$file[match(cov.rk_i$var, gsu
 cov.sub_i<-try(nsdm.covsub(covdata=pseu.abs_i_glo@env_vars,
             rasterdata=stk,
             ranks=cov.rk_i, # ranking from S3
-            thre=ceiling(log2(table(pseu.abs_i_glo@pa)['1'])), # target number of covariates (log2 nobs)
-			max.thre=max_thre), silent=TRUE) # max number of possible covariates in model
+            thre=ceiling(log2(table(pseu.abs_i_glo@pa)['1'])), 
+			max.thre=max_thre), silent=TRUE)
 
 if(counter > 5 | !is(cov.sub_i, 'try-error')) break
 cat(paste0("an error occured; tentative number ", counter, " for covariate selection...\n"))

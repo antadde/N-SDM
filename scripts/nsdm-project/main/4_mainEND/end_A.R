@@ -10,7 +10,7 @@
 ### =========================================================================
 project<-gsub("/main/4_mainEND","",gsub(".*scripts/","",getwd()))
 
-# Load nsdm.ine settings
+# Load nsdm settings
 load(paste0(gsub("scripts","tmp",gsub("/main/4_mainEND","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
@@ -61,65 +61,47 @@ eval_list<-nsdm.loadthis(model_name=model, species_name=ispi_name,
               read_path=paste0(scr_path,"/outputs/",project,"/d3_evals/glo"))
 
 if(model!="esm"){
-  if(length(eval_list)>1){
-    smev<-do.call(cbind,eval_list)
-    ord<-sort(smev[best_met,],decreasing=T)
+  if(ncol(eval_list)>1){
+    ord<-sort(eval_list[best_met,],decreasing=T)
     modinp_top<-names(ord[1])
-   if(ord[1] < disc_thre) next
   } else {
-   if(eval_list[[1]][weight_metric,] < disc_thre) next
-    modinp_top<-colnames(eval_list[[1]])}}
-	
+    modinp_top<-colnames(eval_list)}}
 if(model=="esm"){
-  smev<-do.call(cbind,eval_list)
-  ord<-sort(smev[best_met,],decreasing=T)
+  ord<-sort(eval_list[best_met,],decreasing=T)
   ord<-ord[ord>best_thre_esm]
   modinp_top<-names(ord)
 }
 
-# Load best model(s)
-mods<-list()
-if(model!="esm"){
+# Load model(s)
 mod_m<-nsdm.loadthis(species_name=ispi_name, model_name=model,
-               tag=modinp_top,
-               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/glo"))$mod
-mods[[1]]<-mod_m
-}
-
-if(model=="esm"){
-for(m in 1:length(modinp_top)){
-mod_m<-nsdm.loadthis(species_name=ispi_name, model_name=model,
-               tag=modinp_top[m],
-               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/glo"))$mod
-mods[[m]]<-mod_m
-}
-}
+               tag=paste0(model,"_tune"),
+               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/glo"))$model
 
 # Loop over models (one in regular cases; more for ESMs)
 pop<-list()
-for(n in 1:length(mods)){
-mod<-mods[[n]]
+for(n in 1:length(modinp_top)){
+modinp_top_n<-modinp_top[n]
 
 # Retrieve test and training data 
-testa_GLO<-lapply(mod@tesdat,function(x){
+testa_GLO<-lapply(mod_m$m@tesdat,function(x){
 y<-x[,-which(colnames(x)=="Presence"),drop=FALSE]
 })
 
- papa_GLO<-lapply(mod@tesdat,function(x){
+ papa_GLO<-lapply(mod_m$m@tesdat,function(x){
  y<-x[,"Presence"]})
   
 # Predict
-outerloop<-length(mod@tesdat)
+outerloop<-length(mod_m$m@tesdat)
 tmp_path_gbm<-paste0(scr_path,"/tmp/",project,"/gbm")
 pred<-list()
 for(k in 1:outerloop){
-if("lgb.Booster" %in% class(mod@fits[[k]][[1]])){
-mod@fits[[k]][[1]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod","1","_",level,".rds"))
+if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
+mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
 testa_GLO[[k]]<- testa_GLO[[k]][,-which(colnames(testa_GLO[[k]]) %in% c("X","Y"))]}
-if(class(mod@fits[[k]])=="try-error"){
+if(class(mod_m$m@fits[[modinp_top_n]][[k]])=="try-error"){
 pred_i<-rep(NA, nrow(testa_GLO[[k]]))
 } else {
-pred_i<-nsdm.prd(mod@fits[[k]][[1]], testa_GLO[[k]])}
+pred_i<-nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_GLO[[k]])}
 pred[[k]]<-pred_i
 }
 pop_n<-do.call(cbind, pred)
@@ -128,7 +110,7 @@ pop[[n]]<-pop_n
 
 if(length(pop)>1){
 pop<-simplify2array(pop)
-pop<-rowMeans(pop, dims = 2)
+pop<-apply(pop, c(1,2), mean)
 }else{
 pop<-pop[[1]]}
 
@@ -153,68 +135,50 @@ eval_list<-nsdm.loadthis(model_name=model, species_name=ispi_name,
               read_path=paste0(scr_path,"/outputs/",project,"/d3_evals/loc/multiply"))
 
 if(model!="esm"){
-  if(length(eval_list)>1){
-    smev<-do.call(cbind,eval_list)
-    ord<-sort(smev[best_met,],decreasing=T) # Target metric for identifying "best" model
+  if(ncol(eval_list)>1){
+    ord<-sort(eval_list[best_met,],decreasing=T)
     modinp_top<-names(ord[1])
-   if(ord[1] < disc_thre) next
   } else {
-   if(eval_list[[1]][weight_metric,] < disc_thre) next
-    modinp_top<-colnames(eval_list[[1]])}}
-
+    modinp_top<-colnames(eval_list)}}
 if(model=="esm"){
-  smev<-do.call(cbind,eval_list)
-  ord<-sort(smev[best_met,],decreasing=T)
+  ord<-sort(eval_list[best_met,],decreasing=T)
   ord<-ord[ord>best_thre_esm]
   modinp_top<-names(ord)
 }
- 
-# Load best model
-mods<-list()
-if(model!="esm"){
-mod_m<-nsdm.loadthis(species_name=ispi_name, model_name=model,
-               tag=modinp_top,
-               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/multiply"))$mod
-mods[[1]]<-mod_m
-}
 
-if(model=="esm"){
-for(m in 1:length(modinp_top)){
+# Load best model
 mod_m<-nsdm.loadthis(species_name=ispi_name, model_name=model,
-               tag=modinp_top[m],
-               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/multiply"))$mod
-mods[[m]]<-mod_m
-}
-}
+               tag=paste0(model,"_tune"),
+               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/multiply"))$model
 
 # Loop over models (one in regular cases; more for ESMs)
 pop<-list()
-for(n in 1:length(mods)){
-mod<-mods[[n]]
+for(n in 1:length(modinp_top)){
+modinp_top_n<-modinp_top[n]
 
 # Retrieve test and training data 
-testa_LOC_multiply<-lapply(mod@tesdat,function(x){
+testa_LOC_multiply<-lapply(mod_m$m@tesdat,function(x){
 y<-x[,-which(colnames(x)=="Presence"),drop=FALSE]
 })
 
- papa_LOC_multiply<-lapply(mod@tesdat,function(x){
+ papa_LOC_multiply<-lapply(mod_m$m@tesdat,function(x){
  y<-x[,"Presence"]})
   
 # Predict
-outerloop<-length(mod@tesdat)
+outerloop<-length(mod_m$m@tesdat)
 tmp_path_gbm<-paste0(scr_path,"/tmp/",project,"/gbm")
 pred<-list()
-glo_prob<-list(); glo_out<-readRDS(list.files(paste0(scr_path,"outputs/",project,"/d8_ensembles/glo/", ispi_name), pattern=".rds", full.names=T)) # store glo probabilities for multiply strategy evaluation
+glo_prob<-list(); glo_out<-readRDS(list.files(paste0(scr_path,"outputs/",project,"/d8_ensembles/glo/", ispi_name), pattern=".rds", full.names=T))
 for(k in 1:outerloop){
-if("lgb.Booster" %in% class(mod@fits[[k]][[1]])){
-mod@fits[[k]][[1]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod","1","_",level,".rds"))
+if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
+mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
 testa_LOC_multiply[[k]]<- testa_LOC_multiply[[k]][,-which(colnames(testa_LOC_multiply[[k]]) %in% c("X","Y"))]}
-if(class(mod@fits[[k]])=="try-error"){
+if(class(mod_m$m@fits[[modinp_top_n]][[k]])=="try-error"){
 pred_i<-rep(NA, nrow(testa_LOC_multiply[[k]]))
 } else {
-pred_i<-nsdm.prd(mod@fits[[k]][[1]], testa_LOC_multiply[[k]])}
+pred_i<-nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_LOC_multiply[[k]])}
 pred[[k]]<-pred_i
-glo_prob[[k]]<-raster::extract(glo_out, data.frame(mod@tesdat[[k]]$X,mod@tesdat[[k]]$Y))/100
+glo_prob[[k]]<-raster::extract(glo_out, data.frame(mod_m$m@tesdat[[k]]$X,mod_m$m@tesdat[[k]]$Y))/100
 }
 pop_n<-do.call(cbind, pred)
 pop[[n]]<-pop_n
@@ -222,7 +186,7 @@ pop[[n]]<-pop_n
 
 if(length(pop)>1){
 pop<-simplify2array(pop)
-pop<-rowMeans(pop, dims = 2)
+pop<-apply(pop, c(1,2), mean)
 }else{
 pop<-pop[[1]]}
 
@@ -250,65 +214,47 @@ eval_list<-nsdm.loadthis(model_name=model, species_name=ispi_name,
               read_path=paste0(scr_path,"/outputs/",project,"/d3_evals/loc/covariate"))
 
 if(model!="esm"){
-  if(length(eval_list)>1){
-    smev<-do.call(cbind,eval_list)
-    ord<-sort(smev[best_met,],decreasing=T) # Target metric for identifying "best" model
+  if(ncol(eval_list)>1){
+    ord<-sort(eval_list[best_met,],decreasing=T)
     modinp_top<-names(ord[1])
-   if(ord[1] < disc_thre) next
   } else {
-   if(eval_list[[1]][weight_metric,] < disc_thre) next
-    modinp_top<-colnames(eval_list[[1]])}}
-	
+    modinp_top<-colnames(eval_list)}}
 if(model=="esm"){
-  smev<-do.call(cbind,eval_list)
-  ord<-sort(smev[best_met,],decreasing=T)
+  ord<-sort(eval_list[best_met,],decreasing=T)
   ord<-ord[ord>best_thre_esm]
   modinp_top<-names(ord)
 }
- 
-# Load best model
-mods<-list()
-if(model!="esm"){
-mod_m<-nsdm.loadthis(species_name=ispi_name, model_name=model,
-               tag=modinp_top,
-               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/covariate"))$mod
-mods[[1]]<-mod_m
-}
 
-if(model=="esm"){
-for(m in 1:length(modinp_top)){
+# Load best model
 mod_m<-nsdm.loadthis(species_name=ispi_name, model_name=model,
-               tag=modinp_top[m],
-               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/covariate"))$mod
-mods[[m]]<-mod_m
-}
-}
+               tag=paste0(model,"_tune"),
+               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/covariate"))$model
 
 # Loop over models (one in regular cases; more for ESMs)
 pop<-list()
-for(n in 1:length(mods)){
-mod<-mods[[n]]
+for(n in 1:length(modinp_top)){
+modinp_top_n<-modinp_top[n]
 
 # Retrieve test and training data 
-testa_LOC_covariate<-lapply(mod@tesdat,function(x){
+testa_LOC_covariate<-lapply(mod_m$m@tesdat,function(x){
 y<-x[,-which(colnames(x)=="Presence"),drop=FALSE]
 })
 
- papa_LOC_covariate<-lapply(mod@tesdat,function(x){
+ papa_LOC_covariate<-lapply(mod_m$m@tesdat,function(x){
  y<-x[,"Presence"]})
-  
+   
 # Predict
-outerloop<-length(mod@tesdat)
+outerloop<-length(mod_m$m@tesdat)
 tmp_path_gbm<-paste0(scr_path,"/tmp/",project,"/gbm")
 pred<-list()
 for(k in 1:outerloop){
-if("lgb.Booster" %in% class(mod@fits[[k]][[1]])){
-mod@fits[[k]][[1]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod","1","_",level,".rds"))
+if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
+mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
 testa_LOC_covariate[[k]]<- testa_LOC_covariate[[k]][,-which(colnames(testa_LOC_covariate[[k]]) %in% c("X","Y"))]}
-if(class(mod@fits[[k]])=="try-error"){
+if(class(mod_m$m@fits[[modinp_top_n]][[k]])=="try-error"){
 pred_i<-rep(NA, nrow(testa_LOC_covariate[[k]]))
 } else {
-pred_i<-nsdm.prd(mod@fits[[k]][[1]], testa_LOC_covariate[[k]])}
+pred_i<-nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_LOC_covariate[[k]])}
 pred[[k]]<-pred_i
 }
 pop_n<-do.call(cbind, pred)
@@ -317,7 +263,7 @@ pop[[n]]<-pop_n
 
 if(length(pop)>1){
 pop<-simplify2array(pop)
-pop<-rowMeans(pop, dims = 2)
+pop<-apply(pop, c(1,2), mean)
 }else{
 pop<-pop[[1]]}
 
@@ -332,7 +278,7 @@ LOC_covariate_preds<-simplify2array(pred_all)
 ### D- Evaluate ensemble predictions
 ### =========================================================================
 scores_ensemble<-list()
-# European-level ensemble
+# GLO-level ensemble
 target<-GLO_preds
 scores<-list()
 for (z in 1:outerloop){
@@ -344,7 +290,7 @@ scores[[z]]<-score}
 scores_ensemble[["GLO"]]<-scores	
 
 if(n_levels>1){
-# Swiss-level ensemble without nesting
+# LOC-level ensemble without nesting (only possible in multiple mode)
 if("multiply" %in% nesting_methods){
 target<-LOC_multiply_preds
 scores<-list()

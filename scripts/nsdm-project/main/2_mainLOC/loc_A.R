@@ -95,7 +95,7 @@ cov_info<-na.omit(cov_info[match(colnames(pseu.abs_i@env_vars), gsub(".rds","",b
 
 # Scale env_vars							
 colnames(pseu.abs_i@env_vars)[ncol(pseu.abs_i@env_vars)]<-"mainGLO"
-env_vars<-scale(pseu.abs_i@env_vars) # keep scaling parameters for backtransforming predictions later
+env_vars<-scale(pseu.abs_i@env_vars)
 pseu.abs_i@env_vars<-data.frame(env_vars)
 
 # E.3 Define weights
@@ -131,27 +131,27 @@ counter <- sum(counter, 1)
 foc<-unique(cov_info[which(cov_info$focal!="NA"),"cada"])
 cat('covariate selection with mainGLO forced S1: Filtering...\n')
 if(length(foc)==0) foc<-NULL
-cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i@pa, # pa vector
-                             covdata=pseu.abs_i@env_vars, # data.frame of environmental covariates extracted at pa
-                             weights=wt, # weight vector
+cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i@pa,
+                             covdata=pseu.abs_i@env_vars, 
+                             weights=wt, 
                              datasets=c(cov_info$cada, "mainGLO"),  
 							 varnames=c(gsub("_NA", "", paste(cov_info$variable, cov_info$attribute, sep="_")), "mainGLO"), 
-                             focals=foc, # datasets with focal window selection
-                             method=sel_met, # univariate ranking method to be used
+                             focals=foc,
+                             method=sel_met,
                              corcut=cor_cut,
-							 force=c("mainGLO")), silent=TRUE) # correlation cutoff for colinearity
+							 force=c("mainGLO")), silent=TRUE) 
 							 
 # F.2 Step 2: Model-specific embedding
 cat('covariate selection with mainGLO forced S2: Embedding...\n')
 cov.embed_i<-try(nsdm.embedsel(pa=pseu.abs_i@pa,
-                           covdata=cov.filter_i, # filtered covariate set from Step 1
+                           covdata=cov.filter_i,
                            weights=wt,
 						   force=c("mainGLO"),
                            nthreads=ncores), silent=TRUE)
 						   
 # F.3 Step 3: Overall ranking
 cat('covariate selection with mainGLO forced S3: Ranking...\n')
-cov.rk_i<-try(nsdm.covselrk(embed=cov.embed_i, # embedded results (S2)
+cov.rk_i<-try(nsdm.covselrk(embed=cov.embed_i, 
                         species_name=ispi_name), silent=TRUE)
 					
 cat('covariate selection with mainGLO forced S4: Final subsetting...\n')
@@ -159,11 +159,11 @@ cat('covariate selection with mainGLO forced S4: Final subsetting...\n')
 hab_stk_loc<-try(nsdm.fastraster(files=na.omit(cov_info$file[match(cov.rk_i$var, gsub(".rds","",basename(cov_info$file)))][1:max_thre]), nsplits=ncores), silent=TRUE)
 cov.sub_i_cov <-try(nsdm.covsub(covdata=pseu.abs_i@env_vars,
             rasterdata=hab_stk_loc,
-            ranks=cov.rk_i[-(which(cov.rk_i$var=="mainGLO")),], # ranking from S3
-            thre=ceiling(log2(table(pseu.abs_i@pa)['1']))-1, # target number of covariates
-			max.thre=max_thre-1, # max number of possible covariates in model
-			glo.out=readRDS(glo_out), # add mainGLO outputs to covariate subset
-			glo.xy=pseu.abs_i@xy, #xy coordinates where to extract glo.out
+            ranks=cov.rk_i[-(which(cov.rk_i$var=="mainGLO")),],
+            thre=ceiling(log2(table(pseu.abs_i@pa)['1']))-1, 
+			max.thre=max_thre-1,
+			glo.out=readRDS(glo_out), 
+			glo.xy=pseu.abs_i@xy,
 			), silent=TRUE)
 			
 covstk_res[["cov"]]<-cov.sub_i_cov$rasterdata
@@ -187,25 +187,25 @@ pseu.abs_i@env_vars<-subset(pseu.abs_i@env_vars, select=-c(mainGLO))
 foc<-unique(cov_info[which(cov_info$focal!="NA"),"cada"])
 cat('covariate selection without mainGLO S1: Filtering...\n')
 if(length(foc)==0) foc<-NULL
-cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i@pa, # pa vector
-                                covdata=pseu.abs_i@env_vars, # data.frame of environmental covariates extracted at pa
-                                weights=wt, # weight vector
+cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i@pa, 
+                                covdata=pseu.abs_i@env_vars,
+                                weights=wt,
                                 datasets=cov_info$cada,
 							    varnames=gsub("_NA", "", paste(cov_info$variable, cov_info$attribute, sep="_")), 
-                                focals=foc, # datasets with focal window selection
-                                method=sel_met, # univariate ranking method to be used
-                                corcut=cor_cut), silent=TRUE) # correlation cutoff for colinearity
+                                focals=foc,
+                                method=sel_met,
+                                corcut=cor_cut), silent=TRUE)
 
 # G.2 Step 2: Model-specific embedding
 cat('covariate selection without mainGLO S2: Embedding...\n')
 cov.embed_i<-try(nsdm.embedsel(pa=pseu.abs_i@pa,
-                           covdata=cov.filter_i, # filtered covariate set from Step 1
+                           covdata=cov.filter_i,
                            weights=wt,
                            nthreads=ncores), silent=TRUE)
 
 # G.3 Step 3: Overall ranking
 cat('covariate selection without mainGLO S3: Ranking...\n')
-cov.rk_i<-try(nsdm.covselrk(embed=cov.embed_i, # embedded results (S2)
+cov.rk_i<-try(nsdm.covselrk(embed=cov.embed_i,
                         species_name=ispi_name), silent=TRUE)
 		
 cat('covariate selection without mainGLO S4: Final subsetting...\n')
@@ -213,9 +213,9 @@ cat('covariate selection without mainGLO S4: Final subsetting...\n')
 hab_stk_loc<-try(nsdm.fastraster(files=na.omit(cov_info$file[match(cov.rk_i$var, gsub(".rds","",basename(cov_info$file)))])[1:max_thre], nsplits=ncores), silent=TRUE)
 cov.sub_i_mul <-try(nsdm.covsub(covdata=pseu.abs_i@env_vars,
             rasterdata=hab_stk_loc,
-            ranks=cov.rk_i, # ranking from S3
-            thre=ceiling(log2(table(pseu.abs_i@pa)['1'])), # target number of covariates
-			max.thre=max_thre # max number of possible covariates in model
+            ranks=cov.rk_i, 
+            thre=ceiling(log2(table(pseu.abs_i@pa)['1'])), 
+			max.thre=max_thre 
 			), silent=TRUE)
 			
 covstk_res[["mul"]]<-cov.sub_i_mul$rasterdata

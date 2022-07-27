@@ -67,7 +67,7 @@ pred<-readRDS(pred_file)
 
 # Predict 
 map_i<-nsdm.map(template=pred$template,
-                nona_ix=pred$nona_ix, # indices for non-na cells (stored in clim_df_loc)
+                nona_ix=pred$nona_ix, 
                 species_name=ispi_name,
 				model_name=model_name,
 				level="loc",
@@ -90,11 +90,11 @@ ensemble_loc<-nsdm.ensemble(model_names= mod_algo, # models for ensembling
 						   scenar_name=scenar,
 				           period_name=per,
 				           nesting_name=nesting_method,
-                           map_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/loc/",nesting_method,"/",scenar,"/",per), # path where prediction rasters are stored
-                           score_path=paste0(scr_path,"/outputs/",project,"/d3_evals/loc/", nesting_method), # path where model evaluation tables are stored
-                           weighting=do_weighting, # use weights when ensembling
-                           weight_metric=weight_metric, # evaluation metric for weighting/discarding
-                           discthre=disc_thre) # threshold under which to discard a model
+                           map_path=paste0(scr_path,"/outputs/",project,"/d14_maps-fut/loc/",nesting_method,"/",scenar,"/",per),
+                           score_path=paste0(scr_path,"/outputs/",project,"/d3_evals/loc/", nesting_method),
+                           weighting=do_weighting,
+                           weight_metric=weight_metric,
+                           discthre=disc_thre)
 
 nsdm.savemap(maps=ensemble_loc$ensemble, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/loc/",nesting_method,"/",scenar,"/",per))
 nsdm.savemap(maps=ensemble_loc$ensemble_cv, species_name=ispi_name, model_name=NULL, format="rds", save_path=paste0(scr_path,"/outputs/",project,"/d16_ensembles-cv-fut/loc/",nesting_method,"/",scenar,"/",per))

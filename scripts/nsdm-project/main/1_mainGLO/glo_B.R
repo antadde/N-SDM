@@ -75,51 +75,45 @@ cat(paste0('Modelling parameters defined \n'))
 ### =========================================================================
 ### E- Fit, evaluate and save models
 ### =========================================================================
-eval_list<-list()
-
-suppressWarnings(for(i in 1:length(modinp)){
-modinp_i<-modinp[i]
-
 ## E.1 Fit model
-cat(paste0('\n fitting ',modinp_i[[1]]@tag, '...\n'))
-mod<-NULL
-ptm <- proc.time()
-mod<-try(nsdm.flex2(x=d1_covsels$pseu.abs_i,
+mod<-try(nsdm.flex3(x=d1_covsels$pseu.abs_i,
                    replicatetype=replicate_type,
                    reps=reps, 
-                   mod_args=modinp_i,
+                   mod_args=modinp,
 				   ncores=ncores,
 				   level="glo",
+				   timer=TRUE,
 				   tmp_path=paste0(scr_path,"/tmp/",project)),TRUE)
-timer<-c(proc.time() - ptm)
-
-if(all(lapply(mod@fits, class) == "try-error")) next
 
 ## E.2 Evaluate model
-evals<-NULL
-try(evals<-nsdm.evaluate2(mod,crit=eval_crit, ncores=ncores,level="glo",
+### Assessment metrics
+try(evals<-nsdm.evaluate3(mod$mod,crit=eval_crit, ncores=ncores, level="glo",
 				          tmp_path=paste0(scr_path,"/tmp/",project)),TRUE)
+
+### Computation time		  				  
+t<-list()
+for(k in 1:length(mod$time)){t_k<-mod$time[[k]]; t[[k]]<-t_k}
+t<-do.call(cbind,lapply(1:length(mod$time), function(z){rowMeans(as.matrix(t[[z]]))}))
+colnames(t)<-names(mod$mod@fits)
+
+### Bind
   if(class(evals)!="NULL"){
     smev<-nsdm.summary(evals)
-    t<-rbind(t.user=timer[1],t.elapsed=timer[3])
-    smev<-rbind(smev,t)
-    print(smev)
-    eval_list[[i]]<-smev}
+	smev<-rbind(smev, t)
+    print(smev)}
 
 # E.3 Save model
   if(class(mod)!="NULL"){
-    nsdm.savethis(object=list(model=mod, parameters=modinp_i),
+  suppressWarnings(nsdm.savethis(object=list(model=mod, parameters=modinp),
                   species_name=ispi_name, model_name=model_name,
-                  tag=modinp_i[[1]]@tag,
-                  save_path=paste0(scr_path,"/outputs/",project,"/d2_models/glo"))}	
-})
+                  tag=paste0(model_name,"_tune"),
+                  save_path=paste0(scr_path,"/outputs/",project,"/d2_models/glo")))}
 
 ## E.4 Save evaluation table
-eval_list<-eval_list[lengths(eval_list) != 0] # filter for possible model failures 
-nsdm.savethis(object=eval_list,
+suppressWarnings(nsdm.savethis(object=smev,
               model_name=model_name, species_name=ispi_name,
 			  compression=TRUE,
-              save_path=paste0(scr_path,"/outputs/",project,"/d3_evals/glo"))
+              save_path=paste0(scr_path,"/outputs/",project,"/d3_evals/glo")))
 
 cat(paste0('\n\nModels fitted and evaluated \n'))
 
@@ -128,47 +122,35 @@ cat(paste0('\n\nModels fitted and evaluated \n'))
 ### =========================================================================
 ## F.1.1 Identify best model
 if(model_name!="esm"){
-  if(length(eval_list)>1){
-    smev<-do.call(cbind,eval_list)
-    ord<-sort(smev[best_met,],decreasing=T) # Target metric for identifying "best" model
+  if(ncol(smev)>1){
+    ord<-sort(smev[best_met,],decreasing=T)
     modinp_top<-modinp[names(ord[1])]
   } else {
     modinp_top<-modinp}}
-## F.1.2 ... or discard models with Score < (for esm)
+## F.1.2 ... or discard models with best_thre_esm < (for esm)
 if(model_name=="esm"){
-  smev<-do.call(cbind,eval_list)
-  ord<-sort(smev[best_met,],decreasing=T) # Target metric for identifying "best" model
+  ord<-sort(smev[best_met,],decreasing=T)
   ord<-ord[ord>best_thre_esm]
   modinp_top<-modinp[names(ord)]
 }
 
 ## F.2a Refit model(s) using full dataset
-if(model_name!="esm"){
-suppressWarnings(prmod<-nsdm.flex2(x=d1_covsels$pseu.abs_i,
+suppressWarnings(prmod<-nsdm.flex3(x=d1_covsels$pseu.abs_i,
                                   replicatetype="none",
                                   reps=1,
 								  ncores=1,
 								  level="glo",
                                   mod_args=modinp_top,
 								  tmp_path=paste0(scr_path,"/tmp/",project)))
-}
 
-## F.2b Refit model(s) using full dataset for ESMs
-if(model_name=="esm"){
-suppressWarnings(prmod<-nsdm.flex(x=d1_covsels$pseu.abs_i,
-                                  replicatetype="none",
-                                  reps=1,
-                                  mod_args=modinp_top))
-}
-								  
-nsdm.savethis(object=prmod,
-              species_name=ispi_name, model_name=model_name, tag=model_name,
-			  compression=TRUE,
-              save_path=paste0(scr_path,"/outputs/",project,"/d2_models/glo"))
+suppressWarnings(nsdm.savethis(object=prmod,
+                 species_name=ispi_name, model_name=model_name, tag=model_name,
+			     compression=TRUE,
+                 save_path=paste0(scr_path,"/outputs/",project,"/d2_models/glo")))
 			  
 if(model_name=="gbm") saveRDS.lgb.Booster(prmod@fits[[1]][[1]], paste0(scr_path,"/outputs/",project,"/d2_models/glo/",ispi_name,"/gbm/",ispi_name,"_",model_name,".rds"))
 	
-								  
+							  
 cat(paste0('Top model ',names(modinp_top), ' refitted on full dataset for predictions \n'))
 
 ### =========================================================================
@@ -182,7 +164,7 @@ nsdm.savethis(object=imp,model_name=model_name, species_name=ispi_name,
 
 ## G.2 Response curves
 Data<-d1_covsels$pseu.abs_i@env_vars
-respcurves<-nsdm.respcurve(prmod, Data=Data,factor=100,
+respcurves<-nsdm.respcurve(prmod, Data=Data,
                            scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")],
                            model_name=model_name, species_name=ispi_name,
 			               plotting=TRUE, ncores=ncores, save_path=paste0(scr_path,"/outputs/",project,"/plots/respcurves/glo")) 
@@ -203,11 +185,11 @@ cov_obs<-grep(paste0(cov_observ, collapse="|"), names(d1_covsels$covstk), value=
 cov_obs<-NULL
 }
 
-stk_df<-nsdm.retrieve4pred(covstk=d1_covsels$covstk, # subset for selected covariates
-                           observational=cov_obs,# Flatten observational covariates
+stk_df<-nsdm.retrieve4pred(covstk=d1_covsels$covstk, 
+                           observational=cov_obs,
 						   obsval=cov_observ_val,
-						   mask=mask_pred, # 0-1 mask to be applied on predictions
-                           scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")]) # scaling parameters to be reapplied
+						   mask=mask_pred, 
+                           scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")]) 
 
 ## H.2 Clean workspace to free some memory before predicting
 template<-d1_covsels$covstk[[1]]
@@ -216,7 +198,7 @@ gc()
 
 ## H.3 Predict
 ndata_bck<-nsdm.predict(models=prmod,
-                        nwdata=stk_df$covdf, # covariate data for predictions
+                        nwdata=stk_df$covdf,
                         nsplits=ncores)
 						
 nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=stk_df$covdf_ix),

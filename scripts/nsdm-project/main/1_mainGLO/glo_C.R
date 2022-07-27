@@ -63,14 +63,14 @@ cat(paste0(model_name,' predictions saved \n'))
 ### =========================================================================
 ### D- Ensemble predictions
 ### =========================================================================
-ensemble_glo<-nsdm.ensemble(model_names= mod_algo, # models for ensembling
+ensemble_glo<-nsdm.ensemble(model_names= mod_algo,
                            species_name=ispi_name,
 						   level="glo",
-                           map_path=paste0(scr_path,"/outputs/",project,"/d7_maps/glo"), # path where prediction rasters are stored
-                           score_path=paste0(scr_path,"/outputs/",project,"/d3_evals/glo"), # path where model evaluation tables are stored
-                           weighting=do_weighting, # use weights when ensembling
-                           weight_metric=weight_metric, # evaluation metric for weighting/discarding
-                           discthre=disc_thre) # threshold under which to discard a model
+                           map_path=paste0(scr_path,"/outputs/",project,"/d7_maps/glo"), 
+                           score_path=paste0(scr_path,"/outputs/",project,"/d3_evals/glo"), 
+                           weighting=do_weighting, 
+                           weight_metric=weight_metric, 
+                           discthre=disc_thre) 
 
 nsdm.savemap(maps=ensemble_glo$ensemble, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d8_ensembles/glo"))
 nsdm.savemap(maps=ensemble_glo$ensemble_cv, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d9_ensembles-cv/glo"))

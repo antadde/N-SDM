@@ -94,7 +94,6 @@ cov_info<-lr$cov_info
 cov_info$ID<-paste(cov_info$cada, cov_info$variable, cov_info$attribute, cov_info$focal, sep="_")
 cov_ID<-cov_info$ID[match(cov, gsub(".rds", "", basename(cov_info$file)))]
 cov_info_pres<-cov_info[cov_info$ID %in% cov_ID & cov_info$period!="future",]
-# cov_info_pres<-cov_info_pres[which(cov_info_pres$start_year=="NA" | (cov_info_pres$start_year==min(pint_loc) & cov_info_pres$end_year==max(pint_loc))),]
 cov_info_pres
 lr_pres_ID<-cov_info_pres$ID
 
@@ -133,10 +132,10 @@ names(stk_fut)[nlayers(stk_fut)]<-"mainGLO"
 ### =========================================================================
 ## E.1 Prepare covariate data for predictions
 hab_df_loc<-nsdm.retrieve4pred(covstk=stk_fut,
-                               observational=grep(paste0(cov_observ, collapse="|"), names(stk_fut), value=T),# Flatten observational covariates
+                               observational=grep(paste0(cov_observ, collapse="|"), names(stk_fut), value=T),
 							   obsval=cov_observ_val,
-							   mask=mask_pred, # mask to be applied on predictions
-                               scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")]) # scaling parameters to be reapplied
+							   mask=mask_pred,
+                               scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")])
 
 ## E.2 Clean workspace to free some memory before predicting
 template<-stk_fut[[1]]
@@ -145,7 +144,7 @@ gc()
 
 ## E.3 Predict
 ndata_bck<-nsdm.predict(models=prmod,
-                        nwdata=hab_df_loc$covdf, # covariate data for predictions
+                        nwdata=hab_df_loc$covdf,
                         nsplits=ncores)
 
 ## E.4 Save
