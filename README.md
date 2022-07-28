@@ -57,7 +57,7 @@ Thanks!
 
  To cite N-SDM or acknowledge its use, cite this Software Note as follows, substituting the version of N-SDM that you used for “version 1.0”:
  
- Adde, A. et al. 2022. N-SDM: a high-performance computing pipeline for fitting Nested Species Distribution Models. – XXX XXX: XXX (ver. 1.0).
+ [info hidden for peer review] et al. 2022. N-SDM: a high-performance computing pipeline for fitting Nested Species Distribution Models. – XXX XXX: XXX (ver. 1.0).
 
 # Contact
 
