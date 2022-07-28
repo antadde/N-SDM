@@ -67,7 +67,7 @@ Project Link: [https://github.com/N-SDM/N-SDM](https://https://github.com/N-SDM/
 
 # Acknowledgments
 
-N-SDM development has been conducted within the ECOSPAT lab https://www.unil.ch/ecospat/en/home.html.
+N-SDM development has been conducted within the [info hidden for peer review] lab https://www.unil.ch/ecospat/en/home.html.
 
 We gratefully acknowledge financial support through the Action Plan of the Swiss Biodiversity Strategy by the Federal Office for the Environment (FOEN) for financing the Valpar.ch and SwissCatchment projects.
 
