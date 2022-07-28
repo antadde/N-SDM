@@ -61,7 +61,7 @@ Thanks!
 
 # Contact
 
-Antoine Adde – antoine.adde@unil.ch
+[info hidden for peer review]
 
 Project Link: [https://github.com/N-SDM/N-SDM](https://https://github.com/N-SDM/N-SDM)
 
