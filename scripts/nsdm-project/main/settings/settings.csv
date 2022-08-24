@@ -48,7 +48,7 @@ best_met;Score;4_modelling_evaluation;"model evaluation metric used for identify
 do_weighting;FALSE;5_ensembling;weight modelling algorithms by the value of weight_metric when ensembling? (TRUE or FALSE)
 weight_metric;Score;5_ensembling;evaluation metric used for weighting and discarding models in the ensembling process
 disc_thre;0.4;5_ensembling;cutoff threshold for weight_met at which a model is discarded from the ensembling process
-nesting_methods;c('covariate');5_ensembling;"scale-nesting strategy applied for combining the global- and local-level models. The two available options at the time of N-SDM release are ""covariate"" and ""multiply"""
+nesting_method;c('covariate');5_ensembling;"scale-nesting strategy applied for combining the global- and local-level models. The two available options at the time of N-SDM release are ""covariate"" and ""multiply"""
 mask_pred;ch_mask_terr_gwn07_lakes_50.rds;5_ensembling;[optional] binary (0-1) .rds raster mask stored in the /data/project/mask folder used for masking the predictions [pixels with 0 value]
 do_proj;TRUE;6_projections;do future/alternative projections? (TRUE or FALSE)
 proj_scenarios;c('rcp45', 'rcp85');6_projections;"names of the future/alternative scenarios evaluated for projections (must match with covariate folder names; see Appendix S1: Text S2 for details)"
