@@ -66,7 +66,7 @@ cov_info_loc<-data.frame(lr$cov_info[match(lr_loc, lr$cov_info$file),])
 
 # Subset with list of expert-filtered candidate covariates, if available
 expert_tab<-try(read_excel(expert_table, .name_repair = "minimal"), silent=T)
-if(class(expert_tab) != "try-error"){
+if("try-error" %in% class(expert_tab)){
 colnames(expert_tab)<-gsub("\\s*\\([^\\)]+\\)","",as.character(colnames(expert_tab)))
 dup_ix<-which(duplicated(colnames(expert_tab)))
 if(length(dup_ix)>0) expert_tab<-expert_tab[,-which(duplicated(colnames(expert_tab)))]
