@@ -98,10 +98,10 @@ end_A_t;00-00:15;8_HPC;end_A requested time
 end_A_c;1;8_HPC;end_A requested cores
 args;commandArgs(trailingOnly = TRUE);8_HPC;command arguments, not supposed to be modified
 arrayID;as.numeric(args[[1]]);8_HPC;array identifier, not supposed to be modified
-module_gcc;gcc/9.3.0;8_HPC;gcc module name and version
-module_r;r/4.0.5;8_HPC;r module name/version
+module_gcc;gcc/10.4.0;8_HPC;gcc module name and version
+module_r;r/4.2.1;8_HPC;r module name/version
 module_proj;proj/5.2.0;8_HPC;proj module name/version
 module_perl;perl;8_HPC;perl module name/version
 module_curl;curl;8_HPC;curl module name/version
-module_geos;geos/3.8.1;8_HPC;geos module name/version
+module_geos;geos/3.9.1;8_HPC;geos module name/version
 module_gdal;gdal/2.4.4-proj-5.2.0;8_HPC;gdal module name/version
