@@ -110,7 +110,7 @@ colnames(t)<-names(mod$mod@fits)
                   save_path=paste0(scr_path,"/outputs/",project,"/d2_models/glo")))}
 
 ## E.4 Save evaluation table
-suppressWarnings(nsdm.savethis(object=smev,
+suppressWarnings(nsdm.savethis(object=data.frame(smev),
               model_name=model_name, species_name=ispi_name,
 			  compression=TRUE,
               save_path=paste0(scr_path,"/outputs/",project,"/d3_evals/glo")))
