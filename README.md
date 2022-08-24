@@ -38,11 +38,11 @@ Global-level species occurrence records were obtained from GBIF (https://www.gb
 
 ### Covariate data
 
-We will use a suite of 453 candidate covariates derived from 42 individual parameters and belonging to 6 main categories (bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation). Once the .zip data file has been unzipped, detailed information on the covariates can be found in ./data/nsdm-project/covariates/covariates.xlsx.  Only bioclimatic covariates were used for fitting the global-level model and all the others were used for the local model (see Figure 1 in the companion Software Note for details). To account for environmental conditions within a wider area than the only coordinates of the occurrence records, covariates from the “land use and cover” category were extracted using 13 moving radii ranging from 25 m to 5 km. All covariates were standardized to zero mean and unit variance.
+We will use a suite of 453 candidate covariates derived from 42 individual parameters belonging to 6 main categories (bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation). Once the .zip data file has been unzipped, detailed information on the covariates can be found in ./data/nsdm-project/covariates/covariates.xlsx.  Only bioclimatic covariates were used for fitting the global-level model and all the others were used for the local model (see Figure 1 in the companion Software Note for details). To account for environmental conditions within a wider area than the only coordinates of the occurrence records, covariates from the “land use and cover” category were extracted using 13 moving radii ranging from 25 m to 5 km. All covariates were standardized to zero mean and unit variance.
 
 ## N-SDM settings
 
-N-SDM settings must be adapted to your own computing environment (e.g. paths, HPC account, partition etc.) by editing the file "settings.csv" located in ./scripts/nsdm-project/main/settings. You can also try to customize the data and/or modelling settings (e.g. covariate selection, modelling algorithm, ensembling strategy etc.). Be careful when saving "settings.csv" to use “;” as delimiters. In the same ./scripts/nsdm-project/main/settings directory you will also find the "param-grid.xslx" file that allows specifying the grid for hyperparameter tunning. An example pre-filled "expert-table.xslx" table allowing for expert-based prefiltering of candidate covariates is also included. Additional details on N-SDM settings, hyperparameter tunning or expert pre-filtering are provided in the N-SDM Sofwtare Note.
+N-SDM settings must be adapted to your own computing environment (e.g. paths, HPC account, partition etc.) by editing the file "settings.csv" located in ./scripts/nsdm-project/main/settings. You can also try to customize the data and/or modelling settings (e.g. covariate selection, modelling algorithm, ensembling strategy etc.). Be careful when saving "settings.csv" to use “;” as delimiters. In the same ./scripts/nsdm-project/main/settings directory you will also find the "param-grid.xslx" file that allows specifying the grid for hyperparameter tunning. An example pre-filled "expert-table.xslx" table allowing for an expert-based prefiltering of the candidate covariates is also included. Additional details on N-SDM settings, hyperparameter tunning or expert pre-filtering are provided in the N-SDM Sofwtare Note.
 
 ## Running N-SDM
 
@@ -57,17 +57,17 @@ Thanks!
 
  To cite N-SDM or acknowledge its use, cite this Software Note as follows, substituting the version of N-SDM that you used for “version 1.0”:
  
- Adde, A. et al. 2022. N-SDM: a high-performance computing pipeline for fitting Nested Species Distribution Models. – XXX XXX: XXX (ver. 1.0).
+ [info hidden for peer review] et al. 2022. N-SDM: a high-performance computing pipeline for fitting Nested Species Distribution Models. – XXX XXX: XXX (ver. 1.0).
 
 # Contact
 
-Antoine Adde – antoine.adde@unil.ch
+[info hidden for peer review]
 
 Project Link: [https://github.com/N-SDM/N-SDM](https://https://github.com/N-SDM/N-SDM)
 
 # Acknowledgments
 
-N-SDM development has been conducted within the ECOSPAT lab https://www.unil.ch/ecospat/en/home.html.
+N-SDM development has been conducted within the [info hidden for peer review] lab https://www.unil.ch/ecospat/en/home.html.
 
 We gratefully acknowledge financial support through the Action Plan of the Swiss Biodiversity Strategy by the Federal Office for the Environment (FOEN) for financing the Valpar.ch and SwissCatchment projects.
 
