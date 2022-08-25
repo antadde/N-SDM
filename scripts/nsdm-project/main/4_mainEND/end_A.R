@@ -98,7 +98,7 @@ for(k in 1:outerloop){
 if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
 testa_GLO[[k]]<- testa_GLO[[k]][,-which(colnames(testa_GLO[[k]]) %in% c("X","Y"))]}
-if(class(mod_m$m@fits[[modinp_top_n]][[k]])=="try-error"){
+if("try-error" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 pred_i<-rep(NA, nrow(testa_GLO[[k]]))
 } else {
 pred_i<-nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_GLO[[k]])}
@@ -173,7 +173,7 @@ for(k in 1:outerloop){
 if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
 testa_LOC_multiply[[k]]<- testa_LOC_multiply[[k]][,-which(colnames(testa_LOC_multiply[[k]]) %in% c("X","Y"))]}
-if(class(mod_m$m@fits[[modinp_top_n]][[k]])=="try-error"){
+if("try-error" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 pred_i<-rep(NA, nrow(testa_LOC_multiply[[k]]))
 } else {
 pred_i<-nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_LOC_multiply[[k]])}
@@ -251,7 +251,7 @@ for(k in 1:outerloop){
 if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
 testa_LOC_covariate[[k]]<- testa_LOC_covariate[[k]][,-which(colnames(testa_LOC_covariate[[k]]) %in% c("X","Y"))]}
-if(class(mod_m$m@fits[[modinp_top_n]][[k]])=="try-error"){
+if("try-error" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 pred_i<-rep(NA, nrow(testa_LOC_covariate[[k]]))
 } else {
 pred_i<-nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_LOC_covariate[[k]])}

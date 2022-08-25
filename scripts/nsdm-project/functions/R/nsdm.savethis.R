@@ -18,7 +18,7 @@ save_this_path<-paste(save_path, species_name, model_name, sep="/")
 suppressWarnings(dir.create(save_this_path,  recursive = TRUE))
 if(is.null(tag)){f<-gsub("_\\.",".",paste0(save_this_path,"/", paste(species_name,model_name,sep="_"),".rds"))
 }else{f<-gsub("_\\.",".",paste0(save_this_path,"/", paste(species_name,tag,sep="_"),".rds"))}
-if(class(object)=="lgb.Booster"){
+if("lgb.Booster" %in% class(object)){
 saveRDS.lgb.Booster(object, file=f)
 }else{saveRDS(object, file=f, compress=compression)}
 }
