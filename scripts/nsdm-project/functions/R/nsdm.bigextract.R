@@ -153,10 +153,10 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
   xt_pres<-lapply(xt_pres, function(r){
   for(d in p_ints_t$dataset){
   ix<-grep(d, names(r))
-  names(r)[ix]<-stri_replace_all_regex(names(r),
+  names(r)[ix]<-stri_replace_all_regex(names(r)[ix],
                                    pattern=c(pers),
-                                   replacement=rep(paste(p_ints_t[p_ints_t$dataset==d && p_ints_t$int=="int","start_year"],
-								                         p_ints_t[p_ints_t$dataset==d && p_ints_t$int=="int","end_year"], sep="_"), length(pers)),
+                                   replacement=rep(paste(p_ints_t[which(p_ints_t$dataset==d & p_ints_t$int=="int"), "start_year"],
+								                         p_ints_t[which(p_ints_t$dataset==d & p_ints_t$int=="int"), "end_year"], sep="_"), length(pers)),
 								   vectorize=F)
   }
   return(r)})
