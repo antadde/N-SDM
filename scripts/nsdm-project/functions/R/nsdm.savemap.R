@@ -27,7 +27,7 @@ f_fit_rds<-gsub("_\\.",".",paste0(save_this_path,"/", names(map),".rds"))
 
 if(format=="both"){
 # TIF
-suppressWarnings(raster::writeRaster(map, f_fit_tif, format="GTiff", datatype="INT2U", overwrite=TRUE, options=c("COMPRESS=DEFLATE", "PREDICTOR=2")))
+suppressWarnings(raster::writeRaster(map, f_fit_tif, format="GTiff", datatype="INT2U", overwrite=TRUE, options=c("COMPRESS=LZW", "PREDICTOR=2")))
 # RDS
 saveRDS(map, f_fit_rds, compress = TRUE)
 }
@@ -37,7 +37,7 @@ saveRDS(map, f_fit_rds, compress = TRUE)
 }
 
 if(format=="tif"){
-suppressWarnings(raster::writeRaster(map, f_fit_tif, format="GTiff", datatype="INT2U", overwrite=TRUE, options=c("COMPRESS=DEFLATE", "PREDICTOR=2")))
+suppressWarnings(raster::writeRaster(map, f_fit_tif, format="GTiff", datatype="INT2U", overwrite=TRUE, options=c("COMPRESS=LZW", "PREDICTOR=2")))
 }
 
 }  
@@ -55,7 +55,7 @@ f_fit_rds<-gsub("_\\.",".",paste0(save_this_path,"/", names(map),".rds"))
 
 if(format=="both"){
 # TIF
-suppressWarnings(raster::writeRaster(map, f_fit_tif, format="GTiff", datatype="INT2U", overwrite=TRUE, options=c("COMPRESS=DEFLATE", "PREDICTOR=2")))
+suppressWarnings(raster::writeRaster(map, f_fit_tif, format="GTiff", datatype="INT2U", overwrite=TRUE, options=c("COMPRESS=LZW", "PREDICTOR=2")))
 # RDS
 saveRDS(map, f_fit_rds, compress=TRUE)
 }
@@ -65,7 +65,7 @@ saveRDS(map, f_fit_rds, compress=TRUE)
 }
 
 if(format=="tif"){
-suppressWarnings(raster::writeRaster(map, f_fit_tif, format="GTiff", datatype="INT2U", overwrite=TRUE, options=c("COMPRESS=DEFLATE", "PREDICTOR=2")))
+suppressWarnings(raster::writeRaster(map, f_fit_tif, format="GTiff", datatype="INT2U", overwrite=TRUE, options=c("COMPRESS=LZW", "PREDICTOR=2")))
 }
 
 }
