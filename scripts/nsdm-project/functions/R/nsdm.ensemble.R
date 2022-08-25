@@ -32,7 +32,7 @@ for(i in 1:length(model_names)){
 }
 
 # Compute ensembling evaluation table
-res<-matrix(nrow=raster::nlayers(stack_map), ncol = 3)
+res<-data.frame(matrix(nrow=raster::nlayers(stack_map), ncol = 3))
 colnames(res)<-c("model_name", "score", "discard")
 for(i in 1:length(model_names)){
   model_name<-model_names[i]
@@ -48,12 +48,12 @@ for(i in 1:length(model_names)){
     res[esm_ix,"model_name"]<-esm_names
   } else {
   if(length(score)>1){
-    score_val<-sort(score[weight_metric,],decreasing=T)[1]
+    score_val<-data.frame(sort(score[weight_metric,],decreasing=T)[1])
     ## store outputs
-    res[i,"score"]<-score_val
+    res[i,"score"]<-as.numeric(score_val)
     res[i,"model_name"]<-model_name
   } else {
-   score_val<-score[[1]][weight_metric,]
+   score_val<-score[weight_metric,]
    ## store outputs
    res[i,"score"]<-score_val
    res[i,"model_name"]<-model_name
@@ -68,6 +68,7 @@ res[,"discard"]<-res[,"score"]<discthre
 } else {
 res[,"discard"]<-"FALSE" 
 }
+
 ## Discard
 if(discthre!="NULL"){
 stack_map<-raster::dropLayer(stack_map, c(which(as.logical(res[,"discard"]))))
