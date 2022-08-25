@@ -82,7 +82,7 @@ nsdm.flex3<-function(x=numeric(),
   mod_args_j@args$data<-lis$train[[x]][,-which(colnames(lis$train[[x]]) %in% c("Presence", "X", "Y"))]
   mod_args_j@args$p<-lis$train[[x]][,"Presence"]
   modi<-try(do.call(mod_args_j@mod, mod_args_j@args), TRUE)
-  if(class(modi)=="try-error"){
+  if("try-error" %in% class(modi)){
   mod_args_bis<-mod_args_j@args
   mod_args_bis$addsamplestobackground<-TRUE
   modi<-do.call(mod_args_j@mod, mod_args_bis)}}
