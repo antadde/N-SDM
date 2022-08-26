@@ -160,7 +160,7 @@ hab_stk_loc<-try(nsdm.fastraster(files=na.omit(cov_info$file[match(cov.rk_i$var,
 cov.sub_i_cov <-try(nsdm.covsub(covdata=pseu.abs_i@env_vars,
             rasterdata=hab_stk_loc,
             ranks=cov.rk_i[-(which(cov.rk_i$var=="mainGLO")),],
-            thre=ceiling(log2(table(pseu.abs_i@pa)['1']))-1, 
+            thre=if(!"esm" %in% mod_algo){ceiling(log2(table(pseu.abs_i@pa)['1']))-1} else {ncov_esm}, 
 			max.thre=max_thre-1,
 			glo.out=readRDS(glo_out), 
 			glo.xy=pseu.abs_i@xy,
@@ -214,7 +214,7 @@ hab_stk_loc<-try(nsdm.fastraster(files=na.omit(cov_info$file[match(cov.rk_i$var,
 cov.sub_i_mul <-try(nsdm.covsub(covdata=pseu.abs_i@env_vars,
             rasterdata=hab_stk_loc,
             ranks=cov.rk_i, 
-            thre=ceiling(log2(table(pseu.abs_i@pa)['1'])), 
+            thre=if(!"esm" %in% mod_algo){ceiling(log2(table(pseu.abs_i@pa)['1']))} else {ncov_esm}, 
 			max.thre=max_thre 
 			), silent=TRUE)
 			

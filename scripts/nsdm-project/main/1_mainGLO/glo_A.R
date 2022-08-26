@@ -191,7 +191,7 @@ stk<-try(nsdm.fastraster(files=na.omit(cov_info_glo$file[match(cov.rk_i$var, gsu
 cov.sub_i<-try(nsdm.covsub(covdata=pseu.abs_i_glo@env_vars,
             rasterdata=stk,
             ranks=cov.rk_i, # ranking from S3
-            thre=ceiling(log2(table(pseu.abs_i_glo@pa)['1'])), 
+            thre=if(!"esm" %in% mod_algo){ceiling(log2(table(pseu.abs_i_glo@pa)['1']))} else {ncov_esm}, 
 			max.thre=max_thre), silent=TRUE)
 
 if(counter > 5 | !is(cov.sub_i, 'try-error')) break
