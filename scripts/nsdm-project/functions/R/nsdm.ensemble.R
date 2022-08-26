@@ -63,6 +63,7 @@ for(i in 1:length(model_names)){
 
 # Check if models fulfill discard threshold, and remove if needed
 ## Check
+if(!"esm" %in% model_names){
 if(discthre!="NULL"){
 res[,"discard"]<-res[,"score"]<discthre
 } else {
@@ -73,6 +74,7 @@ res[,"discard"]<-"FALSE"
 if(discthre!="NULL"){
 stack_map<-raster::dropLayer(stack_map, c(which(as.logical(res[,"discard"]))))
 res<-res[-which(as.logical(res[,"discard"])),]
+}
 }
 
 # do weighted ensemble
