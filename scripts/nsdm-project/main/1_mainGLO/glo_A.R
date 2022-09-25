@@ -159,51 +159,38 @@ counter <- sum(counter, 1)
 
 # F.1 Step 1: Filtering for colinearity
 cat('covariate selection S1: Filtering...\n')
-foc<-unique(cov_info_glo[which(cov_info_glo$focal!="NA"),"cada"])
-if(length(foc)==0) foc<-NULL
-cov.filter_i<-try(nsdm.filtersel(pa=pseu.abs_i_glo@pa, 
-                             covdata=pseu.abs_i_glo@env_vars, 
-                             weights=wt,
-                             datasets=cov_info_glo$cada,
-							 varnames=gsub("_NA", "", paste(cov_info_glo$variable, cov_info_glo$attribute, sep="_")), 
-                             focals=foc,
-                             method=sel_met, 
-                             corcut=cor_cut), silent=TRUE) 
+cov.filter_i<-try(covsel.filter(
+  pseu.abs_i_glo@env_vars,
+  pseu.abs_i_glo@pa,
+  variables = cov_info_glo$variable,
+  categories = cov_info_glo$cada,
+  weights = wt,
+  corcut = cor_cut), silent=TRUE)
 
 # F.2 Step 2: Model-specific embedding
 cat('covariate selection S2: Embedding...\n')
-cov.embed_i<-try(nsdm.embedsel(pa=pseu.abs_i_glo@pa,
-                           covdata=cov.filter_i,
-                           weights=wt,
-                           nthreads=ncores), silent=TRUE)
-
-# F.3 Step 3: Overall ranking
-cat('covariate selection S3: Ranking...\n')
-cov.rk_i<-try(nsdm.covselrk(embed=cov.embed_i,
-                        species_name=ispi_name), silent=TRUE)
-
-# F.4 Step 4: Final covariate subset
-cat('covariate selection S4: Final subsetting...\n')
-if(n_levels>1){
-stk<-try(nsdm.fastraster(files=na.omit(cov_info_loc$file[match(cov.rk_i$var, gsub(".rds","",basename(cov_info_loc$file)))][1:max_thre]), nsplits=ncores), silent=TRUE)
-} else {
-stk<-try(nsdm.fastraster(files=na.omit(cov_info_glo$file[match(cov.rk_i$var, gsub(".rds","",basename(cov_info_glo$file)))][1:max_thre]), nsplits=ncores), silent=TRUE)}
-cov.sub_i<-try(nsdm.covsub(covdata=pseu.abs_i_glo@env_vars,
-            rasterdata=stk,
-            ranks=cov.rk_i, # ranking from S3
-            thre=if(!"esm" %in% mod_algo){ceiling(log2(table(pseu.abs_i_glo@pa)['1']))} else {ncov_esm}, 
-			max.thre=max_thre), silent=TRUE)
-
-if(counter > 5 | !is(cov.sub_i, 'try-error')) break
+cov.embed_i<-try(covsel.embed(
+  cov.filter_i,
+  pseu.abs_i_glo@pa,
+  weights = wt,
+  ncov = if(!"esm" %in% mod_algo){ceiling(log2(table(pseu.abs_i_glo@pa)['1']))-1} else {ncov_esm},
+  maxncov  = max_thre,
+  nthreads = ncores), silent=TRUE)
+  
+if(counter > 5 | !is(cov.embed_i, 'try-error')) break
 cat(paste0("an error occured; tentative number ", counter, " for covariate selection...\n"))
 }
-			
-# update with cov.sub outputs
-stk<-cov.sub_i$rasterdata
-pseu.abs_i_glo@env_vars<-cov.sub_i$covdata
 
-# F.5 Save covariate selection results
-nsdm.savethis(object=list(pseu.abs_i=pseu.abs_i_glo, filter=names(cov.filter_i), embed=cov.embed_i, ranking=cov.rk_i, covstk=stk),
+# F.3 Finalize
+if(n_levels>1){
+stk<-try(nsdm.fastraster(files=na.omit(cov_info_loc$file[match(cov.embed_i$ranks_2$covariate, gsub(".rds","",basename(cov_info_loc$file)))]), nsplits=ncores), silent=TRUE)
+} else {
+stk<-try(nsdm.fastraster(files=na.omit(cov_info_glo$file[match(cov.embed_i$ranks_2$covariate, gsub(".rds","",basename(cov_info_glo$file)))]), nsplits=ncores), silent=TRUE)}
+
+
+# F.4 Save
+pseu.abs_i_glo@env_vars<-cov.embed_i$covdata
+nsdm.savethis(object=list(pseu.abs_i=pseu.abs_i_glo, filter=names(cov.filter_i), embed=cov.embed_i, covstk=stk),
               species_name=ispi_name,
               save_path=paste0(scr_path,"/outputs/",project,"/d1_covsels/glo"))
 
