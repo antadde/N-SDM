@@ -11,7 +11,6 @@ nsdm.setparam(
   tmp_path,
   ncov.esm = NULL,
   comb.esm = NULL,
-  force.esm = NULL,
   weights = 1,
   nthreads
 )
@@ -28,8 +27,6 @@ nsdm.setparam(
 \item{ncov.esm}{If the ESM framework is used, a numeric value indicating the total number of covariates evaluated}
 
 \item{comb.esm}{If the ESM framework is used, a numeric value indicating the number of covariates combined in each individual small model}
-
-\item{force.esm}{If the ESM framework is used, a character string indicating the name of covariate(s) to be forced (typically mainGLO)}
 
 \item{weights}{A numeric vector of weights to be applied}
 
