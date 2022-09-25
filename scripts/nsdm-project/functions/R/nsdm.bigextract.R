@@ -134,13 +134,13 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
   xt_pres<-do.call(cbind, xt_pres)
   ## For each row, identify year to be matched
   y<-years[pa==1]
-  # Nearest previous time slice (e.g. climate)
+  # Nearest previous time slice
   if(tmatch_scheme=="npts"){
   suppressWarnings(maxless <- sapply(y, function(z){max(cov_tomatch_times[,2][cov_tomatch_times[,2] <= z])}))
   y_ix<-which(!is.finite(maxless))
   if(length(y_ix)>0) maxless[y_ix]<-min(cov_tomatch_times$end_year)
   }
- # Nearest time slice (e.g. lulc)
+ # Nearest time slice
   if(tmatch_scheme=="nts"){
   suppressWarnings(maxless <- sapply(y, function(z){cov_tomatch_times[,2][which.min(abs(rowMeans(cbind(cov_tomatch_times[,1],cov_tomatch_times[,2]))-z))]}))
   }
@@ -149,18 +149,15 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
   xt_pres<-lapply(1:length(maxless), function(w){xt_pres[w,y_pos[[w]]]})
   # clean rename
   pers<-paste(unique(cov_tomatch_times[,1]), unique(cov_tomatch_times[,2]), sep="_")
-  
-  xt_pres<-lapply(xt_pres, function(r){
+  for(r in 1:length(xt_pres)){
+  r_out<-xt_pres[[r]]
   for(d in p_ints_t$dataset){
-  ix<-grep(d, names(r))
-  names(r)[ix]<-stri_replace_all_regex(names(r)[ix],
-                                   pattern=c(pers),
-                                   replacement=rep(paste(p_ints_t[which(p_ints_t$dataset==d & p_ints_t$int=="int"), "start_year"],
-								                         p_ints_t[which(p_ints_t$dataset==d & p_ints_t$int=="int"), "end_year"], sep="_"), length(pers)),
-								   vectorize=F)
-  }
-  return(r)})
-  
+  tr<-rep(paste(p_ints_t[which(p_ints_t$dataset==d & p_ints_t$int=="int"), "start_year"], p_ints_t[which(p_ints_t$dataset==d & p_ints_t$int=="int"), "end_year"], sep="_"), length(pers))
+  ix<-grep(d, names(r_out))
+  names(r_out)[ix]<-stri_replace_all_fixed(names(r_out)[ix],
+                                           pers, tr, vectorize_all=FALSE)}
+ xt_pres[[r]]<-r_out
+ }
   ## Finalize
   xt_pres_dyn<- do.call(rbind, xt_pres)
   }
@@ -171,7 +168,7 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
   xt_pres<-do.call(cbind, lapply(sets[exi], get, sys.frame(sys.parent(0))))
   
   ### ------------------------
-  ### Extract pseudoabsences
+  ### Extract absences
   ### ------------------------
   cells<-cellFromXY(rst_ref, xy[pa==0,])
   suppressMessages(xt_abs<-mclapply(cov_nomatch, function(i){
@@ -183,36 +180,11 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
   ## Finalize
   xt_abs<-do.call(cbind, xt_abs)
   
-  ### ------------------------
-  ### Extract mainGLO
-  ### ------------------------
-if(length(cov_rds)>0){
-cells<-cellFromXY(rst_ref, xy)
-l<-readRDS(cov_rds)
-r<-raster::as.data.frame(l)
-xt_glo<-data.frame(r[cells,1])
-names(xt_glo)<-names(r)
-}
-
 ### ------------------------
-### Combine everything
+### Combine and clean
 ### ------------------------
 # rbind presences and absences
 env_vars<-rbind(xt_pres, xt_abs)
-
-# cbind mainGLO
-if(length(cov_rds)>0){
-env_vars<-cbind(env_vars, xt_glo)
-}
-
-# Clean for rows with NA values
-na_ix<-which(complete.cases(env_vars)==FALSE)
-if(length(na_ix)>0){
-env_vars<-env_vars[-na_ix,]
-xy<-xy[-na_ix,]
-pa<-pa[-na_ix]
-years<-years[-na_ix]
-}
 
 # Clean for columns with unique value for p==1
 lenv<-(apply(env_vars[which(pa==1),], 2, function(x) length(unique(x))))
@@ -226,11 +198,34 @@ if(length(which(apply(env_vars, 2, function(x) length(unique(x)))<nzvt))>0){
 env_vars<-env_vars[,-which(apply(env_vars, 2, function(x) length(unique(x)))<nzvt)]}
 }
 
+### ------------------------
+### Extract mainGLO
+### ------------------------
+if(length(cov_rds)>0){
+cells<-cellFromXY(rst_ref, xy)
+l<-readRDS(cov_rds)
+r<-raster::as.data.frame(l)
+xt_glo<-data.frame(r[cells,1])
+names(xt_glo)<-names(r)
+env_vars<-cbind(env_vars, xt_glo)
+}
+
+### ------------------------
+### Update and return
+### ------------------------
+# Clean for rows with NA values
+na_ix<-which(complete.cases(env_vars)==FALSE)
+if(length(na_ix)>0){
+env_vars<-env_vars[-na_ix,]
+xy<-xy[-na_ix,]
+pa<-pa[-na_ix]
+years<-years[-na_ix]
+}
+
 # Ecrase with updated data
 data@env_vars<-env_vars
 data@xy<-xy
 data@pa<-pa
 data@years<-years
 
-return(data)
-}
+return(data)}
