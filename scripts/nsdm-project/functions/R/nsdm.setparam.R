@@ -8,7 +8,6 @@
 #' @param tmp_path A character string indicating the path where to store temporary outputs
 #' @param ncov.esm If the ESM framework is used, a numeric value indicating the total number of covariates evaluated
 #' @param comb.esm If the ESM framework is used, a numeric value indicating the number of covariates combined in each individual small model
-#' @param force.esm If the ESM framework is used, a character string indicating the name of covariate(s) to be forced (typically mainGLO)
 #' @param weights A numeric vector of weights to be applied
 #' @param nthreads Number (numeric) of cores to be used during parallel operations
 #'
@@ -16,7 +15,7 @@
 #' @author Antoine Adde (aadde@unil.ch)
 #' @export
 
-nsdm.setparam <- function(model_name, param_grid, covariate_names, tmp_path, ncov.esm=NULL, comb.esm=NULL, force.esm=NULL, weights=1, nthreads){
+nsdm.setparam <- function(model_name, param_grid, covariate_names, tmp_path, ncov.esm=NULL, comb.esm=NULL, weights=1, nthreads){
 # Import parameter grid
 grid.list<-lapply(excel_sheets(param_grid), read_excel, path = param_grid)
 names(grid.list)<-excel_sheets(param_grid)
@@ -130,7 +129,6 @@ modinp<-append(modinp, multi_gbm)
 ## ESM
 if(model_name=="esm"){
 covs<-covariate_names[1:ncov.esm]
-if(is.character(force.esm)) covs<-c(covs[-length(covs)], force.esm)
 combs<-combn(covs, comb.esm)
 
 

@@ -61,7 +61,7 @@ d0_datasets<-readRDS(paste0(scr_path,"/outputs/",project,"/d0_datasets/loc/",isp
 ## Load selected covariates
 d1_covsels<-readRDS(paste0(scr_path,"/outputs/",project,"/d1_covsels/loc/",ispi_name,"/",ispi_name,".rds"))
 
-# Assign covdata and covstk proper nesting method
+# Assign covdata and covstk
 if(nesting_method=="covariate"){
 d1_covsels$pseu.abs_i@env_vars<-d1_covsels$covdata$cov
 d1_covsels$covstk<-d1_covsels$covstk$cov
@@ -77,23 +77,12 @@ cat(paste0('loc_A outputs loaded \n'))
 ### D- Define model parameters 
 ### =========================================================================
 # Define all possible combinations of model parameters
-if(nesting_method=="covariate"){
-modinp<-nsdm.setparam(model_name=model_name, covariate_names=names(d1_covsels$pseu.abs_i@env_vars),
-                      param_grid=param_grid, 
-					  tmp_path=paste0(scr_path,"/tmp/",project),					  
-                      weights=d0_datasets$weights,
-					  ncov.esm=ncov_esm, comb.esm=comb_esm, force.esm="mainGLO", 
-                      nthreads=ncores)
-}
-
-if(nesting_method=="multiply"){
 modinp<-nsdm.setparam(model_name=model_name, covariate_names=names(d1_covsels$pseu.abs_i@env_vars),
                       param_grid=param_grid, 
 					  tmp_path=paste0(scr_path,"/tmp/",project),					  
                       weights=d0_datasets$weights,
 					  ncov.esm=ncov_esm, comb.esm=comb_esm, 
                       nthreads=ncores)
-}
 
 cat(paste0('Modelling parameters defined \n'))
 
