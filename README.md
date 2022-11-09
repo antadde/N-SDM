@@ -1,4 +1,4 @@
-<img src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" width="100%"/>
+<img src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" height="80%"/>
 
 # About N-SDM
 
@@ -57,7 +57,7 @@ Thanks!
 
  To cite N-SDM or acknowledge its use, cite this Software Note as follows, substituting the version of N-SDM that you used for “version 1.0”:
  
- [info hidden for peer review] et al. 2022. N-SDM: a high-performance computing pipeline for fitting Nested Species Distribution Models. – XXX XXX: XXX (ver. 1.0).
+ [info hidden for peer review] et al. 2022. N-SDM: a high-performance computing pipeline for Nested Species Distribution Modelling. – XXX XXX: XXX (ver. 1.0).
 
 # Contact
 
