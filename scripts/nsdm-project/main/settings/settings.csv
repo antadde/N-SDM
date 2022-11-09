@@ -5,34 +5,34 @@ scr_path;/work/FAC/FGSE/IDYST/aguisan/valpar/wd_test/scratch/;0_global;path to s
 svp_path;/work/FAC/FGSE/IDYST/aguisan/valpar/wd_test/save/;0_general;path to saving directory
 lib_path;/work/FAC/FBM/DEE/aguisan/default/rlib/4.0/;0_global;path to R libraries directory
 clear_sop;TRUE;0_global;clear the scratch directory before starting a new run? (TRUE or FALSE)
-n_levels;2;0_global;"number of nested level(s) (1=GLO; 2=GLO+LOC)"
+n_levels;2;0_global;"number of nested level(s) (1=GLO; 2=GLO+REG)"
 n_spe;3;1_speciesdata;total number of species evaluated
 n_mx_spe;100;1_speciesdata;maximum number of species evaluated at the same time for a single N-SDM run (useful to prevent scratch saturation)
 forced_species;force-sp.csv;1_speciesdata;[optional] name of the .csv file stored in the /scripts/project/main/settings folder containing the names of species to be modelled (one per row)
-pa_po_loc;po;1_speciesdata;presence only (po) or presence absence (pa) for local data
+pa_po_reg;po;1_speciesdata;presence only (po) or presence absence (pa) for regional data
 pa_po_glo;po;1_speciesdata;presence only (po) or presence absence (pa) for global data
-min_occ_loc;50;1_speciesdata;minimum number of occurrences required for modelling a species for local level
+min_occ_reg;50;1_speciesdata;minimum number of occurrences required for modelling a species for regional level
 min_occ_glo;50;1_speciesdata;minimum number of occurrences required for modelling a species for global level
-disag_loc;TRUE;1_speciesdata;do spatial and/or temporal disaggregation of local species data (TRUE or FALSE)
+disag_reg;TRUE;1_speciesdata;do spatial and/or temporal disaggregation of regional species data (TRUE or FALSE)
 disag_glo;TRUE;1_speciesdata;do spatial and/or temporal disaggregation of global species data (TRUE or FALSE)
-thin_dist_loc;200;1_speciesdata;[optional] distance for spatial thinning of loc species occurrence data  (in projection system unit)
-thin_time_loc;5;1_speciesdata;[optional] time interval for temporal thinning of local species occurrence data (in years)
-max_uncertain_loc;250;1_speciesdata;[optional] cutoff threshold for maximum coordinate uncertainty in local species occurrence data (in projection system unit)
+thin_dist_reg;200;1_speciesdata;[optional] distance for spatial thinning of reg species occurrence data  (in projection system unit)
+thin_time_reg;5;1_speciesdata;[optional] time interval for temporal thinning of regional species occurrence data (in years)
+max_uncertain_reg;250;1_speciesdata;[optional] cutoff threshold for maximum coordinate uncertainty in regional species occurrence data (in projection system unit)
 thin_dist_glo;0.008333333;1_speciesdata;[optional] distance for spatial thinning of global species occurrence data  (in projection system unit)
 thin_time_glo;NULL;1_speciesdata;[optional] time interval for temporal thinning of global species occurrence data (in years)
 max_uncertain_glo;NULL;1_speciesdata;[optional] cutoff threshold for maximum coordinate uncertainty in global species occurrence data (in projection system unit)
-back_strat;random;1_speciesdata;"[if pa_po_loc or _glo = ""po""] the strategy for generating pseudoabsences. Only the ""random"" option is available at the time of N-SDM release"
-n_back;10000;1_speciesdata;"[if pa_po_loc or _glo = ""po""] the number of background absences to be generated"
-mask_loc;swissmaskWGS84.rds;2_covariatedata;binary (0-1) .rds raster mask stored in the /data/project/mask folder used for identifying the local-level area (pixel value=1)
+back_strat;random;1_speciesdata;"[if pa_po_reg or _glo = ""po""] the strategy for generating pseudoabsences. Only the ""random"" option is available at the time of N-SDM release"
+n_back;10000;1_speciesdata;"[if pa_po_reg or _glo = ""po""] the number of background absences to be generated"
+mask_reg;swissmaskWGS84.rds;2_covariatedata;binary (0-1) .rds raster mask stored in the /data/project/mask folder used for identifying the regional-level area (pixel value=1)
 cov_observ;c('ch_transport_tlm3d_pixel_dist2road', 'ch_transport_sonbase_pixel_noise', 'ch_popdensity_statpop13_pixel_populationdensity','ch_lulc_geostat8_present_pixel_2013_2018_cl3');2_covariatedata;"[optional] covariates considered as ""observational"" and set to an homogeneous value for the prediction process (format is full covariate name without attribute)"
 cov_observ_val;median;2_covariatedata;"[if cov_observ exists] the value to which observational covariates will be set. Three options are available at the time of N-SDM release: ""median"", ""zero"" or ""max"""
 cov_focal;c('lulc_geostat8');2_covariatedata;"[optional] covariate category_dataset with focal windows available (format is ""category_dataset"")"
 cov_time;c('bioclim_chclim25','bioclim_chelsa','lulc_geostat8');2_covariatedata;"[optional] covariate category_dataset with temporal dynamic (format is ""category_dataset"")"
 expert_table;expert-table.xlsx;2_covariatedata;[optional] name of the .xlsx pre-filtering correspondence table stored in the /scripts/project/main/settings folder indicating which covariates are candidate for modelling a target “class” of species
 tmatch_glo;FALSE;2_covariatedata;do temporal matching for global-level analyses? (TRUE or FALSE)
-tmatch_loc;TRUE;2_covariatedata;do temporal matching for local-level analyses? (TRUE or FALSE)
+tmatch_reg;TRUE;2_covariatedata;do temporal matching for regional-level analyses? (TRUE or FALSE)
 tmatch_scheme_glo;npts;2_covariatedata;"[if tmatch_glo = TRUE] scheme for temporal matching of global-level data. Two options are available at the time of N-SDM release: nearest-previous time slice ""npts""or nearest time slice ""nts"""
-tmatch_scheme_loc;nts;2_covariatedata;"[if tmatch_loc = TRUE] scheme for temporal matching of local-level data. Two options are available at the time of N-SDM release: nearest-previous time slice ""npts""or nearest time slice ""nts"""
+tmatch_scheme_reg;nts;2_covariatedata;"[if tmatch_reg = TRUE] scheme for temporal matching of regional-level data. Two options are available at the time of N-SDM release: nearest-previous time slice ""npts""or nearest time slice ""nts"""
 sel_met;GLM;3_covariate selection;"univariate ranking method used for collinearity filtering. Only the ""GLM"" option has been validated at the time of N-SDM release. Explore the nsdm.covfilter.R function for more options"
 cor_cut;0.7;3_covariate selection;Pearson correlation coefficient cutoff threshold used for collinearity filtering
 max_thre;12;3_covariate selection;maximum possible number of covariates in a single model
@@ -48,7 +48,7 @@ best_met;Score;4_modelling_evaluation;"model evaluation metric used for identify
 do_weighting;FALSE;5_ensembling;weight modelling algorithms by the value of weight_metric when ensembling? (TRUE or FALSE)
 weight_metric;Score;5_ensembling;evaluation metric used for weighting and discarding models in the ensembling process
 disc_thre;0.4;5_ensembling;cutoff threshold for weight_met at which a model is discarded from the ensembling process
-nesting_methods;c('covariate');5_ensembling;"scale-nesting strategy applied for combining the global- and local-level models. The two available options at the time of N-SDM release are ""covariate"" and ""multiply"""
+nesting_methods;c('covariate');5_ensembling;"scale-nesting strategy applied for combining the global- and regional-level models. The two available options at the time of N-SDM release are ""covariate"" and ""multiply"""
 mask_pred;ch_mask_terr_gwn07_lakes_50.rds;5_ensembling;[optional] binary (0-1) .rds raster mask stored in the /data/project/mask folder used for masking the predictions [pixels with 0 value]
 do_proj;TRUE;6_projections;do future/alternative projections? (TRUE or FALSE)
 proj_scenarios;c('rcp45', 'rcp85');6_projections;"names of the future/alternative scenarios evaluated for projections (must match with covariate folder names; see Appendix S1: Text S2 for details)"
@@ -72,15 +72,15 @@ glo_B_c;10;8_HPC;glo_B requested cores
 glo_C_m;25G;8_HPC;glo_C requested memory
 glo_C_t;00-00:15;8_HPC;glo_C requested time
 glo_C_c;1;8_HPC;glo_C requested cores
-loc_A_m;25G;8_HPC;loc_A requested memory
-loc_A_t;00-00:15;8_HPC;loc_A requested time
-loc_A_c;10;8_HPC;loc_A requested cores
-loc_B_m;80G;8_HPC;loc_B requested memory
-loc_B_t;00-00:15;8_HPC;loc_B requested time
-loc_B_c;10;8_HPC;loc_B requested cores
-loc_C_m;25G;8_HPC;loc_C requested memory
-loc_C_t;00-00:15;8_HPC;loc_C requested time
-loc_C_c;1;8_HPC;loc_C requested cores
+reg_A_m;25G;8_HPC;reg_A requested memory
+reg_A_t;00-00:15;8_HPC;reg_A requested time
+reg_A_c;10;8_HPC;reg_A requested cores
+reg_B_m;80G;8_HPC;reg_B requested memory
+reg_B_t;00-00:15;8_HPC;reg_B requested time
+reg_B_c;10;8_HPC;reg_B requested cores
+reg_C_m;25G;8_HPC;reg_C requested memory
+reg_C_t;00-00:15;8_HPC;reg_C requested time
+reg_C_c;1;8_HPC;reg_C requested cores
 fut_A_m;80G;8_HPC;fut_A requested memory
 fut_A_t;00-00:15;8_HPC;fut_A requested time
 fut_A_c;10;8_HPC;fut_A requested cores

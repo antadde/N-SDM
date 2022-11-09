@@ -2,7 +2,7 @@
 
 # About N-SDM
 
-Uniting species distribution modelling (SDM) techniques into one high-performance computing (HPC) pipeline, we developed N-SDM, an SDM platform aimed at delivering reproducible outputs for standard biodiversity assessments. N-SDM was built around a spatially-nested framework, intended at facilitating the combined use of species occurrence data retrieved from multiple sources and at various spatial scales. N-SDM allows combining two models fitted with species and covariate data retrieved from global to local scales, which is useful for addressing the issue of spatial niche truncation. The set of state-of-the-art SDM features embodied in N-SDM includes a newly devised covariate selection procedure, five modelling algorithms, an algorithm-specific hyperparameter grid search and the ensemble of small-models approach. N-SDM is designed to be run on HPC environments, allowing the parallel processing of thousands of species at the same time.
+Uniting species distribution modelling (SDM) techniques into one high-performance computing (HPC) pipeline, we developed N-SDM, an SDM platform aimed at delivering reproducible outputs for standard biodiversity assessments. N-SDM was built around a spatially-nested framework, intended at facilitating the combined use of species occurrence data retrieved from multiple sources and at various spatial scales. N-SDM allows combining two models fitted with species and covariate data retrieved from global to regional scales, which is useful for addressing the issue of spatial niche truncation. The set of state-of-the-art SDM features embodied in N-SDM includes a newly devised covariate selection procedure, five modelling algorithms, an algorithm-specific hyperparameter grid search and the ensemble of small-models approach. N-SDM is designed to be run on HPC environments, allowing the parallel processing of thousands of species at the same time.
 
 # Prerequisites
 
@@ -28,17 +28,17 @@ We will run an applied example aimed at illustrating the main operations and per
 
 ## Study area
 
-Following the spatially-nested framework (see Figure 1 and section “Highlighted features” of the N-SDM software note for details), we distinguished between “local-” and “global-” level study areas. The local-level area included all of Switzerland, with a total area of ≈ 40,000 km². For the global-level area, we used a bounding box covering the European continent, ranging from 32,60 °N to 71,70 °N, and from 28,56 °W to 40,21 °E, for an area of ≈ 10 Mio. km².
+Following the spatially-nested framework (see Figure 1 and section “Highlighted features” of the N-SDM software note for details), we distinguished between “regional-” and “global-”level study areas. The regional-level area included all of Switzerland, with a total area of ≈ 40,000 km². For the global-level area, we used a bounding box covering the European continent, ranging from 32,60 °N to 71,70 °N, and from 28,56 °W to 40,21 °E, for an area of ≈ 10 Mio. km².
 
 ## Data
 
 ### Species data
 
-Global-level species occurrence records were obtained from GBIF (https://www.gbif.org/). Local-level records were obtained from the Swiss Species Information Center InfoSpecies (www.infospecies.ch). To limit spatial clustering effects, occurrence records will be disaggregated so that two points cannot be closer than 1 km at the global level and 200 m at the local level. For each species and level 10,000 background absences aimed at contrasting with occurrence records will be randomly generated across the target areas.
+Global-level species occurrence records were obtained from GBIF (https://www.gbif.org/). Local-level records were obtained from the Swiss Species Information Center InfoSpecies (www.infospecies.ch). To limit spatial clustering effects, occurrence records will be disaggregated so that two points cannot be closer than 1 km at the global level and 200 m at the regional level. For each species and level 10,000 background absences aimed at contrasting with occurrence records will be randomly generated across the target areas.
 
 ### Covariate data
 
-We will use a suite of 453 candidate covariates derived from 42 individual parameters belonging to 6 main categories (bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation). Once the .zip data file has been unzipped, detailed information on the covariates can be found in ./data/nsdm-project/covariates/covariates.xlsx.  Only bioclimatic covariates were used for fitting the global-level model and all the others were used for the local model (see Figure 1 in the companion Software Note for details). To account for environmental conditions within a wider area than the only coordinates of the occurrence records, covariates from the “land use and cover” category were extracted using 13 moving radii ranging from 25 m to 5 km. All covariates were standardized to zero mean and unit variance.
+We will use a suite of 453 candidate covariates derived from 42 individual parameters belonging to 6 main categories (bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation). Once the .zip data file has been unzipped, detailed information on the covariates can be found in ./data/nsdm-project/covariates/covariates.xlsx.  Only bioclimatic covariates were used for fitting the global-level model and all the others were used for the regional model (see Figure 1 in the companion Software Note for details). To account for environmental conditions within a wider area than the only coordinates of the occurrence records, covariates from the “land use and cover” category were extracted using 13 moving radii ranging from 25 m to 5 km. All covariates were standardized to zero mean and unit variance.
 
 ## N-SDM settings
 
