@@ -44,8 +44,8 @@ ix4rep<-ix2rep-1
 sacct$JobName[ix2rep]<-sacct$JobName[ix4rep]
 sacct$JobName<-toupper(sacct$JobName)
 sacct<-sacct[-ix4rep,]
-jobs<-c(paste0("PRE_",c("A","B")), paste0("GLO_",c("A", "B", "C")), paste0("LOC_", c("A", "B", "C")), paste0("FUT_", c("A", "B", "C", "D")))
-if(n_levels<2) jobs<-jobs[-grep("LOC",jobs)]
+jobs<-c(paste0("PRE_",c("A","B")), paste0("GLO_",c("A", "B", "C")), paste0("REG_", c("A", "B", "C")), paste0("FUT_", c("A", "B", "C", "D")))
+if(n_levels<2) jobs<-jobs[-grep("REG",jobs)]
 if(do_proj=="FALSE") jobs<-jobs[-grep("FUT",jobs)]
 
 sacct<-sacct[-which(!sacct$JobName %in% jobs),]
@@ -113,7 +113,7 @@ nsdm.savethis(object=list(mem_mn, mem_mx, times_sm, times_mx), species=paste0(ss
 pals<-c(
 get_palette(palette = "Greys", length(grep("PRE", unique(sacct$JobName)))),
 get_palette(palette = "Blues", length(grep("GLO", unique(sacct$JobName)))),
-get_palette(palette = "Greens", length(grep("LOC", unique(sacct$JobName)))),
+get_palette(palette = "Greens", length(grep("REG", unique(sacct$JobName)))),
 get_palette(palette = "Reds", length(grep("FUT", unique(sacct$JobName)))))
 
 spth<-paste0(scr_path,"/outputs/",project,"/plots/sacct/",ssl_id,"_run_",run_id)

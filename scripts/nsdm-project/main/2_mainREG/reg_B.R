@@ -1,5 +1,5 @@
 #############################################################################
-## 2_mainLOC
+## 2_mainREG
 ## B: modelling and predictions
 ## Date: 20-05-2022
 ## Author: Antoine Adde 
@@ -8,10 +8,10 @@
 ### =========================================================================
 ### A- Preparation
 ### =========================================================================
-project<-gsub("/main/2_mainLOC","",gsub(".*scripts/","",getwd()))
+project<-gsub("/main/2_mainREG","",gsub(".*scripts/","",getwd()))
 
 # Load nsdm settings
-load(paste0(gsub("scripts","tmp",gsub("/main/2_mainLOC","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/2_mainREG","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -41,7 +41,7 @@ species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rd
 # Target model algorithms
 models<-mod_algo
 
-# Scale-nesting methods for combining GLO and LOC predictions
+# Scale-nesting methods for combining GLO and REG predictions
 nesting_methods<-nesting_methods
 
 # SBATCH array
@@ -50,16 +50,16 @@ ispi_name <- array[arrayID,"species"]
 model_name <- array[arrayID,"model"]
 nesting_method <- array[arrayID,"nesting"]
 
-cat(paste0('Ready for local-level ', toupper(model_name), ' modelling of ', ispi_name, ' using the ',nesting_method,' method for scale-nesting ...\n'))
+cat(paste0('Ready for regal-level ', toupper(model_name), ' modelling of ', ispi_name, ' using the ',nesting_method,' method for scale-nesting ...\n'))
 
 ### =========================================================================
-### C- Load loc_A outputs
+### C- Load reg_A outputs
 ### =========================================================================
 ## Load modelling sets
-d0_datasets<-readRDS(paste0(scr_path,"/outputs/",project,"/d0_datasets/loc/",ispi_name,"/",ispi_name,".rds"))
+d0_datasets<-readRDS(paste0(scr_path,"/outputs/",project,"/d0_datasets/reg/",ispi_name,"/",ispi_name,".rds"))
 
 ## Load selected covariates
-d1_covsels<-readRDS(paste0(scr_path,"/outputs/",project,"/d1_covsels/loc/",ispi_name,"/",ispi_name,".rds"))
+d1_covsels<-readRDS(paste0(scr_path,"/outputs/",project,"/d1_covsels/reg/",ispi_name,"/",ispi_name,".rds"))
 
 # Assign covdata and covstk
 if(nesting_method=="covariate"){
@@ -71,7 +71,7 @@ d1_covsels$pseu.abs_i@env_vars<-d1_covsels$covdata$mul
 d1_covsels$covstk<-d1_covsels$covstk$mul
 }
 
-cat(paste0('loc_A outputs loaded \n'))
+cat(paste0('reg_A outputs loaded \n'))
 
 ### =========================================================================
 ### D- Define model parameters 
@@ -95,13 +95,13 @@ mod<-try(nsdm.flex3(x=d1_covsels$pseu.abs_i,
                    reps=reps, 
                    mod_args=modinp,
 				   ncores=ncores,
-				   level=paste0("loc_",nesting_method),
+				   level=paste0("reg_",nesting_method),
 				   timer=TRUE,
 				   tmp_path=paste0(scr_path,"/tmp/",project)),TRUE)
 
 ## E.2 Evaluate model
 ### Assessment metrics
-try(evals<-nsdm.evaluate3(mod$mod,crit=eval_crit, ncores=ncores, level=paste0("loc_", nesting_method),
+try(evals<-nsdm.evaluate3(mod$mod,crit=eval_crit, ncores=ncores, level=paste0("reg_", nesting_method),
 				          tmp_path=paste0(scr_path,"/tmp/",project)),TRUE)
 
 ### Computation time		  				  
@@ -121,13 +121,13 @@ colnames(t)<-names(mod$mod@fits)
   suppressWarnings(nsdm.savethis(object=list(model=mod, parameters=modinp),
                   species_name=ispi_name, model_name=model_name,
                   tag=paste0(model_name,"_tune"),
-                  save_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/",nesting_method)))}
+                  save_path=paste0(scr_path,"/outputs/",project,"/d2_models/reg/",nesting_method)))}
 				  
 ## E.4 Save evaluation table
 suppressWarnings(nsdm.savethis(object=smev,
               model_name=model_name, species_name=ispi_name,
 			  compression=TRUE,
-              save_path=paste0(scr_path,"/outputs/",project,"/d3_evals/loc/",nesting_method)))
+              save_path=paste0(scr_path,"/outputs/",project,"/d3_evals/reg/",nesting_method)))
 
 cat(paste0('\n\nModels fitted and evaluated \n'))
   
@@ -153,16 +153,16 @@ suppressWarnings(prmod<-nsdm.flex3(x=d1_covsels$pseu.abs_i,
                                   replicatetype="none",
                                   reps=1,
 								  ncores=1,
-								  level="loc",
+								  level="reg",
                                   mod_args=modinp_top,
 								  tmp_path=paste0(scr_path,"/tmp/",project)))
 
 suppressWarnings(nsdm.savethis(object=prmod,
               species_name=ispi_name, model_name=model_name, tag=model_name,
 			  compression=TRUE,
-              save_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/",nesting_method)))
+              save_path=paste0(scr_path,"/outputs/",project,"/d2_models/reg/",nesting_method)))
 			  
-if(model_name=="gbm") saveRDS.lgb.Booster(prmod@fits[[1]][[1]], paste0(scr_path,"/outputs/",project,"/d2_models/loc/",nesting_method,"/",ispi_name,"/gbm/",ispi_name,"_",model_name,".rds"))
+if(model_name=="gbm") saveRDS.lgb.Booster(prmod@fits[[1]][[1]], paste0(scr_path,"/outputs/",project,"/d2_models/reg/",nesting_method,"/",ispi_name,"/gbm/",ispi_name,"_",model_name,".rds"))
 			  
 cat(paste0('Top model ',names(modinp_top), ' refitted on full dataset for predictions \n'))
   
@@ -173,17 +173,17 @@ cat(paste0('Top model ',names(modinp_top), ' refitted on full dataset for predic
 print(imp<-nsdm.varimp(prmod))
 nsdm.savethis(object=imp,model_name=model_name, species_name=ispi_name,
 			  compression=TRUE,
-              save_path=paste0(scr_path,"/outputs/",project,"/d4_varimps/loc/",nesting_method))
+              save_path=paste0(scr_path,"/outputs/",project,"/d4_varimps/reg/",nesting_method))
 
 ## G.2 Response curves
 Data<-d1_covsels$pseu.abs_i@env_vars
 respcurves<-nsdm.respcurve(prmod, Data=Data,
                            scaleparam=attributes(d1_covsels$env_vars)[c("scaled:center","scaled:scale")],
                            model_name=model_name, species_name=ispi_name,
-			               plotting=TRUE, ncores=ncores, save_path=paste0(scr_path,"/outputs/",project,"/plots/respcurves/loc/",nesting_method))
+			               plotting=TRUE, ncores=ncores, save_path=paste0(scr_path,"/outputs/",project,"/plots/respcurves/reg/",nesting_method))
 						   
 nsdm.savethis(object=respcurves, model_name=model_name, species_name=ispi_name, compression=TRUE,
-                save_path=paste0(scr_path,"/outputs/",project,"/d5_respcurves/loc/",nesting_method))
+                save_path=paste0(scr_path,"/outputs/",project,"/d5_respcurves/reg/",nesting_method))
 
 cat(paste0('\n\nVariable importance scores and response curves computed \n'))
   
@@ -197,7 +197,7 @@ cov_obs<-grep(paste0(cov_observ, collapse="|"), names(d1_covsels$covstk), value=
 cov_obs<-NULL
 }
 
-hab_df_loc<-nsdm.retrieve4pred(covstk=d1_covsels$covstk,
+hab_df_reg<-nsdm.retrieve4pred(covstk=d1_covsels$covstk,
                                observational=cov_obs,
 							   obsval=cov_observ_val,
 							   mask=mask_pred,
@@ -210,12 +210,12 @@ gc()
 
 ## H.3 Predict
 ndata_bck<-nsdm.predict(models=prmod,
-                        nwdata=hab_df_loc$covdf, 
+                        nwdata=hab_df_reg$covdf, 
                         nsplits=ncores)
 
-nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=hab_df_loc$covdf_ix),
+nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=hab_df_reg$covdf_ix),
               model_name=model_name, species_name=ispi_name,
-              save_path=paste0(scr_path,"/outputs/",project,"/d6_preds/loc/", nesting_method))
+              save_path=paste0(scr_path,"/outputs/",project,"/d6_preds/reg/", nesting_method))
 
 cat(paste0('Predictions calculated and saved \n'))
 

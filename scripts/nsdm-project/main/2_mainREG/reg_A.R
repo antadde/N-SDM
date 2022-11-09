@@ -1,5 +1,5 @@
 #############################################################################
-## 2_mainLOC
+## 2_mainREG
 ## A: covariate extraction and covariate selection
 ## Date: 20-05-2022
 ## Author: Antoine Adde
@@ -8,10 +8,10 @@
 ### =========================================================================
 ### A- Preparation
 ### =========================================================================
-project<-gsub("/main/2_mainLOC","",gsub(".*scripts/","",getwd()))
+project<-gsub("/main/2_mainREG","",gsub(".*scripts/","",getwd()))
 
 # Load nsdm settings
-load(paste0(gsub("scripts","tmp",gsub("/main/2_mainLOC","",getwd())),"/settings/nsdm-settings.RData"))
+load(paste0(gsub("scripts","tmp",gsub("/main/2_mainREG","",getwd())),"/settings/nsdm-settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode="000")
@@ -44,7 +44,7 @@ ispi_name<-species[arrayID]
 
 # Load species data
 sp_dat<-readRDS(paste0(scr_path,"/outputs/",project,"/d0_datasets/glo/",ispi_name,"/",ispi_name,".rds"))
-pseu.abs_i<-sp_dat$pseu.abs_i_loc
+pseu.abs_i<-sp_dat$pseu.abs_i_reg
 group_name<-gsub("\\s*\\([^\\)]+\\)","",as.character(sp_dat$group))
 
 cat(paste0('Ready for modelling dataset preparation and covariate selection for ', ispi_name, '...\n'))
@@ -52,11 +52,11 @@ cat(paste0('Ready for modelling dataset preparation and covariate selection for 
 ### =========================================================================
 ### D- Covariate data
 ### =========================================================================
-# D.1 Retrieve loc list of candidate covariates and covinfo table
+# D.1 Retrieve reg list of candidate covariates and covinfo table
 lr<-readRDS(paste0(w_path,"tmp/",project,"/settings/covariates-list.rds"))
 cov_info<-lr$cov_info
-lr_loc<-lr$lr_loc[intersect(grep("/future/", lr$lr_loc, invert=TRUE), grep(paste0("/",unique(cov_info$category[cov_info$level=="glo"]),"/"), lr$lr_loc, invert=T))]
-cov_info<-data.frame(lr$cov_info[match(lr_loc, lr$cov_info$file),])
+lr_reg<-lr$lr_reg[intersect(grep("/future/", lr$lr_reg, invert=TRUE), grep(paste0("/",unique(cov_info$category[cov_info$level=="glo"]),"/"), lr$lr_reg, invert=T))]
+cov_info<-data.frame(lr$cov_info[match(lr_reg, lr$cov_info$file),])
 
 # D.2 Subset with list of expert-filtered candidate covariates, if available
 expert_tab<-try(read_excel(expert_table, .name_repair = "minimal"), silent=T)
@@ -66,10 +66,10 @@ dup_ix<-which(duplicated(colnames(expert_tab)))
 if(length(dup_ix)>0) expert_tab<-expert_tab[,-which(duplicated(colnames(expert_tab)))]
 expert_tab<-expert_tab[which(expert_tab[,group_name]=="1"),]
 cov_info<-merge(cov_info, expert_tab)
-lr_loc<-cov_info$file
+lr_reg<-cov_info$file
 }
 
-# Retrieve glo and loc reference rasters
+# Retrieve glo and reg reference rasters
 rsts_ref<-readRDS(paste0(w_path,"tmp/",project,"/settings/ref-rasters.rds"))
 
 cat(paste0('Covariate data listed \n'))
@@ -81,12 +81,12 @@ cat(paste0('Covariate data listed \n'))
 glo_out_f<-list.files(paste0(scr_path,"/outputs/",project,"/d8_ensembles/glo/",ispi_name), pattern=".rds", full.names = TRUE)
 
 # E.2 Extract new habitat covariates
-pseu.abs_i<-nsdm.bigextract(cov=c(gsub(".rds", ".fst", lr_loc), glo_out_f),
+pseu.abs_i<-nsdm.bigextract(cov=c(gsub(".rds", ".fst", lr_reg), glo_out_f),
                             data=pseu.abs_i,
-							rst_ref=rsts_ref$rst_loc,
+							rst_ref=rsts_ref$rst_reg,
 							cov_info=cov_info,
-							t_match=tmatch_loc,
-							tmatch_scheme=tmatch_scheme_loc,
+							t_match=tmatch_reg,
+							tmatch_scheme=tmatch_scheme_reg,
 							ex_pint=FALSE,
 							nsplits=ncores)
 
@@ -112,7 +112,7 @@ nsdm.savethis(object=list(pseu.abs_i=pseu.abs_i,
 						  group=sp_dat$group),
                           species_name=ispi_name,
 			  			  compression=TRUE,
-                          save_path=paste0(scr_path,"/outputs/",project,"/d0_datasets/loc"))
+                          save_path=paste0(scr_path,"/outputs/",project,"/d0_datasets/reg"))
 
 cat(paste0('Modelling dataset prepared \n'))
 
@@ -154,9 +154,9 @@ if(counter > 5 | !is(cov.embed_i, 'try-error')) break
 cat(paste0("an error occured; tentative number ", counter, " for covariate selection...\n"))
 }
 # F.3 Finalize
-hab_stk_loc<-try(nsdm.fastraster(files=na.omit(cov_info$file[match(cov.embed_i$ranks_2$covariate, gsub(".rds","",basename(cov_info$file)))]), nsplits=ncores), silent=TRUE)
+hab_stk_reg<-try(nsdm.fastraster(files=na.omit(cov_info$file[match(cov.embed_i$ranks_2$covariate, gsub(".rds","",basename(cov_info$file)))]), nsplits=ncores), silent=TRUE)
 glo_out<-readRDS(glo_out_f); names(glo_out)<-"mainGLO"
-covstk_res[["cov"]]<-stack(hab_stk_loc, glo_out)
+covstk_res[["cov"]]<-stack(hab_stk_reg, glo_out)
 covdata_res[["cov"]]<-cov.embed_i$covdata
 }
 
@@ -207,7 +207,7 @@ nsdm.savethis(object=list(pseu.abs_i=pseu.abs_i,
 			  covdata=covdata_res,
 			  env_vars=env_vars),
               species_name=ispi_name,
-              save_path=paste0(scr_path,"/outputs/",project,"/d1_covsels/loc"))
+              save_path=paste0(scr_path,"/outputs/",project,"/d1_covsels/reg"))
 
 cat(paste0('Covariate selection for ',ispi_name,' done \n'))
 cat(paste0('Finished \n'))

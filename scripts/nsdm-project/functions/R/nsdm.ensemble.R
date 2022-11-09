@@ -9,7 +9,7 @@
 #' @param discthre A numeric value for the threshold for weight_metric under which to discard an algorithm
 #' @param weighting Logical. If TRUE, weight individual algorithms by weight_metric
 #' @param weight_metric A character string indicating the name of the metric used for weighting or discarding
-#' @param level A character vector indicating the name of the level considered (e.g., glo or loc)
+#' @param level A character vector indicating the name of the level considered (e.g., glo or reg)
 #' @param nesting_name A character vector indicating the name of the nesting strategy for which predicted values are provided
 #' @param scenar_name A character vector indicating the name of the scenario for which predicted values are provided
 #' @param period_name A character vector indicating the name of the period for which predicted values are provided

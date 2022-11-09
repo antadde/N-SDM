@@ -12,7 +12,7 @@
 #' @param reps Numeric number of replicates
 #' @param mod_args List of class 'multi.input' containing information on models to be fitted
 #' @param timer Logical (TRUE or FALSE) indicating if model computation time is to be saved
-#' @param level A charachter string indicating the level evaluated (e.g. glo or loc)
+#' @param level A charachter string indicating the level evaluated (e.g. glo or reg)
 #' @param ncores Number of cores to be used during parallel operations
 #' @param save  should the model be saved in a structured way? (not implemented yet)
 #' @param project character indicating the name of the project within which the models are run (later used to define saving directories)

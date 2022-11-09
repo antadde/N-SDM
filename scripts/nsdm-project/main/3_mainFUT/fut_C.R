@@ -1,6 +1,6 @@
 #############################################################################
 ## 3_mainFUT
-## B: local-level projections
+## B: regal-level projections
 ## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
@@ -41,7 +41,7 @@ species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rd
 # Target model algorithms
 models<-mod_algo
 
-# Scale-nesting methods for combining GLO and LOC predictions
+# Scale-nesting methods for combining GLO and REG predictions
 nesting_methods<-nesting_methods
 
 # Target RCP for future predictions
@@ -60,25 +60,25 @@ scenar<-array[arrayID,"scenarios"]
 
 for (per in pers){
 
-cat(paste('Ready for', scenar, per, toupper(model_name),  'future LOC predictions of', ispi_name, ' using the ',nesting_method,' method for scale-nesting ...\n'))
+cat(paste('Ready for', scenar, per, toupper(model_name),  'future REG predictions of', ispi_name, ' using the ',nesting_method,' method for scale-nesting ...\n'))
 
 ### =========================================================================
-### C- Load LOC model
+### C- Load REG model
 ### =========================================================================
-# C.1.1 Load LOC data
+# C.1.1 Load REG data
 d0_datasets<-nsdm.loadthis(species_name=ispi_name,
-              read_path=paste0(scr_path,"/outputs/",project,"/d0_datasets/loc"))
+              read_path=paste0(scr_path,"/outputs/",project,"/d0_datasets/reg"))
 
-# C.1.2 Load LOC model
+# C.1.2 Load REG model
 prmod<-nsdm.loadthis(model_name=model_name, species_name=ispi_name,
-              read_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/",nesting_method))
+              read_path=paste0(scr_path,"/outputs/",project,"/d2_models/reg/",nesting_method))
 
 # Specific loading strategy for lgb.booster			  
 if("lgb.Booster" %in% class(prmod)){
-prmod<-readRDS.lgb.Booster(paste0(scr_path,"/outputs/",project,"/d2_models/loc/",nesting_method,"/",ispi_name,"/gbm/",ispi_name,"_gbm.rds"))
+prmod<-readRDS.lgb.Booster(paste0(scr_path,"/outputs/",project,"/d2_models/reg/",nesting_method,"/",ispi_name,"/gbm/",ispi_name,"_gbm.rds"))
 prmod2<-prmod
 prmod<-nsdm.loadthis(model_name="glm", species_name=ispi_name,
-              read_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/",nesting_method))
+              read_path=paste0(scr_path,"/outputs/",project,"/d2_models/reg/",nesting_method))
 prmod@fits[[1]][[1]]<-prmod2	  
 }
 
@@ -131,7 +131,7 @@ names(stk_fut)[nlayers(stk_fut)]<-"mainGLO"
 ### E- Spatial predictions
 ### =========================================================================
 ## E.1 Prepare covariate data for predictions
-hab_df_loc<-nsdm.retrieve4pred(covstk=stk_fut,
+hab_df_reg<-nsdm.retrieve4pred(covstk=stk_fut,
                                observational=grep(paste0(cov_observ, collapse="|"), names(stk_fut), value=T),
 							   obsval=cov_observ_val,
 							   mask=mask_pred,
@@ -144,13 +144,13 @@ gc()
 
 ## E.3 Predict
 ndata_bck<-nsdm.predict(models=prmod,
-                        nwdata=hab_df_loc$covdf,
+                        nwdata=hab_df_reg$covdf,
                         nsplits=ncores)
 
 ## E.4 Save
-nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=hab_df_loc$covdf_ix),
+nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=hab_df_reg$covdf_ix),
               model_name=model_name, species_name=ispi_name,
-              save_path=paste0(scr_path,"/outputs/",project,"/d13_preds-fut/loc/",nesting_method,"/",scenar,"/",per))
+              save_path=paste0(scr_path,"/outputs/",project,"/d13_preds-fut/reg/",nesting_method,"/",scenar,"/",per))
 }
 
 cat(paste0('Predictions calculated and saved \n'))

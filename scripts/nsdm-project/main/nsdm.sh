@@ -110,21 +110,21 @@ glo_C_t=$(awk -F ";" '$1 == "glo_C_t" { print $2}' ./settings/settings.csv)     
 glo_C_c=$(awk -F ";" '$1 == "glo_C_c" { print $2}' ./settings/settings.csv)                           # C cores
 glo_C_a=$n_spe                                                                                        # C array extent
 
-## LOC
-loc_A_m=$(awk -F ";" '$1 == "loc_A_m" { print $2}' ./settings/settings.csv)                           # A memory
-loc_A_t=$(awk -F ";" '$1 == "loc_A_t" { print $2}' ./settings/settings.csv)                           # A time
-loc_A_c=$(awk -F ";" '$1 == "loc_A_c" { print $2}' ./settings/settings.csv)                           # A cores
-loc_A_a=$n_spe                                                                                        # A array extent
+## REG
+reg_A_m=$(awk -F ";" '$1 == "reg_A_m" { print $2}' ./settings/settings.csv)                           # A memory
+reg_A_t=$(awk -F ";" '$1 == "reg_A_t" { print $2}' ./settings/settings.csv)                           # A time
+reg_A_c=$(awk -F ";" '$1 == "reg_A_c" { print $2}' ./settings/settings.csv)                           # A cores
+reg_A_a=$n_spe                                                                                        # A array extent
 
-loc_B_m=$(awk -F ";" '$1 == "loc_B_m" { print $2}' ./settings/settings.csv)                           # B memory
-loc_B_t=$(awk -F ";" '$1 == "loc_B_t" { print $2}' ./settings/settings.csv)                           # B time
-loc_B_c=$(awk -F ";" '$1 == "loc_B_c" { print $2}' ./settings/settings.csv)                           # B cores
-loc_B_a=`expr $n_spe \* $n_algo \* $n_nesting`                                                        # B array extent
+reg_B_m=$(awk -F ";" '$1 == "reg_B_m" { print $2}' ./settings/settings.csv)                           # B memory
+reg_B_t=$(awk -F ";" '$1 == "reg_B_t" { print $2}' ./settings/settings.csv)                           # B time
+reg_B_c=$(awk -F ";" '$1 == "reg_B_c" { print $2}' ./settings/settings.csv)                           # B cores
+reg_B_a=`expr $n_spe \* $n_algo \* $n_nesting`                                                        # B array extent
 
-loc_C_m=$(awk -F ";" '$1 == "loc_C_m" { print $2}' ./settings/settings.csv)                           # C memory
-loc_C_t=$(awk -F ";" '$1 == "loc_C_t" { print $2}' ./settings/settings.csv)                           # C time
-loc_C_c=$(awk -F ";" '$1 == "loc_C_c" { print $2}' ./settings/settings.csv)                           # C cores
-loc_C_a=`expr $n_spe \* $n_nesting`                                                                   # C array extent   
+reg_C_m=$(awk -F ";" '$1 == "reg_C_m" { print $2}' ./settings/settings.csv)                           # C memory
+reg_C_t=$(awk -F ";" '$1 == "reg_C_t" { print $2}' ./settings/settings.csv)                           # C time
+reg_C_c=$(awk -F ";" '$1 == "reg_C_c" { print $2}' ./settings/settings.csv)                           # C cores
+reg_C_a=`expr $n_spe \* $n_nesting`                                                                   # C array extent   
 
 ## FUT
 fut_A_m=$(awk -F ";" '$1 == "fut_A_m" { print $2}' ./settings/settings.csv)                           # A memory
@@ -158,8 +158,8 @@ rm $wp/scripts/$project/main/0_mainPRE/pre_B*.err 2>/dev/null
 rm $wp/scripts/$project/main/0_mainPRE/pre_B*.out 2>/dev/null
 rm $wp/scripts/$project/main/1_mainGLO/*.err 2>/dev/null
 rm $wp/scripts/$project/main/1_mainGLO/*.out 2>/dev/null
-rm $wp/scripts/$project/main/2_mainLOC/*.err 2>/dev/null
-rm $wp/scripts/$project/main/2_mainLOC/*.out 2>/dev/null
+rm $wp/scripts/$project/main/2_mainREG/*.err 2>/dev/null
+rm $wp/scripts/$project/main/2_mainREG/*.out 2>/dev/null
 rm $wp/scripts/$project/main/3_mainFUT/*.err 2>/dev/null
 rm $wp/scripts/$project/main/3_mainFUT/*.out 2>/dev/null
 rm $wp/scripts/$project/main/4_mainEND/*.err 2>/dev/null
@@ -174,7 +174,7 @@ rm -r $sop/tmp/$project/* 2>/dev/null
 fi
 
 # Start running jobs
-## n_levels of analyses (1=GLO; 2=GLO+LOC)?
+## n_levels of analyses (1=GLO; 2=GLO+REG)?
 n_levels=$(awk -F ";" '$1 == "n_levels" { print $2}' ./settings/settings.csv)
 
 ## Do future analyses?
@@ -196,14 +196,14 @@ echo GLO ensembling done
 
 if [ $n_levels -gt 1 ]
 then 
-## LOC level
-cd $wp/scripts/$project/main/2_mainLOC
-sbatch --wait --account=$acc --partition=$part --mem=$loc_A_m --time=$loc_A_t --cpus-per-task=$loc_A_c --ntasks=1 --array [1-$loc_A_a] job_loc_A.sh
-echo LOC data preparation and covariate selection done
-sbatch --wait --account=$acc --partition=$part --mem=$loc_B_m --time=$loc_B_t --cpus-per-task=$loc_B_c --ntasks=1 --array [1-$loc_B_a] job_loc_B.sh
-echo LOC modelling done
-sbatch --wait --account=$acc --partition=$part --mem=$loc_C_m --time=$loc_C_t --cpus-per-task=$loc_C_c --ntasks=1 --array [1-$loc_C_a] job_loc_C.sh
-echo LOC ensembling and scale nesting done
+## REG level
+cd $wp/scripts/$project/main/2_mainREG
+sbatch --wait --account=$acc --partition=$part --mem=$reg_A_m --time=$reg_A_t --cpus-per-task=$reg_A_c --ntasks=1 --array [1-$reg_A_a] job_reg_A.sh
+echo REG data preparation and covariate selection done
+sbatch --wait --account=$acc --partition=$part --mem=$reg_B_m --time=$reg_B_t --cpus-per-task=$reg_B_c --ntasks=1 --array [1-$reg_B_a] job_reg_B.sh
+echo REG modelling done
+sbatch --wait --account=$acc --partition=$part --mem=$reg_C_m --time=$reg_C_t --cpus-per-task=$reg_C_c --ntasks=1 --array [1-$reg_C_a] job_reg_C.sh
+echo REG ensembling and scale nesting done
 fi
 
 ## FUT projections
@@ -217,9 +217,9 @@ echo FUT GLO ensembling done
 if [ $n_levels -gt 1 ]
 then
 sbatch --wait --account=$acc --partition=$part --mem=$fut_C_m --time=$fut_C_t --cpus-per-task=$fut_C_c --ntasks=1 --array [1-$fut_C_a] job_fut_C.sh
-echo individual FUT LOC predictions done
+echo individual FUT REG predictions done
 sbatch --wait --account=$acc --partition=$part --mem=$fut_D_m --time=$fut_D_t --cpus-per-task=$fut_D_c --ntasks=1 --array [1-$fut_D_a] job_fut_D.sh
-echo FUT LOC ensembling and scale nesting done
+echo FUT REG ensembling and scale nesting done
 fi
 fi
 

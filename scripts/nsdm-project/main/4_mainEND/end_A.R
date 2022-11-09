@@ -36,7 +36,7 @@ arrayID<-eval(parse(text=arrayID))
 species<-readRDS(paste0(w_path,"tmp/",project,"/settings/tmp/species-list-run.rds"))
 ispi_name <- species[arrayID]
 
-# Scale-nesting methods for combining GLO and LOC predictions
+# Scale-nesting methods for combining GLO and REG predictions
 nesting_methods<-nesting_methods
 
 # Target model algorithms
@@ -122,17 +122,17 @@ GLO_preds<-simplify2array(pred_all)
 
 if(n_levels>1){
 ### =========================================================================
-### LOC MULTIPLY
+### REG MULTIPLY
 ### =========================================================================
 if("multiply" %in% nesting_methods){
 ################# Retrieve predictions
-level<-"loc_multiply"
+level<-"reg_multiply"
 ## Loop on target algorithms
 pred_all<-list()
 for(model in models){
 # Retrieve evaluation table and identify best model
 eval_list<-nsdm.loadthis(model_name=model, species_name=ispi_name,
-              read_path=paste0(scr_path,"/outputs/",project,"/d3_evals/loc/multiply"))
+              read_path=paste0(scr_path,"/outputs/",project,"/d3_evals/reg/multiply"))
 
 if(model!="esm"){
   if(ncol(eval_list)>1){
@@ -149,7 +149,7 @@ if(model=="esm"){
 # Load best model
 mod_m<-nsdm.loadthis(species_name=ispi_name, model_name=model,
                tag=paste0(model,"_tune"),
-               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/multiply"))$model
+               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/reg/multiply"))$model
 
 # Loop over models (one in regular cases; more for ESMs)
 pop<-list()
@@ -157,11 +157,11 @@ for(n in 1:length(modinp_top)){
 modinp_top_n<-modinp_top[n]
 
 # Retrieve test and training data 
-testa_LOC_multiply<-lapply(mod_m$m@tesdat,function(x){
+testa_REG_multiply<-lapply(mod_m$m@tesdat,function(x){
 y<-x[,-which(colnames(x)=="Presence"),drop=FALSE]
 })
 
- papa_LOC_multiply<-lapply(mod_m$m@tesdat,function(x){
+ papa_REG_multiply<-lapply(mod_m$m@tesdat,function(x){
  y<-x[,"Presence"]})
   
 # Predict
@@ -172,11 +172,11 @@ glo_prob<-list(); glo_out<-readRDS(list.files(paste0(scr_path,"outputs/",project
 for(k in 1:outerloop){
 if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
-testa_LOC_multiply[[k]]<- testa_LOC_multiply[[k]][,-which(colnames(testa_LOC_multiply[[k]]) %in% c("X","Y"))]}
+testa_REG_multiply[[k]]<- testa_REG_multiply[[k]][,-which(colnames(testa_REG_multiply[[k]]) %in% c("X","Y"))]}
 if("try-error" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
-pred_i<-rep(NA, nrow(testa_LOC_multiply[[k]]))
+pred_i<-rep(NA, nrow(testa_REG_multiply[[k]]))
 } else {
-pred_i<-nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_LOC_multiply[[k]])}
+pred_i<-nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_REG_multiply[[k]])}
 pred[[k]]<-pred_i
 glo_prob[[k]]<-raster::extract(glo_out, data.frame(mod_m$m@tesdat[[k]]$X,mod_m$m@tesdat[[k]]$Y))/100
 }
@@ -194,24 +194,24 @@ pop<-pop[[1]]}
 pred_all[[model]]<-pop
 }
 
-LOC_multiply_preds<-simplify2array(pred_all)
+REG_multiply_preds<-simplify2array(pred_all)
 }
 
 ### =========================================================================
-### LOC COVARIATE
+### REG COVARIATE
 ### =========================================================================
 if("covariate" %in% nesting_methods){
 # Load covariate matrix to rescale GLO predictions
-mat<-nsdm.loadthis(species_name=ispi_name, read_path=paste0(scr_path,"/outputs/",project,"/d1_covsels/loc"))$env_vars
+mat<-nsdm.loadthis(species_name=ispi_name, read_path=paste0(scr_path,"/outputs/",project,"/d1_covsels/reg"))$env_vars
 
 ################# Retrieve predictions
-level<-paste0("loc_covariate")
+level<-paste0("reg_covariate")
 ## Loop on target algorithms
 pred_all<-list()
 for(model in models){
 # Retrieve evaluation table and identify best model
 eval_list<-nsdm.loadthis(model_name=model, species_name=ispi_name,
-              read_path=paste0(scr_path,"/outputs/",project,"/d3_evals/loc/covariate"))
+              read_path=paste0(scr_path,"/outputs/",project,"/d3_evals/reg/covariate"))
 
 if(model!="esm"){
   if(ncol(eval_list)>1){
@@ -228,7 +228,7 @@ if(model=="esm"){
 # Load best model
 mod_m<-nsdm.loadthis(species_name=ispi_name, model_name=model,
                tag=paste0(model,"_tune"),
-               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/loc/covariate"))$model
+               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/reg/covariate"))$model
 
 # Loop over models (one in regular cases; more for ESMs)
 pop<-list()
@@ -236,11 +236,11 @@ for(n in 1:length(modinp_top)){
 modinp_top_n<-modinp_top[n]
 
 # Retrieve test and training data 
-testa_LOC_covariate<-lapply(mod_m$m@tesdat,function(x){
+testa_REG_covariate<-lapply(mod_m$m@tesdat,function(x){
 y<-x[,-which(colnames(x)=="Presence"),drop=FALSE]
 })
 
- papa_LOC_covariate<-lapply(mod_m$m@tesdat,function(x){
+ papa_REG_covariate<-lapply(mod_m$m@tesdat,function(x){
  y<-x[,"Presence"]})
    
 # Predict
@@ -250,11 +250,11 @@ pred<-list()
 for(k in 1:outerloop){
 if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
-testa_LOC_covariate[[k]]<- testa_LOC_covariate[[k]][,-which(colnames(testa_LOC_covariate[[k]]) %in% c("X","Y"))]}
+testa_REG_covariate[[k]]<- testa_REG_covariate[[k]][,-which(colnames(testa_REG_covariate[[k]]) %in% c("X","Y"))]}
 if("try-error" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
-pred_i<-rep(NA, nrow(testa_LOC_covariate[[k]]))
+pred_i<-rep(NA, nrow(testa_REG_covariate[[k]]))
 } else {
-pred_i<-nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_LOC_covariate[[k]])}
+pred_i<-nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_REG_covariate[[k]])}
 pred[[k]]<-pred_i
 }
 pop_n<-do.call(cbind, pred)
@@ -270,7 +270,7 @@ pop<-pop[[1]]}
 # List results
 pred_all[[model]]<-pop
 }
-LOC_covariate_preds<-simplify2array(pred_all)
+REG_covariate_preds<-simplify2array(pred_all)
 }
 }
 
@@ -290,27 +290,27 @@ scores[[z]]<-score}
 scores_ensemble[["GLO"]]<-scores	
 
 if(n_levels>1){
-# LOC-level ensemble without nesting (only possible in multiple mode)
+# REG-level ensemble without nesting (only possible in multiple mode)
 if("multiply" %in% nesting_methods){
-target<-LOC_multiply_preds
+target<-REG_multiply_preds
 scores<-list()
 for (z in 1:outerloop){
 score<-nsdm.ceval(f=rowMeans(as.data.frame(target[,z,]),na.rm=T),
-                   pa=papa_LOC_multiply[[z]],
-                   tesdat=testa_LOC_multiply[[z]],
+                   pa=papa_REG_multiply[[z]],
+                   tesdat=testa_REG_multiply[[z]],
                    crit=eval_crit)
 scores[[z]]<-score}
-scores_ensemble[["LOC"]]<-scores
+scores_ensemble[["REG"]]<-scores
 }	
 
 # Covariate nested ensemble
 if("covariate" %in% nesting_methods){
-target<-LOC_covariate_preds
+target<-REG_covariate_preds
 scores<-list()
 for (z in 1:outerloop){
 score<-nsdm.ceval(f=rowMeans(as.data.frame(target[,z,]),na.rm=T),
-                   pa=papa_LOC_covariate[[z]],
-                   tesdat=testa_LOC_covariate[[z]],
+                   pa=papa_REG_covariate[[z]],
+                   tesdat=testa_REG_covariate[[z]],
                    crit=eval_crit)
 scores[[z]]<-score}
 scores_ensemble[["COV"]]<-scores
@@ -318,7 +318,7 @@ scores_ensemble[["COV"]]<-scores
 
 # Multiply nested ensemble
 if("multiply" %in% nesting_methods){
-target<-LOC_multiply_preds
+target<-REG_multiply_preds
 glo_prob2<-lapply(glo_prob, function(eux){
 eux_i<-which(eux<0)
 eux[eux_i]<-0
@@ -327,8 +327,8 @@ return(eux)
 scores<-list()
 for (z in 1:outerloop){
 score<-nsdm.ceval(f=sqrt(rowMeans(as.data.frame(target[,z,]), na.rm=T)*glo_prob2[[z]]),
-                   pa=papa_LOC_multiply[[z]],
-                   tesdat=testa_LOC_multiply[[z]],
+                   pa=papa_REG_multiply[[z]],
+                   tesdat=testa_REG_multiply[[z]],
                    crit=eval_crit)
 scores[[z]]<-score}
 scores_ensemble[["MUL"]]<-scores	

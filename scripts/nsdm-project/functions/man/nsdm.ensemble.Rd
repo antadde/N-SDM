@@ -23,7 +23,7 @@ nsdm.ensemble(
 
 \item{species_name}{A character string indicating the name of the taxon}
 
-\item{level}{A character vector indicating the name of the level considered (e.g., glo or loc)}
+\item{level}{A character vector indicating the name of the level considered (e.g., glo or reg)}
 
 \item{nesting_name}{A character vector indicating the name of the nesting strategy for which predicted values are provided}
 

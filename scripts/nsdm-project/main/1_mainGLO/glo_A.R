@@ -57,10 +57,10 @@ cov_info<-lr$cov_info
 # Refine glo set
 lr_glo<-lr$lr_glo[grep("/future/", lr$lr_glo, invert=TRUE)]
 cov_info_glo<-data.frame(lr$cov_info[match(lr_glo, lr$cov_info$file),])
-# Refine loc set
+# Refine reg set
 if(n_levels>1){
-lr_loc<-lr$lr_loc[intersect(grep("/future/", lr$lr_loc, invert=TRUE), grep(paste0("/",unique(cov_info_glo$category),"/"), lr$lr_loc))]
-cov_info_loc<-data.frame(lr$cov_info[match(lr_loc, lr$cov_info$file),])
+lr_reg<-lr$lr_reg[intersect(grep("/future/", lr$lr_reg, invert=TRUE), grep(paste0("/",unique(cov_info_glo$category),"/"), lr$lr_reg))]
+cov_info_reg<-data.frame(lr$cov_info[match(lr_reg, lr$cov_info$file),])
 }
 
 
@@ -75,13 +75,13 @@ expert_tab<-data.frame(expert_tab[which(expert_tab[,group_name]=="1"),])
 cov_info_glo<-merge(cov_info_glo, expert_tab)
 lr_glo<-cov_info_glo$file
 if(n_levels>1){
-## loc
-cov_info_loc<-merge(cov_info_loc, expert_tab)
-lr_loc<-cov_info_loc$file
+## reg
+cov_info_reg<-merge(cov_info_reg, expert_tab)
+lr_reg<-cov_info_reg$file
 }
 }
 
-# Retrieve glo and loc reference rasters
+# Retrieve glo and reg reference rasters
 rsts_ref<-readRDS(paste0(w_path,"tmp/",project,"/settings/ref-rasters.rds"))
 
 ### =========================================================================
@@ -97,22 +97,22 @@ pseu.abs_i_glo<-nsdm.bigextract(cov=gsub(".rds", ".fst", lr_glo),
 
 pseu.abs_i_glo_copy<-pseu.abs_i_glo
                          
-# E.2 LOC
+# E.2 REG
 if(n_levels>1){
-pseu.abs_i_loc<-nsdm.bigextract(cov=gsub(".rds", ".fst", lr_loc),
-                               data=sp_dat$pseu.abs_i_loc,
-							   rst_ref=rsts_ref$rst_loc,
-							   cov_info=cov_info_loc,
-							   t_match=tmatch_loc,
+pseu.abs_i_reg<-nsdm.bigextract(cov=gsub(".rds", ".fst", lr_reg),
+                               data=sp_dat$pseu.abs_i_reg,
+							   rst_ref=rsts_ref$rst_reg,
+							   cov_info=cov_info_reg,
+							   t_match=tmatch_reg,
 							   nsplits=ncores)
 							   
-# E.3 Combine GLO and LOC data
-pseu.abs_i_glo@pa<-c(pseu.abs_i_glo@pa, pseu.abs_i_loc@pa)
-pseu.abs_i_glo@years<-c(pseu.abs_i_glo@years, pseu.abs_i_loc@years)
-pseu.abs_i_glo@xy<-rbind(pseu.abs_i_glo@xy, pseu.abs_i_loc@xy)
-m_ord<-match(cov_info_loc$variable, cov_info_glo$variable)
-names(pseu.abs_i_glo@env_vars)[m_ord]<-names(pseu.abs_i_loc@env_vars) 
-env_vars<-scale(rbind(pseu.abs_i_glo@env_vars, pseu.abs_i_loc@env_vars))
+# E.3 Combine GLO and REG data
+pseu.abs_i_glo@pa<-c(pseu.abs_i_glo@pa, pseu.abs_i_reg@pa)
+pseu.abs_i_glo@years<-c(pseu.abs_i_glo@years, pseu.abs_i_reg@years)
+pseu.abs_i_glo@xy<-rbind(pseu.abs_i_glo@xy, pseu.abs_i_reg@xy)
+m_ord<-match(cov_info_reg$variable, cov_info_glo$variable)
+names(pseu.abs_i_glo@env_vars)[m_ord]<-names(pseu.abs_i_reg@env_vars) 
+env_vars<-scale(rbind(pseu.abs_i_glo@env_vars, pseu.abs_i_reg@env_vars))
 pseu.abs_i_glo@env_vars<-data.frame(env_vars)							   
 } else {
 env_vars<-scale(pseu.abs_i_glo@env_vars)
@@ -132,7 +132,7 @@ if(n_levels>1){
 l<-list(group=sp_dat$group,
         pseu.abs_i_glo_copy=pseu.abs_i_glo_copy,
         pseu.abs_i_glo=pseu.abs_i_glo,
-        pseu.abs_i_loc=pseu.abs_i_loc,
+        pseu.abs_i_reg=pseu.abs_i_reg,
 		weights=wt,
 		env_vars=env_vars)
 } else {
@@ -183,7 +183,7 @@ cat(paste0("an error occured; tentative number ", counter, " for covariate selec
 
 # F.3 Finalize
 if(n_levels>1){
-stk<-try(nsdm.fastraster(files=na.omit(cov_info_loc$file[match(cov.embed_i$ranks_2$covariate, gsub(".rds","",basename(cov_info_loc$file)))]), nsplits=ncores), silent=TRUE)
+stk<-try(nsdm.fastraster(files=na.omit(cov_info_reg$file[match(cov.embed_i$ranks_2$covariate, gsub(".rds","",basename(cov_info_reg$file)))]), nsplits=ncores), silent=TRUE)
 } else {
 stk<-try(nsdm.fastraster(files=na.omit(cov_info_glo$file[match(cov.embed_i$ranks_2$covariate, gsub(".rds","",basename(cov_info_glo$file)))]), nsplits=ncores), silent=TRUE)}
 

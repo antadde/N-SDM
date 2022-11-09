@@ -26,9 +26,6 @@ nsdm.stratified(
 
 \item{bothSets}{}
 }
-\value{
-
-}
 \description{
 Stratified sampling
 }

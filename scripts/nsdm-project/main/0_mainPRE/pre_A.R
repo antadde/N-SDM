@@ -38,13 +38,13 @@ do.call("<-",list(parameters[i], as.numeric(values[i])))
 ssl_id<-readLines(paste0(w_path,"tmp/",project,"/settings/tmp/ssl_id.txt"))
 cov_path<-paste0(w_path,"data/",project,"/covariates/")
 spe_glo<-list.files(paste0(w_path,"data/",project,"/species/glo"), full.names=T, pattern=".rds")
-if(n_levels>1) spe_loc<-list.files(paste0(w_path,"data/",project,"/species/loc"), full.names=T, pattern=".rds")
+if(n_levels>1) spe_reg<-list.files(paste0(w_path,"data/",project,"/species/reg"), full.names=T, pattern=".rds")
 param_grid<-paste0(w_path,"scripts/",project,"/main/settings/", param_grid)
 if(length(expert_table)>0) expert_table<-paste0(w_path,"scripts/",project,"/main/settings/", expert_table)
 if(length(forced_species)>0) forced_species<-paste0(w_path,"scripts/",project,"/main/settings/", forced_species)
 
 # Check and refine masks
-if(n_levels>1) mask_loc<-paste0(w_path,"data/",project,"/masks/", mask_loc)
+if(n_levels>1) mask_reg<-paste0(w_path,"data/",project,"/masks/", mask_reg)
 if(length(mask_pred)>0) mask_pred<-paste0(w_path,"data/",project,"/masks/", mask_pred)
 
 # Save settings
@@ -70,14 +70,14 @@ nsdm.covinfo(cov_path=cov_path, save_path=paste0(w_path,"scripts/",project,"/mai
 			 
 cov_info<-read_excel(paste0(w_path,"scripts/", project, "/main/settings/predictors-available.xlsx"))
 			 
-# Rewrite glo rasters masked with mask_loc if not already done
+# Rewrite glo rasters masked with mask_reg if not already done
 lr_glo<-cov_info$file[cov_info$level=="glo"]
 if(n_levels>1){
 if(length(grep("msk", lr_glo)) != length(lr_glo)/2){
-msk_loc<-readRDS(mask_loc)
+msk_reg<-readRDS(mask_reg)
 for(m in lr_glo){
 r<-readRDS(m)
-r_msk<-raster::mask(r, msk_loc, inverse=TRUE)
+r_msk<-raster::mask(r, msk_reg, inverse=TRUE)
 saveRDS(r_msk, gsub(".rds", "_msk.rds", m, fixed=T))
 nsdm.covinfo(cov_path=cov_path, save_path=paste0(w_path,"scripts/",project,"/main/settings/"),
              time_cov=cov_time, focal_cov=cov_focal)			 
@@ -92,8 +92,8 @@ lr_glo<-cov_info$file[cov_info$level=="glo" & cov_info$attribute=="msk"]
 } else {
 lr_glo<-cov_info$file[cov_info$level=="glo"]
 }
-if(n_levels>1){lr_loc<-cov_info$file[cov_info$level=="loc"]
-lr<-c(lr_glo, lr_loc)
+if(n_levels>1){lr_reg<-cov_info$file[cov_info$level=="reg"]
+lr<-c(lr_glo, lr_reg)
 } else {
 lr<-lr_glo}
 
@@ -113,25 +113,25 @@ write.fst(r_df, gsub(".rds", ".fst", c, fixed=T), 75)
 names(r)
 }, mc.cores=ncores)}
 
-# Create local and global reference rasters
+# Create regal and global reference rasters
 ## for glo if bioclim layer available use it; else first one
 if(length(grep("bio1", lr_glo, value=T))>0){
 rst_glo<-readRDS(grep("bio1", lr_glo, value=T)[1])
 }else{
 rst_glo<-readRDS(lr_glo[1])}
 
-## for loc if bioclim layer available use it; else first one
+## for reg if bioclim layer available use it; else first one
 if(n_levels>1){
-if(length(grep("bio1", lr_loc, value=T))>0){
-rst_loc<-readRDS(grep("bio1", lr_loc, value=T)[1])
+if(length(grep("bio1", lr_reg, value=T))>0){
+rst_reg<-readRDS(grep("bio1", lr_reg, value=T)[1])
 }else{
-rst_loc<-readRDS(lr_loc[1])}
+rst_reg<-readRDS(lr_reg[1])}
 }
 
 # Save covariate data settings
 ## reference rasters
 if(n_levels>1){
-l<-list(rst_loc=rst_loc, rst_glo=rst_glo)
+l<-list(rst_reg=rst_reg, rst_glo=rst_glo)
 } else {
 l<-list(rst_glo=rst_glo)}
 
@@ -140,7 +140,7 @@ saveRDS(l,
 		
 ## covariates list and info
 if(n_levels>1){
-l2<-list(lr_loc=lr_loc, lr_glo=lr_glo, cov_info=cov_info)
+l2<-list(lr_reg=lr_reg, lr_glo=lr_glo, cov_info=cov_info)
 } else {
 l2<-list(lr_glo=lr_glo, cov_info=cov_info)}
 
@@ -152,16 +152,16 @@ print(paste0("Covariate settings defined"))
 ### =========================================================================
 ### C- Refine the list of species to be modelled
 ### =========================================================================
-# Check if .fst versions of local and global species data exist or create them
+# Check if .fst versions of regal and global species data exist or create them
 threads_fst(nr_of_threads = ncores)
 
 if(n_levels>1){
-if(!file.exists(gsub(".rds", ".fst", spe_loc))){
-spe_loc_pts<-readRDS(spe_loc)
-if(class(spe_loc_pts)=="SpatialPointsDataFrame"){spe_loc_pts_dat<-spe_loc_pts@data
+if(!file.exists(gsub(".rds", ".fst", spe_reg))){
+spe_reg_pts<-readRDS(spe_reg)
+if(class(spe_reg_pts)=="SpatialPointsDataFrame"){spe_reg_pts_dat<-spe_reg_pts@data
 } else {
-spe_loc_pts_dat<-spe_loc_pts}
-write_fst(spe_loc_pts_dat, gsub(".rds", ".fst", spe_loc), 0)
+spe_reg_pts_dat<-spe_reg_pts}
+write_fst(spe_reg_pts_dat, gsub(".rds", ".fst", spe_reg), 0)
 }
 }
 
@@ -173,12 +173,12 @@ spe_glo_pts_dat<-spe_glo_pts}
 write_fst(spe_glo_pts_dat, gsub(".rds", ".fst", spe_glo), 0)
 }
 
-# Load local and global species fst data
+# Load regal and global species fst data
 if(n_levels>1){
-spe_loc_fst <-read_fst(gsub(".rds", ".fst", spe_loc))
-if("canonicalname" %in% names(spe_loc_fst)) spe_loc_fst$species<-spe_loc_fst$canonicalname
-spe_loc_names<-unique(spe_loc_fst$species)
-print(paste0("Initial number of species in LOC species dataset is: ",length(spe_loc_names)))
+spe_reg_fst <-read_fst(gsub(".rds", ".fst", spe_reg))
+if("canonicalname" %in% names(spe_reg_fst)) spe_reg_fst$species<-spe_reg_fst$canonicalname
+spe_reg_names<-unique(spe_reg_fst$species)
+print(paste0("Initial number of species in REG species dataset is: ",length(spe_reg_names)))
 }
 
 spe_glo_fst<-read_fst(gsub(".rds", ".fst", spe_glo))
@@ -186,13 +186,13 @@ if("canonicalname" %in% names(spe_glo_fst)) spe_glo_fst$species<-spe_glo_fst$can
 spe_glo_names<-unique(spe_glo_fst$species)
 print(paste0("Initial number of species in GLO species dataset is: ",length(spe_glo_names)))
 
-# Intersect global and local lists of species (matching)
+# Intersect global and regal lists of species (matching)
 if(n_levels>1){
-species<-sort(intersect(spe_glo_names, spe_loc_names))
+species<-sort(intersect(spe_glo_names, spe_reg_names))
 } else {
 species<-spe_glo_names}
 
-print(paste0("Number of remaining species after intersecting GLO and LOC species dataset is: ",length(species)))
+print(paste0("Number of remaining species after intersecting GLO and REG species dataset is: ",length(species)))
 
 # If a vector of species to be forced is available use it
 if(length(forced_species)>0) forced_species<-read.csv2(forced_species, header=FALSE)[,1]
@@ -210,23 +210,23 @@ print(paste0("Total number of species considered for this N-SDM run is: ",length
 ### =========================================================================
 ### D- Spatiotemporal disaggregation of species data
 ### =========================================================================
-# Subset local species data
+# Subset regal species data
 if(n_levels>1){
 
-spe_loc_pts<-spe_loc_fst[spe_loc_fst$species %in% species,]
+spe_reg_pts<-spe_reg_fst[spe_reg_fst$species %in% species,]
 
-print(paste0("Ready for spatiotemporal disaggregation of local data for ",length(species)," species"))
+print(paste0("Ready for spatiotemporal disaggregation of regal data for ",length(species)," species"))
 
-# Disaggregate local species data
-if(tmatch_loc==FALSE) spe_loc_pts$year<-NULL # no temporal matching
-if(disag_loc==TRUE){
-spe_loc_dis<-nsdm.disaggregate(pres=spe_loc_pts, rst=rst_loc, thindist=thin_dist_loc, thinyear=thin_time_loc, max_uncertain=max_uncertain_loc, min_occ=min_occ_loc, ncores=ncores)
+# Disaggregate regal species data
+if(tmatch_reg==FALSE) spe_reg_pts$year<-NULL # no temporal matching
+if(disag_reg==TRUE){
+spe_reg_dis<-nsdm.disaggregate(pres=spe_reg_pts, rst=rst_reg, thindist=thin_dist_reg, thinyear=thin_time_reg, max_uncertain=max_uncertain_reg, min_occ=min_occ_reg, ncores=ncores)
 } else { # if no disaggregation is requested
-spe_loc_dis<-spe_loc_pts
+spe_reg_dis<-spe_reg_pts
 }
 
 # Update species list
-species<-unique(spe_loc_dis$species)
+species<-unique(spe_reg_dis$species)
 }
 
 # Subset global species data
@@ -245,7 +245,7 @@ spe_glo_dis<-spe_glo_pts
 # Save species data settings
 ## datasets
 if(n_levels>1){
-l3<-list(spe_loc_dis=spe_loc_dis, spe_glo_dis=spe_glo_dis)
+l3<-list(spe_reg_dis=spe_reg_dis, spe_glo_dis=spe_glo_dis)
 } else {
 l3<-list(spe_glo_dis=spe_glo_dis)}
 

@@ -32,9 +32,6 @@ ecospat.boyce(
 
 \item{method}{correlation method used to compute the boyce index}
 }
-\value{
-
-}
 \description{
 Updated ecospat.boyce (ecospat package) function for calculating Boyce index as in Hirzel et al. 2006
 }

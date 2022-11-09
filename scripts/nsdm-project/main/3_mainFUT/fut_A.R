@@ -118,7 +118,7 @@ stk_fut<-stack(stk_fut, stk_remain)
 ### C- Spatial predictions
 ### =========================================================================
 ## C.1 Prepare covariate data for predictions
-clim_df_loc<-nsdm.retrieve4pred(covstk=stk_fut,
+clim_df_reg<-nsdm.retrieve4pred(covstk=stk_fut,
                                scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")])
 
 ## C.2 Clean workspace to free some memory before predicting
@@ -128,11 +128,11 @@ gc()
 
 ## C.3 Predict
 ndata_bck<-nsdm.predict(models=prmod,
-                        nwdata=clim_df_loc$covdf,
+                        nwdata=clim_df_reg$covdf,
                         nsplits=ncores)
 
 ## C.4 Save
-nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=clim_df_loc$covdf_ix),
+nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=clim_df_reg$covdf_ix),
               model_name=model_name, species_name=ispi_name,
               save_path=paste0(scr_path,"/outputs/",project,"/d13_preds-fut/glo/",scenar,"/",per))
 }
