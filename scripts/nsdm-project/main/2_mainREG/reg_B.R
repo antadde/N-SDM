@@ -50,7 +50,7 @@ ispi_name <- array[arrayID,"species"]
 model_name <- array[arrayID,"model"]
 nesting_method <- array[arrayID,"nesting"]
 
-cat(paste0('Ready for regal-level ', toupper(model_name), ' modelling of ', ispi_name, ' using the ',nesting_method,' method for scale-nesting ...\n'))
+cat(paste0('Ready for regional-level ', toupper(model_name), ' modelling of ', ispi_name, ' using the ',nesting_method,' method for scale-nesting ...\n'))
 
 ### =========================================================================
 ### C- Load reg_A outputs

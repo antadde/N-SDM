@@ -1,6 +1,6 @@
 #############################################################################
 ## 3_mainFUT
-## D: ensembling, nesting and mapping regal-level projections
+## D: ensembling, nesting and mapping regional-level projections
 ## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################

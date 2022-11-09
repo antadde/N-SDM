@@ -113,7 +113,7 @@ write.fst(r_df, gsub(".rds", ".fst", c, fixed=T), 75)
 names(r)
 }, mc.cores=ncores)}
 
-# Create regal and global reference rasters
+# Create regional and global reference rasters
 ## for glo if bioclim layer available use it; else first one
 if(length(grep("bio1", lr_glo, value=T))>0){
 rst_glo<-readRDS(grep("bio1", lr_glo, value=T)[1])
@@ -152,7 +152,7 @@ print(paste0("Covariate settings defined"))
 ### =========================================================================
 ### C- Refine the list of species to be modelled
 ### =========================================================================
-# Check if .fst versions of regal and global species data exist or create them
+# Check if .fst versions of regional and global species data exist or create them
 threads_fst(nr_of_threads = ncores)
 
 if(n_levels>1){
@@ -173,7 +173,7 @@ spe_glo_pts_dat<-spe_glo_pts}
 write_fst(spe_glo_pts_dat, gsub(".rds", ".fst", spe_glo), 0)
 }
 
-# Load regal and global species fst data
+# Load regional and global species fst data
 if(n_levels>1){
 spe_reg_fst <-read_fst(gsub(".rds", ".fst", spe_reg))
 if("canonicalname" %in% names(spe_reg_fst)) spe_reg_fst$species<-spe_reg_fst$canonicalname
@@ -186,7 +186,7 @@ if("canonicalname" %in% names(spe_glo_fst)) spe_glo_fst$species<-spe_glo_fst$can
 spe_glo_names<-unique(spe_glo_fst$species)
 print(paste0("Initial number of species in GLO species dataset is: ",length(spe_glo_names)))
 
-# Intersect global and regal lists of species (matching)
+# Intersect global and regional lists of species (matching)
 if(n_levels>1){
 species<-sort(intersect(spe_glo_names, spe_reg_names))
 } else {
@@ -210,14 +210,14 @@ print(paste0("Total number of species considered for this N-SDM run is: ",length
 ### =========================================================================
 ### D- Spatiotemporal disaggregation of species data
 ### =========================================================================
-# Subset regal species data
+# Subset regional species data
 if(n_levels>1){
 
 spe_reg_pts<-spe_reg_fst[spe_reg_fst$species %in% species,]
 
-print(paste0("Ready for spatiotemporal disaggregation of regal data for ",length(species)," species"))
+print(paste0("Ready for spatiotemporal disaggregation of regional data for ",length(species)," species"))
 
-# Disaggregate regal species data
+# Disaggregate regional species data
 if(tmatch_reg==FALSE) spe_reg_pts$year<-NULL # no temporal matching
 if(disag_reg==TRUE){
 spe_reg_dis<-nsdm.disaggregate(pres=spe_reg_pts, rst=rst_reg, thindist=thin_dist_reg, thinyear=thin_time_reg, max_uncertain=max_uncertain_reg, min_occ=min_occ_reg, ncores=ncores)
