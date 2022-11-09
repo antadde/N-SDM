@@ -22,8 +22,6 @@ Prerequisites for running N-SDM include:
 
 # Example N-SDM run
 
-<img align="right" alt="N-SDM logo" src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_logo_v2.png" width="30%"/>
-
 We will run an applied example aimed at illustrating the main operations and performances of N-SDM by modelling the habitat suitability of three species (Larix decidua, Capra Ibex and Cantharellus cibarius) at 100-m resolution across Switzerland for both current (1980–2021) and future (2070–2100) periods.
 
 ## Study area
