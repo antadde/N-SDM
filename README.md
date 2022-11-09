@@ -1,4 +1,4 @@
-<img src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" width="100%"/>
+<img src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" align="right" width="50%"/>
 
 # About N-SDM
 
@@ -22,8 +22,6 @@ Prerequisites for running N-SDM include:
 
 # Example N-SDM run
 
-<img align="right" alt="N-SDM logo" src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_logo_v2.png" width="30%"/>
-
 We will run an applied example aimed at illustrating the main operations and performances of N-SDM by modelling the habitat suitability of three species (Larix decidua, Capra Ibex and Cantharellus cibarius) at 100-m resolution across Switzerland for both current (1980–2021) and future (2070–2100) periods.
 
 ## Study area
@@ -34,7 +32,7 @@ Following the spatially-nested framework (see Figure 1 and section “Highlighte
 
 ### Species data
 
-Global-level species occurrence records were obtained from GBIF (https://www.gbif.org/). Local-level records were obtained from the Swiss Species Information Center InfoSpecies (www.infospecies.ch). To limit spatial clustering effects, occurrence records will be disaggregated so that two points cannot be closer than 1 km at the global level and 200 m at the regional level. For each species and level 10,000 background absences aimed at contrasting with occurrence records will be randomly generated across the target areas.
+Global-level species occurrence records were obtained from GBIF (https://www.gbif.org/). Regional-level records were obtained from the Swiss Species Information Center InfoSpecies (www.infospecies.ch). To limit spatial clustering effects, occurrence records will be disaggregated so that two points cannot be closer than 1 km at the global level and 200 m at the regional level. For each species and level 10,000 background absences aimed at contrasting with occurrence records will be randomly generated across the target areas.
 
 ### Covariate data
 
@@ -57,7 +55,7 @@ Thanks!
 
  To cite N-SDM or acknowledge its use, cite this Software Note as follows, substituting the version of N-SDM that you used for “version 1.0”:
  
- [info hidden for peer review] et al. 2022. N-SDM: a high-performance computing pipeline for fitting Nested Species Distribution Models. – XXX XXX: XXX (ver. 1.0).
+ [info hidden for peer review] et al. 2022. N-SDM: a high-performance computing pipeline for Nested Species Distribution Modelling. – XXX XXX: XXX (ver. 1.0).
 
 # Contact
 
