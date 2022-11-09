@@ -34,7 +34,7 @@ Following the spatially-nested framework (see Figure 1 and section “Highlighte
 
 ### Species data
 
-Global-level species occurrence records were obtained from GBIF (https://www.gbif.org/). Local-level records were obtained from the Swiss Species Information Center InfoSpecies (www.infospecies.ch). To limit spatial clustering effects, occurrence records will be disaggregated so that two points cannot be closer than 1 km at the global level and 200 m at the regional level. For each species and level 10,000 background absences aimed at contrasting with occurrence records will be randomly generated across the target areas.
+Global-level species occurrence records were obtained from GBIF (https://www.gbif.org/). Regional-level records were obtained from the Swiss Species Information Center InfoSpecies (www.infospecies.ch). To limit spatial clustering effects, occurrence records will be disaggregated so that two points cannot be closer than 1 km at the global level and 200 m at the regional level. For each species and level 10,000 background absences aimed at contrasting with occurrence records will be randomly generated across the target areas.
 
 ### Covariate data
 
