@@ -7,7 +7,7 @@
 covsel.filteralgo(covdata, pa, weights = NULL, force = NULL, corcut = 0.7)
 }
 \arguments{
-\item{covdata}{data.frame containing covariate data extracted at 'pa' locations}
+\item{covdata}{data.frame containing covariate data (continuous values) extracted at 'pa' locations}
 
 \item{pa}{numeric vector of species presences (1) and absences (0)}
 
@@ -24,6 +24,7 @@ A data.frame of "non-collinear" candidate covariates
 Collinearity filtering algorithm
 }
 \examples{
+library(covsel)
 covdata<-data_covsel$env_vars
 dim(covdata)
 covdata_filter<-covsel.filteralgo(covdata, pa=data_covsel$pa)
