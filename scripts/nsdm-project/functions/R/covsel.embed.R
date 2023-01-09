@@ -2,7 +2,7 @@
 #'
 #' Covariate selection with model-specific embedding (Step-2)
 #'
-#' @param covdata data.frame containing covariate data extracted at 'pa' locations
+#' @param covdata data.frame containing covariate data (continuous values) extracted at 'pa' locations
 #' @param pa numeric vector of species presences (1) and absences (0)
 #' @param weights numeric vector containing the weights for each value in 'pa' (of length 'pa')
 #' @param force optional character vector indicating the name(s) of the covariate(s) to be forced in the final set
@@ -14,6 +14,7 @@
 #' @return A list with three objects: (i) a data.frame with the covariates selected after the regularization/penalization and ranking procedures (covdata), (ii) a data.frame with the individual ranks of all covariates for each target algorithm (ranks_1), (iii) a data.frame with the final average ranks of selected covariates (ranks_2)
 #' @author Antoine Adde (antoine.adde@unil.ch)
 #' @examples
+#' library(covsel)
 #' covdata<-data_covfilter
 #' dim(covdata)
 #' covdata_embed<-covsel.embed(covdata, pa=data_covsel$pa, algorithms=c('glm','gam','rf'))
@@ -111,7 +112,7 @@ mdl.rf <- RRF(covdata, as.factor(pa), classwt=c("0"=min(weights), "1"=max(weight
 # Extract results
 rf.beta<-data.frame(covariate = row.names(mdl.rf$importance), mdl.rf$importance,  row.names=NULL)
 rf.beta<-rf.beta[which(rf.beta$MeanDecreaseGini > 0),]
-if(nrow(gam.beta)<1){print("No covariate selected after RF (guided regularized random forest)")
+if(nrow(rf.beta)<1){print("No covariate selected after RF (guided regularized random forest)")
 } else {
 rf.beta<-data.frame(rf.beta[order(rf.beta$MeanDecreaseGini, decreasing = TRUE),], rank = 1:nrow(rf.beta), model="rf")
 ranks_1<-rbind(ranks_1, rf.beta[,c("covariate","rank","model")])

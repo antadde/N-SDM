@@ -2,7 +2,7 @@
 #'
 #' Apply the collinearity filtering algorithm at each target level (i=variable level; ii=category level; iii= all remainders)
 #'
-#' @param covdata data.frame containing covariate data extracted at 'pa' locations
+#' @param covdata data.frame containing covariate data (continuous values) extracted at 'pa' locations
 #' @param pa numeric vector of species presences (1) and absences (0)
 #' @param weights numeric vector containing the weights for each value in 'pa' (of length 'pa')
 #' @param force optional character vector indicating the name(s) of the covariate(s) to be forced in the final set
@@ -13,6 +13,7 @@
 #' @return A data.frame of "non-colinear" candidate covariates
 #' @author Antoine Adde (antoine.adde@unil.ch)
 #' @examples
+#' library(covsel)
 #' covdata<-data_covsel$env_vars
 #' dim(covdata)
 #' covdata_filter<-covsel.filter(covdata,

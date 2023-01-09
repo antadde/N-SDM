@@ -2,7 +2,7 @@
 #'
 #' Collinearity filtering algorithm
 #'
-#' @param covdata data.frame containing covariate data extracted at 'pa' locations
+#' @param covdata data.frame containing covariate data (continuous values) extracted at 'pa' locations
 #' @param pa numeric vector of species presences (1) and absences (0)
 #' @param weights numeric vector containing the weights for each value in 'pa' (of length 'pa')
 #' @param force optional character vector indicating the name(s) of the covariate(s) to be forced in the final set
@@ -11,6 +11,7 @@
 #' @return A data.frame of "non-collinear" candidate covariates
 #' @author Antoine Adde (antoine.adde@unil.ch)
 #' @examples
+#' library(covsel)
 #' covdata<-data_covsel$env_vars
 #' dim(covdata)
 #' covdata_filter<-covsel.filteralgo(covdata, pa=data_covsel$pa)
@@ -18,6 +19,9 @@
 #' @export
 
 covsel.filteralgo <- function(covdata, pa, weights=NULL, force=NULL, corcut=0.7){
+
+# Retrieve covariate names
+candidates<-names(covdata)
 
 # If only one covariate in the candidate set, don't do anything
   if(ncol(covdata)==1){
@@ -37,6 +41,12 @@ if(length(pointless_f)>0){
 print(paste0("Warning: forced covariate '", names(covdata)[pointless_f], "' has less than 10 unique points"))
 }
 }
+
+# If only one remaining covariate in the candidate set, stop
+  if(class(covdata) != "data.frame"){
+  covdata.filter<-data.frame(covdata)
+  names(covdata.filter)<-candidates[-pointless10]
+  return(covdata.filter)}
 
 # If covariate(s) to force, eliminate collinear ones
 force_dat<-data.frame()
