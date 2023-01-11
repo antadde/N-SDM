@@ -42,7 +42,7 @@ print(paste0("Warning: forced covariate '", names(covdata)[pointless_f], "' has 
 }
 }
 
-if(length(pointless10) == length(candidates)) return NULL
+if(length(pointless10) == length(candidates)) return (NULL)
 
 # If only one remaining covariate in the candidate set, stop
   if(class(covdata) != "data.frame"){
