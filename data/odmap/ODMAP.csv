@@ -37,7 +37,7 @@ Index;ODMAP section;ODMAP subsection;ODMAP variable;ODMAP answer
 36;Data;Biodiversity data;Details on background data derivation, if applicable: e.g., spatial and temporal extent, spatial and temporal buffer, bias correction (e.g. target group sampling);
 37;Data;Biodiversity data;Details on potential errors and biases in data, if applicable: e.g., detection probability, misidentification potential, geo-referencing errors, sampling bias;
 38;Data;Data partitioning;Selection of validation data (withheld from model fitting, used for estimating prediction error for model selection, model averaging or ensemble): e.g., cross-validation method;
-;Data;Data partitioning;;
+39;Data;Data partitioning;;
 40;Data;Data partitioning;Selection of test (truly independent) data, sensu Hastie, et al. (2009);
 41;Data;Predictor variables;State predictor variables used;
 42;Data;Predictor variables;Details on data sources:  e.g., URL/DOI, accession date, database version;
