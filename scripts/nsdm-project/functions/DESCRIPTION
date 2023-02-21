@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "aadde@unil.ch",
            comment = c(ORCID = "0000-0003-4388-0880"))
-Depends: data.table, stringi, stringr, plyr, readxl, writexl, parallel, sp, raster, rgdal, zoo, fst, tools, glmnet, gam, mgcv, randomForest, RRF, lightgbm, ranger, maxnet, caret, ROCR, chron, ggpubr
+Depends: data.table, stringi, stringr, plyr, readxl, writexl, parallel, sp, terra, rgdal, zoo, fst, tools, glmnet, gam, mgcv, randomForest, RRF, lightgbm, ranger, maxnet, caret, ROCR, chron, ggpubr
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
