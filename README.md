@@ -16,7 +16,7 @@ Prerequisites for running N-SDM include:
 
 3.	a clone of the N-SDM/N-SDM GitHub repository in the working directory `git clone https://github.com/N-SDM/N-SDM.git .`
 
-4.	an installation of the nsdm R package `remotes::install_github("N-SDM/N-SDM/scripts/nsdm-project/functions", upgrade=FALSE)`
+4.	an installation of the nsdm R package `remotes::install_github("N-SDM/N-SDM/scripts/nsdm-project/functions", ref="v1.0.1", upgrade=FALSE)`
 
 5. [optional for running the N-SDM example] download the 6GB zip file containing example species and covariate data in the ./data folder `curl -o ./data/nsdm-project.zip  https://drive.switch.ch/index.php/s/qSfAD0naZnvdxsW/download`
 
