@@ -1,0 +1,83 @@
+Index;ODMAP section;ODMAP subsection;ODMAP variable;ODMAP answer
+1;Overview;Authorship;Authors;
+2;Overview;Authorship;Contact email;
+3;Overview;Authorship;Title;
+4;Overview;Authorship;DOI;
+5;Overview;Model objective;SDM objective/purpose:;
+6;Overview;Model objective;Main target output: e.g., suitable vs. unsuitable habitat, continuous habitat suitability index, abundance;habitat suitability
+7;Overview;Taxon ;Focal taxon;
+8;Overview;Location;Location of study area;
+9;Overview;Scale of analysis;Spatial Extent (Lon / Lat);
+10;Overview;Scale of analysis;Spatial resolution;
+11;Overview;Scale of analysis;Temporal extent/time period;
+12;Overview;Scale of analysis;Temporal resolution, if applicable ;
+13;Overview;Scale of analysis;Type of extent boundary (e.g., rectangular, natural, political);rectangular
+14;Overview;Biodiversity data overview;Observation type (e.g., standardised monitoring data, field survey, range map, citizen science, GPS tracking, camera traps);
+15;Overview;;Response/data type (e.g., presence-only, presence-absence, counts) ;presence and background points
+16;Overview;Type of predictors;Climatic, topographic, edaphic, habitat, etc.;
+17;Overview;Conceptual model;Hypotheses about species-environment relationships;
+18;Overview;Assumptions;State critical model assumptions (cf. Table 2);
+19;Overview;SDM algorithms;Model algorithms;
+20;Overview;SDM algorithms;Justification of model complexity;
+21;Overview;SDM algorithms;Is model averaging/ensemble modelling used?;
+22;Overview;Model workflow;Conceptual description of modelling steps  including model fitting, assessment and prediction;N-SDM workflow (https://github.com/N-SDM/N-SDM)
+23;Overview;Software, codes and data;Specify modelling platform incl. version, key packages used;NSDM v1.0.1
+24;Overview;Software, codes and data;Specify availability of codes;https://github.com/N-SDM/N-SDM
+25;Overview;Software, codes and data;Specify availability of data, e.g. data links;
+26;Data;Biodiversity data;Taxon names;
+27;Data;Biodiversity data;Details on taxonomic reference system;
+28;Data;Biodiversity data;Ecological level (ind., pop, comm?);
+29;Data;Biodiversity data;Biodiversity data source: reference, accession date;
+30;Data;Biodiversity data;Sampling design: spatial design (e.g. random, uniform, stratified), temporal design, nestedness;
+31;Data;Biodiversity data;Sample size per taxon:  e.g., number of observations/counts, prevalence;
+32;Data;Biodiversity data;Country/region masl, if applicable;
+33;Data;Biodiversity data;Details on scaling, if applicable: e.g., rasterisation of polygon maps, spatial and temporal thinning, measures to address spatial uncertainties;
+34;Data;Biodiversity data;Details on data cleaning/filtering steps, if applicable: e.g., taxonomically, spatially, temporally, outlier presence/treatment;
+35;Data;Biodiversity data;Details on absence data collection, if applicable;
+36;Data;Biodiversity data;Details on background data derivation, if applicable: e.g., spatial and temporal extent, spatial and temporal buffer, bias correction (e.g. target group sampling);
+37;Data;Biodiversity data;Details on potential errors and biases in data, if applicable: e.g., detection probability, misidentification potential, geo-referencing errors, sampling bias;
+38;Data;Data partitioning;Selection of validation data (withheld from model fitting, used for estimating prediction error for model selection, model averaging or ensemble): e.g., cross-validation method;
+;Data;Data partitioning;;
+40;Data;Data partitioning;Selection of test (truly independent) data, sensu Hastie, et al. (2009);
+41;Data;Predictor variables;State predictor variables used;
+42;Data;Predictor variables;Details on data sources:  e.g., URL/DOI, accession date, database version;
+43;Data;Predictor variables;Spatial resolution and spatial extent of raw data, if different from biodiversity data;
+44;Data;Predictor variables;Map projection (coordinate reference system);
+45;Data;Predictor variables;Temporal resolution and temporal extent of raw data, if applicable;
+46;Data;Predictor variables;Details on data processing and on spatial, temporal and thematic scaling: e.g. upscaling/downscaling, transformations, normalisations, thematic aggregations (e.g. of land cover classes), measures to address spatial uncertainties;
+47;Data;Predictor variables;Details on measurements errors and bias, when known;
+48;Data;Predictor variables;Details on dimension reduction of variable set, if applicable – if model-based, this should be contained in Model section (element:  Details on pre-selection of variables);
+49;Data;Transfer data for projection;Details on data sources:  e.g., URL/DOI, accession date, database version;
+50;Data;Transfer data for projection;Spatial extent;
+51;Data;Transfer data for projection;Spatial resolution;
+52;Data;Transfer data for projection;temporal extent/time period;
+53;Data;Transfer data for projection;temporal resolution;
+54;Data;Transfer data for projection;Models and scenarios used;
+55;Data;Transfer data for projection;Details on data processing and scaling (see above);
+56;Data;Transfer data for projection;Quantification of novel environmental conditions and novel environmental combinations: e.g., distance to training data ;
+57;Model;Variable pre-selection;Details on pre-selection of variables, if applicable;covsel method (Adde et al. In prep)
+58;Model;Multicollinearity;Methods for identifying and dealing with multicollinearity (Dormann, et al. 2013) or justification if multicollinearity is not explicitly dealt with;covsel method (Adde et al. In prep)
+59;Model;Model settings ;Models settings for all selected algorithms (including default settings of specific platforms/packages,  weighting of data etc.);param-grid.xlsx
+60;Model;Model settings ;Details on relevant model settings for extrapolation beyond sample range, if applicable: e.g., clamping;
+61;Model;Model estimates;Assessment of model coefficients ;
+62;Model;Model estimates;Details on quantification of uncertainty in model coefficients, e.g. resampling;
+63;Model;Model estimates;Assessment of variable importance;nsdm.varimp.R
+64;Model;Model selection / Model averaging / Ensembles;Model selection strategy: e.g. information-theoretic approach for variable selection, shrinkage and regularization;covsel method (Adde et al. In prep) and hyperparameter grid search (param-grid.xlsx)
+65;Model;Model selection / Model averaging / Ensembles;Method for model averaging: e.g. derivation of weights ;
+66;Model;Model selection / Model averaging / Ensembles;Ensemble method;
+67;Model;Non-independence correction/analyses;Method for addressing spatial autocorrelation in residuals;
+68;Model;Non-independence correction/analyses;Method for addressing temporal autocorrelation in residuals;
+69;Model;Non-independence correction/analyses;Method to account for nested data: e.g., fixed and random effects;
+70;Model;Threshold selection;Details on threshold selection, if applicable: transforming continuous predictions into binary predictions;
+71;Assessment;Performance statistics ;Performance statistics estimated on training data;
+72;Assessment;Performance statistics ;Performance  statistics estimated on validation data (from data partitioning);
+73;Assessment;Performance statistics ;Performance statistics estimated on test (truly independent) data, if applicable;
+74;Assessment;Plausibility check;nsdm.respcurve.R;
+75;Assessment;Plausibility check;Expert judgements, e.g. map display;
+76;Prediction;Prediction output;Prediction unit;pixel level
+77;Prediction;Prediction output;Post-processing, e.g. clipping, reprojection;
+78;Prediction;Uncertainty quantification;Algorithmic uncertainty, if applicable;algorithmic uncertainty: coefficient of variation
+79;Prediction;Uncertainty quantification;Uncertainty in input data, if applicable;
+80;Prediction;Uncertainty quantification;Effect of parameter uncertainty, error propagation, if applicable;
+81;Prediction;Uncertainty quantification;Uncertainty in scenarios (e.g. climate models, land use models, storylines);
+82;Prediction;Uncertainty quantification;Visualisation/treatment of novel environments: e.g., masking;
