@@ -231,6 +231,12 @@ sacct --starttime $dt -u $own --format JobID,JobName,Elapsed,NCPUs,TotalCPU,CPUT
 Rscript end_B.R 1>/dev/null 2>&1
 echo Sacct outputs analysis done
 
+# Pre-fill and save ODMAP protocol
+mkdir $wp/tmp/$project/ODMAP 2>/dev/null
+Rscript end_C.R 1>/dev/null 2>&1
+rsync -a $wp/tmp/$project/ODMAP $svp/outputs/$project
+echo ODMAP protocol generated
+
 # Permissions
 chmod -R 777 $wp/scripts/$project/main
 
@@ -243,11 +249,5 @@ rsync -a --exclude-from="$wp/tmp/$project/settings/tmp/exclfiles.txt" $sop/outpu
 echo Main outputs sync to saving location
 done
 
-
-# Download and save ODMAP protocol
-mkdir $wp/tmp/$project/ODMAP 2>/dev/null
-curl -o $wp/tmp/$project/ODMAP/ODMAP.xlsx https://damariszurell.github.io/files/Zurell_etal_ODMAP.v1.0_TableS1.xlsx 2>/dev/null
-rsync -a $wp/tmp/$project/ODMAP $svp/outputs/$project
-echo ODMAP protocol generated
 
 echo Finished!
