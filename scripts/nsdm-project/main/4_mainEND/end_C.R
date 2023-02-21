@@ -25,7 +25,7 @@ setwd(w_path)
 require(nsdm)
 
 # Load ODMAP template
-ODMAP<-read.csv(paste0(w_path, "/data/",project,"/odmap/ODMAP.csv"), sep=";")
+ODMAP<-read.csv(paste0(w_path, "/data/odmap/ODMAP.csv"), sep=";")
 ODMAP_short<-ODMAP[,c(1,5)]
 
 # Load template raster
