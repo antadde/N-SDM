@@ -11,9 +11,9 @@ nsdm.covinfo(cov_path, save_path, time_cov, focal_cov)
 
 \item{save_path}{A character string for the path to which write the .xlsx covariate information table}
 
-\item{dyna_cov}{A character vector containing the names of datasets equipped with temporally dynamic covariates}
+\item{time_cov}{A character vector containing the names of the category_datasets equipped with temporally dynamic covariates}
 
-\item{focal_cat}{A character vector containing the names of categories equipped with temporally dynamic covariates}
+\item{focal_cat}{A character vector containing the names of the category_datasets equipped with focal statistics covariates}
 }
 \value{
 An xlsx covariate information table
