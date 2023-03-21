@@ -28,21 +28,19 @@ candidates<-names(covdata)
   covdata.filter<-covdata
   return(covdata.filter)}
   
-# Remove covariates with 10 or less unique points (required for embedding part), but keep forced ones
-pointless10<-which(apply(covdata, 2, function(x) length(unique(x)))<11)
+# Remove covariates with less than 10 unique points (required for embedding part), but keep forced ones
+pointless10<-which(apply(covdata, 2, function(x) length(unique(x)))<10)
 if(length(pointless10)>0){
 pointless<-pointless10[!names(pointless10)%in% force]
 if(length(pointless)>0){
-print(paste0("Covariate '", names(covdata)[pointless], "' has 10 or less unique points and will be discarded"))
+print(paste0("Covariate '", names(covdata)[pointless], "' has less than 10 unique points and will be discarded"))
 covdata<-covdata[,-pointless]
 }
 pointless_f<-pointless10[names(pointless10)%in% force]
 if(length(pointless_f)>0){
-print(paste0("Warning: forced covariate '", names(covdata)[pointless_f], "' has 10 or less unique points"))
+print(paste0("Warning: forced covariate '", names(covdata)[pointless_f], "' has less than 10 unique points"))
 }
 }
-
-if(length(pointless10) == length(candidates)) return (NULL)
 
 # If only one remaining covariate in the candidate set, stop
   if(class(covdata) != "data.frame"){
