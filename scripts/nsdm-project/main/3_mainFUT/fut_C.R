@@ -93,8 +93,8 @@ lr<-readRDS(paste0(w_path,"tmp/",project,"/settings/covariates-list.rds"))
 cov_info<-lr$cov_info
 cov_info$ID<-paste(cov_info$cada, cov_info$variable, cov_info$attribute, cov_info$focal, sep="_")
 cov_ID<-cov_info$ID[match(cov, gsub(".rds", "", basename(cov_info$file)))]
-cov_info_pres<-cov_info[cov_info$ID %in% cov_ID & cov_info$period!="future",]
-cov_info_pres
+if(n_levels==1) cov_info_pres<-cov_info[cov_info$ID %in% cov_ID & cov_info$period!="future",]
+if(n_levels==2) cov_info_pres<-cov_info[cov_info$ID %in% cov_ID & cov_info$period!="future" & cov_info$level=="reg",]
 lr_pres_ID<-cov_info_pres$ID
 
 # D.1 List available future layers for cov_ID
@@ -131,8 +131,14 @@ names(stk_fut)[nlayers(stk_fut)]<-"mainGLO"
 ### E- Spatial predictions
 ### =========================================================================
 ## E.1 Prepare covariate data for predictions
+if(length(cov_observ)>0){
+cov_obs<-grep(paste0(cov_observ, collapse="|"), names(stk_fut), value=T)
+} else {
+cov_obs<-NULL
+}
+
 hab_df_reg<-nsdm.retrieve4pred(covstk=stk_fut,
-                               observational=grep(paste0(cov_observ, collapse="|"), names(stk_fut), value=T),
+                               observational=cov_obs,
 							   obsval=cov_observ_val,
 							   mask=mask_pred,
                                scaleparam=attributes(d0_datasets$env_vars)[c("scaled:center","scaled:scale")])
