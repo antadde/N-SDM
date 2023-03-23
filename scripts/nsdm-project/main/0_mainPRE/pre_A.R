@@ -102,16 +102,31 @@ threads_fst(nr_of_threads = 1)
 
 # if not already done: check if fst version exists
 k<-sapply(lr, function(f){file.exists(gsub(".rds", ".fst", f, fixed=T))})
-lr<-lr[!k]
+lr2fst<-lr[!k]
 
 # otherwise do it now
-if(length(lr) > 0){
-pp<-mclapply(lr, function(c){
+if(length(lr2fst) > 0){
+pp<-mclapply(lr2fst, function(c){
 r<-readRDS(c)
 r_df<-as.data.frame(r)
 write.fst(r_df, gsub(".rds", ".fst", c, fixed=T), 75)
 names(r)
 }, mc.cores=ncores)}
+
+# Check for incomplete fst conversions (less than half of the orginal size)
+fst_sz<-sapply(lr, function(f){
+file.size(gsub(".rds", ".fst", f, fixed=T)) < file.size(f)/2
+})
+if(TRUE %in% fst_sz){
+lr2fst<-names(fst_sz[which(fst_sz)])
+pp<-mclapply(lr2fst, function(c){
+r<-readRDS(c)
+r_df<-as.data.frame(r)
+write.fst(r_df, gsub(".rds", ".fst", c, fixed=T), 75)
+names(r)
+}, mc.cores=ncores)
+}
+
 
 # Create regional and global reference rasters
 ## for glo if bioclim layer available use it; else first one
