@@ -1,9 +1,9 @@
-#' nsdm.bigextract
+#' nsdm.pseuabs
 #'
-#' Parallel loading and spatiotemporal extraction of large raster sets
+#' Prepare background (pseudoabsences) points
 #'
-#' @param n Number of background points (pseudoabsences) to be generated
-#' @param pres Spatial point object containing species occurence data
+#' @param n Number of background points to be generated
+#' @param pres Spatial point object containing species occurrence data
 #' @param taxon A character string for the target species
 #' @param type A character string indicating the type of species data ("po"=presence only; "pa"=presence absence)
 #' @param rst_ref Reference raster used in subsequent analyses
@@ -15,8 +15,8 @@
 nsdm.pseuabs<-function(n=10000,
                        pres,
                        taxon=character(),
-					   type="po",
-					   rst_ref,
+					             type="po",
+					             rst_ref,
                        set_max_npres_to_nabs=TRUE){
 
   ### ------------------------

@@ -2,7 +2,7 @@
 % Please edit documentation in R/nsdm.pseuabs.R
 \name{nsdm.pseuabs}
 \alias{nsdm.pseuabs}
-\title{nsdm.bigextract}
+\title{nsdm.pseuabs}
 \usage{
 nsdm.pseuabs(
   n = 10000,
@@ -14,9 +14,9 @@ nsdm.pseuabs(
 )
 }
 \arguments{
-\item{n}{Number of background points (pseudoabsences) to be generated}
+\item{n}{Number of background points to be generated}
 
-\item{pres}{Spatial point object containing species occurence data}
+\item{pres}{Spatial point object containing species occurrence data}
 
 \item{taxon}{A character string for the target species}
 
@@ -30,7 +30,7 @@ nsdm.pseuabs(
 A nsdm.pseudoabsences object
 }
 \description{
-Parallel loading and spatiotemporal extraction of large raster sets
+Prepare background (pseudoabsences) points
 }
 \author{
 Antoine Adde (aadde@unil.ch) and Philipp Brun (philipp.brun@wsl.ch)
