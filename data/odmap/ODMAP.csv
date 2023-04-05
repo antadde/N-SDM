@@ -72,7 +72,7 @@ Index;ODMAP section;ODMAP subsection;ODMAP variable;ODMAP answer
 71;Assessment;Performance statistics ;Performance statistics estimated on training data;
 72;Assessment;Performance statistics ;Performance  statistics estimated on validation data (from data partitioning);
 73;Assessment;Performance statistics ;Performance statistics estimated on test (truly independent) data, if applicable;
-74;Assessment;Plausibility check;nsdm.respcurve.R;
+74;Assessment;Plausibility check;;nsdm.respcurve.R
 75;Assessment;Plausibility check;Expert judgements, e.g. map display;
 76;Prediction;Prediction output;Prediction unit;pixel level
 77;Prediction;Prediction output;Post-processing, e.g. clipping, reprojection;
