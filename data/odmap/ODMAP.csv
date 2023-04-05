@@ -12,8 +12,8 @@ Index;ODMAP section;ODMAP subsection;ODMAP variable;ODMAP answer
 11;Overview;Scale of analysis;Temporal extent/time period;
 12;Overview;Scale of analysis;Temporal resolution, if applicable ;
 13;Overview;Scale of analysis;Type of extent boundary (e.g., rectangular, natural, political);rectangular
-14;Overview;Biodiversity data overview;Observation type (e.g., standardised monitoring data, field survey, range map, citizen science, GPS tracking, camera traps);
-15;Overview;;Response/data type (e.g., presence-only, presence-absence, counts) ;presence and background points
+14;Overview;Biodiversity data;Observation type (e.g., standardised monitoring data, field survey, range map, citizen science, GPS tracking, camera traps);
+15;Overview;Biodiversity data;Response/data type (e.g., presence-only, presence-absence, counts) ;presence and background points
 16;Overview;Type of predictors;Climatic, topographic, edaphic, habitat, etc.;
 17;Overview;Conceptual model;Hypotheses about species-environment relationships;
 18;Overview;Assumptions;State critical model assumptions (cf. Table 2);
