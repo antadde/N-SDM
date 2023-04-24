@@ -55,19 +55,19 @@ Thanks!
 
 # Citation
 
- To cite N-SDM or acknowledge its use, cite this Software Note as follows, substituting the version of N-SDM that you used for “version 1.0”:
- 
- [info hidden for peer review] et al. 2022. N-SDM: a high-performance computing pipeline for Nested Species Distribution Modelling. – XXX XXX: XXX (ver. 1.0).
+To cite N-SDM or acknowledge its use, cite the Software note as follows, substituting the version of the application that you used for ‘version 1.0':
+
+Adde, A. et al. 2023. N-SDM: a high-performance computing pipeline for Nested Species Distribution Modelling. – Ecography 2023: e06272 (ver. 1.0). https://onlinelibrary.wiley.com/doi/10.1111/ecog.06540
 
 # Contact
 
-[info hidden for peer review]
+antoine.adde@unil.ch
 
 Project Link: [https://github.com/N-SDM/N-SDM](https://https://github.com/N-SDM/N-SDM)
 
 # Acknowledgments
 
-N-SDM development has been conducted within the [info hidden for peer review] lab https://www.unil.ch/ecospat/en/home.html.
+N-SDM development has been conducted within the Ecospat lab https://www.unil.ch/ecospat/en/home.html.
 
 We gratefully acknowledge financial support through the Action Plan of the Swiss Biodiversity Strategy by the Federal Office for the Environment (FOEN) for financing the Valpar.ch and SwissCatchment projects.
 
