@@ -51,9 +51,9 @@ cat(paste0('Ready for GLO and REG modelling dataset preparation for ', ispi_name
 ### =========================================================================
 # D.1 GLO
 sp_dat_glo<-sp_dat$spe_glo_dis[sp_dat$spe_glo_dis$species==ispi_name,]
-pseu.abs_i_glo<-nsdm.pseuabs(n=n_back,
-							 rst_ref=rsts_ref$rst_glo,
-							 type=pa_po_glo,
+pseu.abs_i_glo<-nsdm.pseuabs2(n=n_back,
+							               rst_ref=rsts_ref$rst_glo,
+							               type=pa_po_glo,
                              pres=sp_dat_glo,
                              taxon=ispi_name)
 
@@ -62,11 +62,11 @@ cat(paste0('GLO dataset prepared (n_occ=',length(which(pseu.abs_i_glo@pa==1)),')
 # D.2 REG
 if(n_levels>1){
 sp_dat_reg<-sp_dat$spe_reg_dis[sp_dat$spe_reg_dis$species==ispi_name,]
-pseu.abs_i_reg<-nsdm.pseuabs(n=n_back,
-							 rst_ref=rsts_ref$rst_reg,
-							 type=pa_po_reg,
-                             pres=sp_dat_reg,
-                             taxon=ispi_name)
+pseu.abs_i_reg<-nsdm.pseuabs2(n=n_back,
+							                rst_ref=rsts_ref$rst_reg,
+							                type=pa_po_reg,
+                              pres=sp_dat_reg,
+                              taxon=ispi_name)
 						   
 cat(paste0('REG dataset prepared (n_occ=',length(which(pseu.abs_i_reg@pa==1)),')...\n'))
 
