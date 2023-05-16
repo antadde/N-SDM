@@ -64,9 +64,9 @@ nsdm.pseuabs2<-function(n=10000,
   nona<-which(!is.na(raster::values(rst_ref)))
   rnd.pts<-sample(nona, size=n*1.5)
   crds_abs<-coordinates(rst_ref)[rnd.pts,]
-  abs<-SpatialPoints(coords=crds_abs, proj4string =rst_ref@crs)
+  abs<-SpatialPointsDataFrame(coords=crds_abs, data=data.frame(a=rep(0,nrow(crds_abs))), proj4string =rst_ref@crs)
   # B- Subsample to n+200 (some points will be dropped after NA covariate cleaning)
-   if(length(abs)>n+200) abs<-abs[sample(1:length(abs),n+200),]}
+  if(length(abs)>n+200) abs<-abs[sample(1:length(abs),n+200),]}
 
   ### ------------------------
   ### Prepare output
