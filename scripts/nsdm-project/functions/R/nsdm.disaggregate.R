@@ -29,9 +29,6 @@ if(!"year" %in% names(pres)) pres$year<-NA
 # Prepare reference raster with target resolution for spatial dissagregation  
 rstthin<-aggregate(rst, fact=(thindist/res(rst))[1])
 
-# Crop points that are out of reference raster
-pres<-crop(pres, rst)
-
 # Remove presences with uncertainty (coordinates uncertainty) > max_uncertain
 bad_uncertain<-which(pres$uncertainty>max_uncertain)
 if(length(bad_uncertain)>0) pres<-pres[-bad_uncertain,]
