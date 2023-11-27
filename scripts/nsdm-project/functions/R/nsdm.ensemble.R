@@ -85,7 +85,9 @@ if(weighting){
 # or un-weighted
 ensemble <- raster::mean(stack_map)
 }
+
 ensemble_mn<-ensemble
+crs(ensemble_mn)<-crs(stack_map)
 
 # Compute coefficient of variation	  
 rasterstack_sd_fast <- function(x) {
