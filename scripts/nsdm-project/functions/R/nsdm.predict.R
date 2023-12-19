@@ -48,7 +48,7 @@ ndata_bck<-rbind.fill(ndata)
 
 ## GAM
 if(c("gam") %in% class(model)){
-ndata<-parallel::mclapply(splits_ix, function(x){data.frame(fit=predict(model, nwdata[x,], se.fit = FALSE, gc.level=1, type = "response", block.size=round(nrow(nwdata[x,])/1.5)))}, mc.cores = nsplits)
+ndata<-parallel::mclapply(splits_ix, function(x){data.frame(fit=predict(model, nwdata[x,], se.fit = FALSE, gc.level=1, type = "response", block.size=round(nrow(nwdata[x,])/2.5)))}, mc.cores = nsplits)
 ndata_bck<-rbind.fill(ndata)
 #ndata<-parallel::mclapply(splits_ix, function(x){data.frame(predict(model, nwdata[x,], se.fit = TRUE, block.size=0))[,1:2]}, mc.cores = nsplits)
 #ndata<-rbind.fill(ndata)
