@@ -42,7 +42,9 @@ print(paste0("Warning: forced covariate '", names(covdata)[pointless_f], "' has 
 }
 }
 
-# If only one remaining covariate in the candidate set, stop
+# If only zero or one remaining covariate in the candidate set, stop
+  if(class(covdata) == "data.frame" & ncol(covdata)==0) return(NULL)
+  
   if(class(covdata) != "data.frame"){
   covdata.filter<-data.frame(covdata)
   names(covdata.filter)<-candidates[-pointless10]
