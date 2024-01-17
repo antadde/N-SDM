@@ -28,6 +28,7 @@ covsel.filter <- function(covdata, pa, weights=NULL, force=NULL, corcut=0.7, var
 if(length(variables)>0){
 covdata.candidates <- split.default(covdata, variables)
 covdata.variable.filter<-lapply(covdata.candidates, covsel.filteralgo, pa=pa, weights=weights, force=force, corcut=0) # corcut=0 select one covariate per variable
+covdata.variable.filter<-Filter(Negate(is.null), covdata.variable.filter)
 covdata<-do.call("cbind", covdata.variable.filter)
 names(covdata)<-gsub("^.*\\.","", names(covdata))
 if(length(categories)>0) categories<-categories[match(names(covdata.variable.filter), variables)]
