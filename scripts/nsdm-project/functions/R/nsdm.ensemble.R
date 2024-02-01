@@ -30,6 +30,7 @@ for(i in 1:length(model_names)){
   map<-raster::stack(unlist(map2))
   stack_map<-raster::stack(stack_map, map)
 }
+crs(stack_map)<-proj4string(crs(readRDS(map_files[1])))
 
 # Compute ensembling evaluation table
 res<-data.frame(matrix(nrow=raster::nlayers(stack_map), ncol = 3))
@@ -85,9 +86,7 @@ if(weighting){
 # or un-weighted
 ensemble <- raster::mean(stack_map)
 }
-
 ensemble_mn<-ensemble
-crs(ensemble_mn)<-crs(stack_map)
 
 # Compute coefficient of variation	  
 rasterstack_sd_fast <- function(x) {
