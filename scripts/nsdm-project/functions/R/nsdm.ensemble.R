@@ -30,7 +30,6 @@ for(i in 1:length(model_names)){
   map<-raster::stack(unlist(map2))
   stack_map<-raster::stack(stack_map, map)
 }
-crs(stack_map)<-proj4string(crs(readRDS(map_files[1])))
 
 # Compute ensembling evaluation table
 res<-data.frame(matrix(nrow=raster::nlayers(stack_map), ncol = 3))
@@ -110,6 +109,9 @@ ensemble_mn<-round(ensemble_mn)
 
 storage.mode(ensemble_cv[]) = "integer"
 storage.mode(ensemble_mn[]) = "integer"
+
+crs(ensemble_cv)<-proj4string(crs(readRDS(map_files[1])))
+crs(ensemble_mn)<-proj4string(crs(readRDS(map_files[1])))
 
 names(ensemble_mn)<-gsub("_NA", "", paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble", sep="_"))
 names(ensemble_cv)<-gsub("_NA", "", paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble_cv", sep="_"))
