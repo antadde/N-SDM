@@ -149,10 +149,12 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
   xt_pres<-lapply(1:length(maxless), function(w){xt_pres[w,y_pos[[w]]]})
   # clean rename
   pers<-paste(unique(cov_tomatch_times[,1]), unique(cov_tomatch_times[,2]), sep="_")
+  if(identical(cov_tomatch_times[,1], cov_tomatch_times[,2])) pers<-unique(cov_tomatch_times[,1])
   for(r in 1:length(xt_pres)){
   r_out<-xt_pres[[r]]
   for(d in p_ints_t$dataset){
   tr<-rep(paste(p_ints_t[which(p_ints_t$dataset==d & p_ints_t$int=="int"), "start_year"], p_ints_t[which(p_ints_t$dataset==d & p_ints_t$int=="int"), "end_year"], sep="_"), length(pers))
+  if(identical(cov_tomatch_times[,1], cov_tomatch_times[,2])) tr <-rep(paste(p_ints_t[which(p_ints_t$dataset==d & p_ints_t$int=="int"), "start_year"]), length(pers))
   ix<-grep(d, names(r_out))
   names(r_out)[ix]<-stri_replace_all_fixed(names(r_out)[ix],
                                            pers, tr, vectorize_all=FALSE)}
