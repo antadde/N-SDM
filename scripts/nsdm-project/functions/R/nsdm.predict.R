@@ -62,7 +62,7 @@ ndata_bck<-rbind.fill(ndata)
 
 ## Maxent
 if(c("maxnet") %in% class(model)){
-ndata<-parallel::mclapply(splits_ix, function(x){data.frame(fit=round(predict(model, nwdata[x,], type="cloglog", clamp=F)),2)}, mc.cores = nsplits)
+ndata<-parallel::mclapply(splits_ix, function(x){data.frame(fit=round(predict(model, nwdata[x,], type="cloglog", clamp=F),2))}, mc.cores = nsplits)
 ndata_bck<-rbind.fill(ndata)
 }
 
