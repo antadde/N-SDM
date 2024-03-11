@@ -144,12 +144,14 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
   if(tmatch_scheme=="nts"){
   suppressWarnings(maxless <- sapply(y, function(z){cov_tomatch_times[,2][which.min(abs(rowMeans(cbind(cov_tomatch_times[,1],cov_tomatch_times[,2]))-z))]}))
   }
-  y_pos<-lapply(1:length(maxless), function(t){cov_tomatch_times$end_year %in% maxless[t]})
   ## Thin accordingly
+  y_pos<-lapply(1:length(maxless), function(t){cov_tomatch_times$end_year %in% maxless[t]})
   xt_pres<-lapply(1:length(maxless), function(w){xt_pres[w,y_pos[[w]]]})
   # clean rename
   pers<-paste(unique(cov_tomatch_times[,1]), unique(cov_tomatch_times[,2]), sep="_")
-  if(identical(cov_tomatch_times[,1], cov_tomatch_times[,2])) pers<-unique(cov_tomatch_times[,1])
+  for (i in seq_along(pers)) {
+  replacement <- sub("^(\\d+)_\\1$", "\\1", pers[i])
+  pers[i] <- replacement}
   for(r in 1:length(xt_pres)){
   r_out<-xt_pres[[r]]
   for(d in p_ints_t$dataset){
