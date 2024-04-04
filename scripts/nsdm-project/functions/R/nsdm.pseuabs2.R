@@ -38,7 +38,7 @@ nsdm.pseuabs2<-function(n=10000,
     abs=pres[pres$pa==0,]
     pres=pres[pres$pa==1,]}
       # set_max_npres_to_nabs if requested
-	  if(set_max_npres_to_nabs && length(pres)>n){
+	  if(set_max_npres_to_nabs && nrow(pres)>n){
 	  ## stratum indicator
 	  d<-NULL
 	  d <- data.frame(id=1:length(pres), coordinates(pres))
