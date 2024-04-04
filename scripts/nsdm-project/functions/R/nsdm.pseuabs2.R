@@ -41,7 +41,7 @@ nsdm.pseuabs2<-function(n=10000,
 	  if(set_max_npres_to_nabs && nrow(pres)>n){
 	  ## stratum indicator
 	  d<-NULL
-	  d <- data.frame(id=1:length(pres), coordinates(pres))
+	  d <- data.frame(id=1:nrow(pres), X=pres$X, Y=pres$Y)
 	  if(d[1,2]>10000){ d$group<- round(d[,2]/10000*d[,3]/10000) 
       } else {
 	  d$group <- round(d[,2]*d[,3])}
