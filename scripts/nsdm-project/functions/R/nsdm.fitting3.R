@@ -41,7 +41,7 @@ nsdm.flex3<-function(x=numeric(),
 
  # Check supplied model types
   for(i in 1:length(mod_args)){
-    if(!(mod_args[[i]]@mod%in%c("glm","gam","gbm","maxnet","randomForest","mgcv_gam","mgcv_gam_fx","lightgbm","ranger"))){
+    if(!(mod_args[[i]]@mod%in%c("glm","gam","gbm","maxnet","randomForest","mgcv_gam","mgcv_gam_fx","lgb.train","ranger"))){
       warning(paste(mod_args[[i]]@mod,"not in focal model functions. You might run in to problems when evaluating/predicting..."))
     }
   }
@@ -88,7 +88,7 @@ nsdm.flex3<-function(x=numeric(),
   modi<-do.call(mod_args_j@mod, mod_args_bis)}}
 
   ### GBM
- if(mod_args_j@mod=="lightgbm"){
+ if(mod_args_j@mod=="lgb.train"){
   tmp_path_gbm<-paste0(tmp_path, "/gbm")
   dir.create(tmp_path_gbm, recursive=TRUE)
   if(mod_args_j@weight){
