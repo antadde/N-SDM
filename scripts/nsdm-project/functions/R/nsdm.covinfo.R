@@ -20,7 +20,7 @@ nsdm.covinfo<-function(
   ### List all available layers and extract their information
   setwd(cov_path)    
   full_pred_list <- system(paste("find -L", cov_path, "-type f -name '*.rds'"), intern = TRUE)
-  pred_list<-basename(full_pred_list) 
+  pred_list<-gsub(cov_path, "", full_pred_list) 
   pred_table <- c()
   
   ## Generic information (level, category, dataset)
