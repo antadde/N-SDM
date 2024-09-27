@@ -1,0 +1,107 @@
+parameter|value|group|details
+project|nsdm-project|0_global|name of the N-SDM project
+w_path|/work/FAC/FBM/DEE/aguisan/4c/N-SDM_FUTEI/|0_global|path to working directory
+scr_path|/work/FAC/FBM/DEE/aguisan/4c/N-SDM_FUTEI/scratch/|0_global|path to scratch directory
+svp_path|/work/FAC/FBM/DEE/aguisan/4c/N-SDM_FUTEI/save/|0_general|path to saving directory
+lib_path|/work/FAC/FBM/DEE/aguisan/default/rlib/4.0/|0_global|path to R libraries directory
+clear_sop|TRUE|0_global|clear the scratch directory before starting a new run? (TRUE or FALSE)
+n_levels|2|0_global|"number of nested level(s) (1=GLO| 2=GLO+REG)"
+n_spe|3|1_speciesdata|total number of species evaluated
+n_mx_spe|100|1_speciesdata|maximum number of species evaluated at the same time for a single N-SDM run (useful to prevent scratch saturation)
+forced_species|forced.psv|1_speciesdata|[optional] name of the .psv file stored in the /scripts/project/main/settings folder containing the names of species to be modelled (one per row)
+pa_po_reg|po|1_speciesdata|presence only (po) or presence absence (pa) for regional data
+pa_po_glo|po|1_speciesdata|presence only (po) or presence absence (pa) for global data
+min_occ_reg|50|1_speciesdata|minimum number of occurrences required for modelling a species for regional level
+min_occ_glo|50|1_speciesdata|minimum number of occurrences required for modelling a species for global level
+disag_reg|TRUE|1_speciesdata|do spatial and/or temporal disaggregation of regional species data (TRUE or FALSE)
+disag_glo|TRUE|1_speciesdata|do spatial and/or temporal disaggregation of global species data (TRUE or FALSE)
+thin_dist_reg|200|1_speciesdata|[optional] distance for spatial thinning of reg species occurrence data  (in projection system unit)
+thin_time_reg|5|1_speciesdata|[work in progress][optional] time interval for temporal thinning of regional species occurrence data (in years)
+max_uncertain_reg|250|1_speciesdata|[optional] cutoff threshold for maximum coordinate uncertainty in regional species occurrence data (in projection system unit)
+thin_dist_glo|0.008333333|1_speciesdata|[optional] distance for spatial thinning of global species occurrence data  (in projection system unit)
+thin_time_glo|NULL|1_speciesdata|[work in progress][optional] time interval for temporal thinning of global species occurrence data (in years)
+max_uncertain_glo|NULL|1_speciesdata|[optional] cutoff threshold for maximum coordinate uncertainty in global species occurrence data (in projection system unit)
+back_strat|random|1_speciesdata|"[if pa_po_reg or _glo = ""po""] the strategy for generating pseudoabsences. Only the ""random"" option is available at the time of N-SDM release"
+n_back|10000|1_speciesdata|"[if pa_po_reg or _glo = ""po""] the number of background absences to be generated"
+mask_reg|swissmaskWGS84.rds|2_covariatedata|binary (NA or 1) .rds raster mask stored in the /data/project/mask folder used for identifying the regional-level area (pixel value=1). Note that the mask should be constructed using the global grid (i.e. same extent and resolution as global-level covariates)
+cov_observ|c('reg_transport_tlm3d_pixel_dist2road', 'reg_transport_sonbase_pixel_noise', 'reg_popdensity_statpop13_pixel_populationdensity','reg_lulc_geostat8_present_pixel_2013_2018_cl3')|2_covariatedata|"[optional] covariates considered as ""observational"" and set to an homogeneous value for the prediction process (format is full covariate name without attribute)"
+cov_observ_val|median|2_covariatedata|"[if cov_observ exists] the value to which observational covariates will be set. Three options are available at the time of N-SDM release: ""median"", ""zero"" or ""max"""
+cov_focal|c('lulc_geostat8')|2_covariatedata|"[optional] covariate category_dataset with focal windows available (format is ""category_dataset"")"
+cov_time|c('bioclim_chclim25','bioclim_chelsa','lulc_geostat8')|2_covariatedata|"[optional] covariate category_dataset with temporal dynamic (format is ""category_dataset"")"
+expert_table|expert-table.xlsx|2_covariatedata|[optional] name of the .xlsx pre-filtering correspondence table stored in the /scripts/project/main/settings folder indicating which covariates are candidate for modelling a target “class” of species
+tmatch_glo|FALSE|2_covariatedata|do temporal matching for global-level analyses? (TRUE or FALSE)
+tmatch_reg|TRUE|2_covariatedata|do temporal matching for regional-level analyses? (TRUE or FALSE)
+tmatch_scheme_glo|npts|2_covariatedata|"[if tmatch_glo = TRUE] scheme for temporal matching of global-level data. Two options are available at the time of N-SDM release: nearest-previous time slice ""npts""or nearest time slice ""nts"""
+tmatch_scheme_reg|nts|2_covariatedata|"[if tmatch_reg = TRUE] scheme for temporal matching of regional-level data. Two options are available at the time of N-SDM release: nearest-previous time slice ""npts""or nearest time slice ""nts"""
+sel_met|GLM|3_covariate selection|"univariate ranking method used for collinearity filtering. Only the ""GLM"" option has been validated at the time of N-SDM release. Explore the nsdm.covfilter.R function for more options"
+cor_cut|0.7|3_covariate selection|Pearson correlation coefficient cutoff threshold used for collinearity filtering
+max_thre|12|3_covariate selection|maximum possible number of covariates in a single model
+param_grid|param-grid.xlsx|4_modelling|name of the .xlsx file stored in the /scripts/project/main/settings folder containing the grid for hyperparameter tunning
+mod_algo|c('glm','gam','max','rf','gbm') |4_modelling|"name(s) of the modelling algorithms evaluated. Available options include ""glm"", ""gam"", ""max"", ""rf"", ""gbm"" and ""esm"""
+ncov_esm|5|4_modelling_esm|"[if ""esm"" included in mod_algo] total number of covariates evaluated in the esm framework"
+comb_esm|2|4_modelling_esm|"[if ""esm"" included in mod_algo] number of covariates combined in each esm"
+best_thre_esm|0.5|4_modelling_esm|"[if ""esm"" included in mod_algo] cutoff threshold value for ""best_met"" under which a model is discarded from the esm set"
+replicate_type|splitsample|4_modelling_evaluation|"cross-validation strategy. Only the ""splitsample"" option is available at the time of N-SDM release"
+reps|25|4_modelling_evaluation|number of cross-validation replicates
+eval_crit|maxTSS|4_modelling_evaluation|"criteria for threshold dependent evaluation metrics. Only the ""maxTSS"" option is available at the time of N-SDM release"
+best_met|Score|4_modelling_evaluation|"model evaluation metric used for identifying best models. Available options include ""AUC"", ""AUC'"", ""Boyce"", ""Score"", ""maxSensitivity"", ""maxSpecificity"", ""maxAccuracy"", ""maxPPV"", ""maxNPV"", ""maxJaccard"", ""maxTSS"", ""maxKappa"", ""maxSEDI"""
+do_weighting|FALSE|5_ensembling|weight modelling algorithms by the value of weight_metric when ensembling? (TRUE or FALSE)
+weight_metric|Score|5_ensembling|evaluation metric used for weighting and discarding models in the ensembling process
+disc_thre|0.4|5_ensembling|cutoff threshold for weight_met at which a model is discarded from the ensembling process
+nesting_methods|c('covariate')|5_ensembling|"scale-nesting strategy applied for combining the global- and regional-level models. The two available options at the time of N-SDM release are ""covariate"" and ""multiply"""
+mask_pred|ch_mask_terr_gwn07_lakes_50.rds|5_ensembling|[optional] binary (0-1) .rds raster mask stored in the /data/project/mask folder used for masking the predictions [pixels with 0 value]
+do_proj|TRUE|6_projections|do future/alternative projections? (TRUE or FALSE)
+proj_scenarios|c('rcp45', 'rcp85')|6_projections|"names of the future/alternative scenarios evaluated for projections (must match with covariate folder names| see Appendix S1: Text S2 for details)"
+proj_periods|c('2020_2049','2045_2074','2070_2099')|6_projections|"names of the future/alternative periods evaluated for projections (must match with covariate folder names| see Appendix S1: Text S2 for details)"
+rsync_exclude|d1_covsels,d2_models,d6_preds,d13_preds-fut,d14_maps-fut,d17_nested-ensembles-fut,d18_nested-ensembles-cv-fut|7_rsyncsaving|"names of the output folders (no spaces between names) to be excluded when moving the scratch files to the saving directory| see Appendix S1: Text S5 for details on the output folder names. The default exclusion settings, along with the covariate nesting strategy, should provide you with all the material you need for in-depth analyses. Note that the final models are included by default, even if the d2_models folder is in the exclusion list (only models fitted during the hyperparameter tuning step will be excluded)"
+sess_own|aadde|8_HPC|HPC session owner
+account|aguisan_valpar|8_HPC|HPC account
+partition|cpu|8_HPC|HPC partition
+pre_A_m|5G|8_HPC|pre_A requested memory
+pre_A_t|00-00:15|8_HPC|pre_A requested time
+pre_A_c|10|8_HPC|pre_A requested cores
+pre_B_m|5G|8_HPC|pre_B requested memory
+pre_B_t|00-00:15|8_HPC|pre_B requested time
+pre_B_c|1|8_HPC|pre_B requested cores
+glo_A_m|25G|8_HPC|glo_A requested memory
+glo_A_t|00-00:15|8_HPC|glo_A requested time
+glo_A_c|10|8_HPC|glo_A requested cores
+glo_B_m|80G|8_HPC|glo_B requested memory
+glo_B_t|00-00:15|8_HPC|glo_B requested time
+glo_B_c|10|8_HPC|glo_B requested cores
+glo_C_m|25G|8_HPC|glo_C requested memory
+glo_C_t|00-00:15|8_HPC|glo_C requested time
+glo_C_c|1|8_HPC|glo_C requested cores
+reg_A_m|25G|8_HPC|reg_A requested memory
+reg_A_t|00-00:15|8_HPC|reg_A requested time
+reg_A_c|10|8_HPC|reg_A requested cores
+reg_B_m|80G|8_HPC|reg_B requested memory
+reg_B_t|00-00:15|8_HPC|reg_B requested time
+reg_B_c|10|8_HPC|reg_B requested cores
+reg_C_m|25G|8_HPC|reg_C requested memory
+reg_C_t|00-00:15|8_HPC|reg_C requested time
+reg_C_c|1|8_HPC|reg_C requested cores
+fut_A_m|80G|8_HPC|fut_A requested memory
+fut_A_t|00-00:15|8_HPC|fut_A requested time
+fut_A_c|10|8_HPC|fut_A requested cores
+fut_B_m|25G|8_HPC|fut_B requested memory
+fut_B_t|00-00:15|8_HPC|fut_B requested time
+fut_B_c|1|8_HPC|fut_B requested cores
+fut_C_m|80G|8_HPC|fut_C requested memory
+fut_C_t|00-00:15|8_HPC|fut_C requested time
+fut_C_c|10|8_HPC|fut_C requested cores
+fut_D_m|25G|8_HPC|fut_D requested memory
+fut_D_t|00-00:15|8_HPC|fut_D requested time
+fut_D_c|1|8_HPC|fut_D requested cores
+end_A_m|25G|8_HPC|end_A requested memory
+end_A_t|00-00:15|8_HPC|end_A requested time
+end_A_c|1|8_HPC|end_A requested cores
+args|commandArgs(trailingOnly = TRUE)|8_HPC|command arguments, not supposed to be modified
+arrayID|as.numeric(args[[1]])|8_HPC|array identifier, not supposed to be modified
+module_gcc|gcc/10.4.0|8_HPC|gcc module name and version
+module_r|r/4.2.1|8_HPC|r module name/version
+module_proj|proj/5.2.0|8_HPC|proj module name/version
+module_perl|perl|8_HPC|perl module name/version
+module_curl|curl|8_HPC|curl module name/version
+module_geos|geos/3.9.1|8_HPC|geos module name/version
+module_gdal|gdal/2.4.4-proj-5.2.0|8_HPC|gdal module name/version

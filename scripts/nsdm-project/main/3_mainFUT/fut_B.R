@@ -45,10 +45,12 @@ scenars<-proj_scenarios
 pers<-proj_periods
 
 # SBATCH array
-array<-expand.grid(species=species, scenarios=scenars)
+# array<-expand.grid(species=species, scenarios=scenars)
+array<-expand.grid(species=species)
 ispi_name <- array[arrayID,"species"]
-scenar<-array[arrayID,"scenarios"]
+# scenar<-array[arrayID,"scenarios"]
 
+for(scenar in scenars){
 for (per in pers){
 
 cat(paste('Ready for mapping and ensembling', scenar, per, 'future GLO predictions obtained for', ispi_name, '...\n', sep=" "))
@@ -94,8 +96,9 @@ ensemble_glo<-nsdm.ensemble(model_names= mod_algo,
                            discthre=disc_thre)
 
 nsdm.savemap(maps=ensemble_glo$ensemble, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d15_ensembles-fut/glo/",scenar,"/",per))
-nsdm.savemap(maps=ensemble_glo$ensemble_cv, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d16_ensembles-cv-fut/glo/",scenar,"/",per))
 
+nsdm.savemap(maps=ensemble_glo$ensemble_cv, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d16_ensembles-cv-fut/glo/",scenar,"/",per))
+}
 }
 
 cat(paste0('Ensemble predictions saved \n'))

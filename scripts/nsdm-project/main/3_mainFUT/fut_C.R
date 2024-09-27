@@ -51,15 +51,13 @@ scenars<-proj_scenarios
 pers<-proj_periods
 
 # SBATCH array
-array<-expand.grid(nesting=nesting_methods, model=models, species=species, scenarios=scenars)
+array<-expand.grid(nesting=nesting_methods, species=species, scenarios=scenars)
 ispi_name <- array[arrayID,"species"]
-model_name <- array[arrayID,"model"]
 nesting_method <- array[arrayID,"nesting"]
 scenar<-array[arrayID,"scenarios"]
 
-
+for(model_name in models){
 for (per in pers){
-
 cat(paste('Ready for', scenar, per, toupper(model_name),  'future REG predictions of', ispi_name, ' using the ',nesting_method,' method for scale-nesting ...\n'))
 
 ### =========================================================================
@@ -158,6 +156,6 @@ nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=hab_df
               model_name=model_name, species_name=ispi_name,
               save_path=paste0(scr_path,"/outputs/",project,"/d13_preds-fut/reg/",nesting_method,"/",scenar,"/",per))
 }
-
+}
 cat(paste0('Predictions calculated and saved \n'))
 cat(paste0('Finished!\n'))

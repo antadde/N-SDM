@@ -85,7 +85,8 @@ ensemble_reg<-nsdm.ensemble(model_names=mod_algo,
                            discthre=disc_thre)
 
 nsdm.savemap(maps=ensemble_reg$ensemble, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d8_ensembles/reg/",nesting_method))
-nsdm.savemap(maps=ensemble_reg$ensemble_cv, species_name=ispi_name, model_name=NULL, format="rds", save_path=paste0(scr_path,"/outputs/",project,"/d9_ensembles-cv/reg/",nesting_method))
+
+nsdm.savemap(maps=ensemble_reg$ensemble_cv, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d9_ensembles-cv/reg/",nesting_method))
 
 ### =========================================================================
 ### E- Combine REG and GLO predictions
@@ -103,7 +104,10 @@ if(nesting_method=="multiply"){
   names(ensemble_nested_cv)<-names(ensemble_reg$ensemble_cv)
   # Save
   nsdm.savemap(map=ensemble_nested, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d10_nested-ensembles/",nesting_method))
+
+  
   nsdm.savemap(map=ensemble_nested_cv, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d11_nested-ensembles-cv/",nesting_method))
+
 } 
 
 # # E.1.2 "Covariate" nesting (identical to D)
@@ -113,6 +117,7 @@ ensemble_nested<-ensemble_reg$ensemble
 ensemble_nested_cv<-ensemble_reg$ensemble_cv
 # Save
  nsdm.savemap(map=ensemble_nested, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d10_nested-ensembles/",nesting_method))
+
  nsdm.savemap(map=ensemble_nested_cv, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d11_nested-ensembles-cv/",nesting_method))
 }
 

@@ -73,6 +73,7 @@ ensemble_glo<-nsdm.ensemble(model_names= mod_algo,
                            discthre=disc_thre) 
 
 nsdm.savemap(maps=ensemble_glo$ensemble, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d8_ensembles/glo"))
+
 nsdm.savemap(maps=ensemble_glo$ensemble_cv, species_name=ispi_name, model_name=NULL, save_path=paste0(scr_path,"/outputs/",project,"/d9_ensembles-cv/glo"))
 
 cat(paste0('Ensemble predictions saved \n'))

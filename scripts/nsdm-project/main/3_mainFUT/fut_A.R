@@ -48,10 +48,14 @@ scenars<-proj_scenarios
 pers<-proj_periods
 
 # SBATCH array
-array<-expand.grid(model=models, species=species, scenarios=scenars)
+# array<-expand.grid(model=models, species=species, scenarios=scenars)
+array<-expand.grid(species=species, scenarios=scenars)
 ispi_name <- array[arrayID,"species"]
-model_name <- array[arrayID,"model"]
+# model_name <- array[arrayID,"model"]
 scenar<-array[arrayID,"scenarios"]
+
+
+for(model_name in models){
 
 for (per in pers){
 
@@ -136,6 +140,7 @@ ndata_bck<-nsdm.predict(models=prmod,
 nsdm.savethis(object=list(ndata_bck=ndata_bck, template=template, nona_ix=clim_df_reg$covdf_ix),
               model_name=model_name, species_name=ispi_name,
               save_path=paste0(scr_path,"/outputs/",project,"/d13_preds-fut/glo/",scenar,"/",per))
+}
 }
 
 cat(paste0('Predictions calculated and saved \n'))

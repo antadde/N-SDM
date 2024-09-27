@@ -15,7 +15,7 @@ project<-gsub("/main","",gsub(".*scripts/","",getwd()))
 Sys.umask(mode="000")
 
 # Load and retrieve main settings
-settings<-read.csv2("./settings/settings.csv")
+settings <- read.csv("./settings/settings.psv", sep = "|")
 parameters<-settings$parameter
 values<-settings$value
 for(i in 1:length(parameters)){
@@ -210,7 +210,7 @@ species<-spe_glo_names}
 print(paste0("Number of remaining species after intersecting GLO and REG species dataset is: ",length(species)))
 
 # If a vector of species to be forced is available use it
-if(length(forced_species)>0) forced_species<-read.csv2(forced_species, header=FALSE)[,1]
+if(length(forced_species)>0) forced_species<-readLines(forced_species)
 if(is.character(forced_species)){
 species<-forced_species
 }

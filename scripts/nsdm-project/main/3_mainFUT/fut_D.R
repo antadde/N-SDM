@@ -42,14 +42,14 @@ scenars<-proj_scenarios
 nesting_methods<-nesting_methods
 
 # SBATCH array
-array<-expand.grid(nesting=nesting_methods, species=species, scenarios=scenars)
+array<-expand.grid(nesting=nesting_methods, species=species)
 ispi_name <- array[arrayID,"species"]
 nesting_method <- array[arrayID,"nesting"]
-scenar<-array[arrayID,"scenarios"]
 
 # Target period for future predictions
 pers<-proj_periods
 
+for(scenar in scenars){
 for (per in pers){
 
 cat(paste('Ready for mapping and ensembling', scenar, per, 'future REG predictions obtained for', ispi_name, 'under', nesting_method, 'nesting method...\n', sep=" "))
@@ -127,6 +127,7 @@ nsdm.savemap(map=ensemble_nested, species_name=ispi_name, save_path=paste0(scr_p
 nsdm.savemap(map=ensemble_nested_cv, species_name=ispi_name, save_path=paste0(scr_path,"/outputs/",project,"/d18_nested-ensembles-cv-fut/",nesting_method,"/",scenar,"/",per))
 }
 
+}
 }
 
 cat(paste0('GLO and REG predictions nested and saved \n'))

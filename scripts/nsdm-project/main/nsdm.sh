@@ -1,253 +1,478 @@
 #!/bin/bash
 
+# Exit on any error
+set -e
+
+# Function to clean up on script exit (optional)
+cleanup() {
+  if [ $? -ne 0 ]; then
+    echo "An error occurred. Cleaning up and exiting."
+  fi
+}
+
+# Set trap to call the cleanup function on script exit
+trap cleanup EXIT
+
 ##########################
 ## nsdm.sh
 ## Core N-SDM script
 ## Date: 20-05-2022
-## Author: Antoine Adde (antoine.adde@unil.ch)
+## Author: Antoine Adde (antoine.adde@eawag.ch)
+## Updated: 20-09-2024
 ##########################
 
-# Load required modules
-module load $(awk -F ";" '$1 == "module_gcc" { print $2}' ./settings/settings.csv)
-module load $(awk -F ";" '$1 == "module_r" { print $2}' ./settings/settings.csv)
-module load $(awk -F ";" '$1 == "module_proj" { print $2}' ./settings/settings.csv)
-module load $(awk -F ";" '$1 == "module_perl" { print $2}' ./settings/settings.csv)
-module load $(awk -F ";" '$1 == "module_curl" { print $2}' ./settings/settings.csv)
-module load $(awk -F ";" '$1 == "module_geos" { print $2}' ./settings/settings.csv)
-module load $(awk -F ";" '$1 == "module_gdal" { print $2}' ./settings/settings.csv)
+# Function to retrieve values from the settings.csv file
+get_value() {
+  local key=$1
+  awk -F "|" -v search_key="$key" '$1 == search_key { print $2 }' ./settings/settings.psv
+}
 
-# Retrieve main paths
-wp=$(awk -F ";" '$1 == "w_path" { print $2}' ./settings/settings.csv)    # working path
-sop=$(awk -F ";" '$1 == "scr_path" { print $2}' ./settings/settings.csv) # scratch output path
-svp=$(awk -F ";" '$1 == "svp_path" { print $2}' ./settings/settings.csv) # saving output path
+# Function to submit jobs
+submit_job() {
+  local job_name=$1
+  local mem=$2
+  local time=$3
+  local cpus=$4
+  local ntasks=$5
+  local job_command=$6
+  local array_flag=$7
+  local log_dir=$8
+  local account=$9
+  
+  # Create timestamp
+  local timestamp=$(date +%Y%m%d_%H%M%S)
+
+  # Customize output and error filenames
+  if [ -z "$array_flag" ]; then
+    # No array job, standard log filenamesblue
+    local output_file="${log_dir}/${job_name}_$timestamp.out"
+    local error_file="${log_dir}/${job_name}_$timestamp.err"
+  else
+    # Array job, log filenames include job and array task IDs
+    local output_file="${log_dir}/${job_name}_%A_%a_$timestamp.out"
+    local error_file="${log_dir}/${job_name}_%A_%a_$timestamp.err"
+  fi
+
+  echo "Submitting $job_name job..."
+  if [ -z "$array_flag" ]; then
+    # Standard job submission
+    sbatch --wait --job-name="$job_name" \
+           --output="$output_file" \
+           --error="$error_file" \
+           --mem-per-cpu="$mem" --time="$time" --cpus-per-task="$cpus" --ntasks="$ntasks" --wrap="$job_command" --account="$account"
+  else
+    # Array job submission
+    sbatch --wait --job-name="$job_name" \
+           --output="$output_file" \
+           --error="$error_file" \
+           --mem-per-cpu="$mem" --time="$time" --cpus-per-task="$cpus" --ntasks="$ntasks" --array="$array_flag" --wrap="$job_command" --account="$account"
+  fi
+
+  # Check if the job submission was successful
+  if [[ $? -eq 0 ]]; then
+    echo "$job_name completed successfully."
+  else
+    echo "Error: $job_name submission failed."
+    exit 1
+  fi
+}
+
+# Function to count the number of items
+count_items() {
+  local list=$1
+  echo $(( $(grep -o "'" <<< "$list" | wc -l) / 2 ))
+}
+
+# Load required modules
+echo "Loading required modules..."
+
+module load "$(get_value "module_gcc")"
+module load "$(get_value "module_r")"
+module load "$(get_value "module_proj")"
+module load "$(get_value "module_perl")"
+module load "$(get_value "module_curl")"
+module load "$(get_value "module_geos")"
+module load "$(get_value "module_gdal")"
+
+echo "Modules loaded successfully."
+
+# Retrieve main paths from settings.csv
+echo "Retrieving main paths..."
+wp=$(get_value "w_path")    # Working path
+sop=$(get_value "scr_path")  # Scratch output path
+svp=$(get_value "svp_path")  # Saving output path
 
 # Retrieve project name
-project=$(awk -F ";" '$1 == "project" { print $2}' ./settings/settings.csv)
+project=$(get_value "project")
+echo "Project name: $project"
 
-# General definitions
-own=$(awk -F ";" '$1 == "sess_own" { print $2}' ./settings/settings.csv)                          # session account
-acc=$(awk -F ";" '$1 == "account" { print $2}' ./settings/settings.csv)                           # HPC account
-part=$(awk -F ";" '$1 == "partition" { print $2}' ./settings/settings.csv)                        # HPC partition
+# General definitions from settings.csv
+echo "Retrieving general HPC definitions..."
+own=$(get_value "sess_own")  # Session account
+acc=$(get_value "account")   # HPC account
+part=$(get_value "partition") # HPC partition
 
-# Clean and/or create output directories
-rm -r $wp/tmp/$project/* 2>/dev/null
-mkdir -p $svp/outputs/$project/ 2>/dev/null
-mkdir -p $sop/outputs/$project/ 2>/dev/null
-mkdir -p $sop/tmp/$project/ 2>/dev/null
-mkdir -p $wp/tmp/$project/settings/tmp/ 2>/dev/null
-mkdir -p $wp/tmp/$project/sacct/ 2>/dev/null
+# Clean and/or create necessary directories
+echo "Setting up output directories..."
 
-# Permissions
-chmod -R 777 $wp/data/$project 2>/dev/null
-chmod -R 777 $wp/scripts/$project 2>/dev/null
-chmod -R 777 $wp/tmp/$project 2>/dev/null
+# Remove old temporary files, if any
+rm -r "$wp/tmp/$project/*" 2>/dev/null || true
 
-# Clean existing 0_mainPRE log files if any
-rm $wp/scripts/$project/main/0_mainPRE/*.err 2>/dev/null
-rm $wp/scripts/$project/main/0_mainPRE/*.out 2>/dev/null
+# Create required directories if they don't already exist
+mkdir -p "$svp/outputs/$project/" 2>/dev/null || true
+mkdir -p "$sop/outputs/$project/" 2>/dev/null || true
+mkdir -p "$sop/tmp/$project/" 2>/dev/null || true
+mkdir -p "$wp/tmp/$project/settings/tmp/" 2>/dev/null || true
+mkdir -p "$wp/tmp/$project/sacct/" 2>/dev/null || true
 
-# Create N-SDM unique identifier
+# Set directory permissions (make them writable by all users)
+echo "Setting permissions for project directories..."
+chmod -R 777 "$wp/data/$project" 2>/dev/null || true
+chmod -R 777 "$wp/scripts/$project" 2>/dev/null || true
+chmod -R 777 "$wp/tmp/$project" 2>/dev/null || true
+
+# Clean up old log files from the mainPRE script if they exist
+echo "Cleaning existing log files from mainPRE..."
+rm "$wp/scripts/$project/main/0_mainPRE/logs/"*.err 2>/dev/null || true
+rm "$wp/scripts/$project/main/0_mainPRE/logs/"*.out 2>/dev/null || true
+
+# Generate a unique identifier for this N-SDM session
+echo "Generating unique N-SDM session identifier..."
 ssl_id=$(openssl rand -hex 3)
-echo $ssl_id > $wp/tmp/$project/settings/tmp/ssl_id.txt
+echo "$ssl_id" > "$wp/tmp/$project/settings/tmp/ssl_id.txt"
+echo "Session ID: $ssl_id"
 
-echo Welcome to this new $project run $ssl_id
+# Display welcome message with project and session ID
+echo "Welcome to this new $project run, Session ID: $ssl_id"
 
-# Define N-SDM settings and disaggregate species occurence data
-pre_A_m=$(awk -F ";" '$1 == "pre_A_m" { print $2}' ./settings/settings.csv)                           # memory
-pre_A_t=$(awk -F ";" '$1 == "pre_A_t" { print $2}' ./settings/settings.csv)                           # time
-pre_A_c=$(awk -F ";" '$1 == "pre_A_c" { print $2}' ./settings/settings.csv)                           # cores
-sbatch --wait --account=$acc --partition=$part --mem=$pre_A_m --time=$pre_A_t --cpus-per-task=$pre_A_c --ntasks=1 ./0_mainPRE/job_pre_A.sh
-echo N-SDM settings defined and species occurence data for "$(cat $wp/tmp/$project/settings/tmp/n_spe.txt)" species disaggregated 
+# PRE_A Job
+PRE_A_m=$(get_value "pre_A_m")  # Memory
+PRE_A_t=$(get_value "pre_A_t")  # Time
+PRE_A_c=$(get_value "pre_A_c")  # Cores
 
-### Loop over spe_runs (n_spe/n_spe_max_hpc) to prevent scratch path saturation
+pre_A_job() {
+  local job_name="pre_A"
+  local log_dir="./0_mainPRE/logs"
+  local job_command="export OMP_NUM_THREADS=1; Rscript ./0_mainPRE/pre_A.R"
+  submit_job "$job_name" "$PRE_A_m" "$PRE_A_t" "$PRE_A_c" 1 "$job_command" "" "$log_dir" "$acc"
+}
+pre_A_job
+
+# Loop over species runs to prevent scratch path saturation
 spe_runs="$(cat $wp/tmp/$project/settings/tmp/spe_runs.txt)"
 
-for i in $(seq 1 $spe_runs)
-do
-echo $i > $wp/tmp/$project/settings/tmp/run_id.txt
-echo "Starting N-SDM run $i out of $spe_runs runs"
+# Iterate through each run
+for i in $(seq 1 "$spe_runs"); do
+  # Save the current run ID
+  echo "$i" > "$wp/tmp/$project/settings/tmp/run_id.txt"
+  echo "Starting N-SDM run $i out of $spe_runs runs"
 
-# Retrieve time/date
-dt=$(date +"%FT%T")
+  # Retrieve current time/date for logging
+  dt=$(date +"%FT%T")
+  echo "Run $i started at $dt"
 
-# Update N-SDM settings
-cd $wp/scripts/$project/main/
-Rscript ./0_mainPRE/nsdm_update.R 1>/dev/null 2>&1
-echo N-SDM settings updated
+  # Update N-SDM settings using the R script
+  cd "$wp/scripts/$project/main/" || exit 1  # Exit if directory change fails
+  Rscript ./0_mainPRE/nsdm_update.R >/dev/null 2>&1 || true
+  if [[ $? -eq 0 ]]; then
+    echo "N-SDM settings updated successfully."
+  else
+    echo "Error: Failed to update N-SDM settings for run $i."
+    exit 1
+  fi
 
-# Update n_spe (number of species to be modelled in this run)
-n_spe="$(cat $wp/tmp/$project/settings/tmp/n_spe.txt)"
+ # Retrieve the number of species to model in this run
+  n_spe="$(cat "$wp/tmp/$project/settings/tmp/n_spe.txt")"
+  echo "Number of species to be modeled in this run: $n_spe"
 
-# Dimensions for array definitions
-mod_algo=$(awk 'BEGIN{FS=";"}/mod_algo/ {print $2}' ./settings/settings.csv)        # modelling algorithms evaluated
-n_algo=$(($(grep -o "'" <<<"$mod_algo" | grep -c .) / 2))                           # number of modelling algorithms evaluated
-nest_met=$(awk 'BEGIN{FS=";"}/nesting_methods/ {print $2}' ./settings/settings.csv) # modelling algorithms evaluated
-n_nesting=$(($(grep -o "'" <<<"$nest_met" | grep -c .) / 2))                        # number of nesting methods evaluated
-scenars=$(awk 'BEGIN{FS=";"}/proj_scenarios/ {print $2}' ./settings/settings.csv)   # alternative scenarios evaluated
-n_scenarios=$(($(grep -o "'" <<<"$scenars" | grep -c .) / 2))                       # number of alternative scenarios evaluated
-periods=$(awk 'BEGIN{FS=";"}/proj_periods/ {print $2}' ./settings/settings.csv)          # alternative periods evaluated
-n_periods=$(($(grep -o "'" <<<"$periods" | grep -c .) / 2))                         # number of alternative periods evaluated
+# Retrieve modelling algorithms, nesting methods, scenarios, and periods using get_value
+mod_algo=$(get_value "mod_algo")  # Modelling algorithms evaluated
+n_algo=$(count_items "$mod_algo") # Number of modelling algorithms
 
-# Memory/Time/Cores/Array definitions
-## PRE_B
-pre_B_m=$(awk -F ";" '$1 == "pre_B_m" { print $2}' ./settings/settings.csv)                           # memory
-pre_B_t=$(awk -F ";" '$1 == "pre_B_t" { print $2}' ./settings/settings.csv)                           # time
-pre_B_c=$(awk -F ";" '$1 == "pre_B_c" { print $2}' ./settings/settings.csv)                           # cores
+nest_met=$(get_value "nesting_methods")  # Nesting methods evaluated
+n_nesting=$(count_items "$nest_met")     # Number of nesting methods
 
-## GLO
-glo_A_m=$(awk -F ";" '$1 == "glo_A_m" { print $2}' ./settings/settings.csv)                           # A memory
-glo_A_t=$(awk -F ";" '$1 == "glo_A_t" { print $2}' ./settings/settings.csv)                           # A time
-glo_A_c=$(awk -F ";" '$1 == "glo_A_c" { print $2}' ./settings/settings.csv)                           # A cores
-glo_A_a=$n_spe                                                                                        # A array extent
+scenars=$(get_value "proj_scenarios")    # Projection scenarios evaluated
+n_scenarios=$(count_items "$scenars")    # Number of projection scenarios
 
-glo_B_m=$(awk -F ";" '$1 == "glo_B_m" { print $2}' ./settings/settings.csv)                           # B memory
-glo_B_t=$(awk -F ";" '$1 == "glo_B_t" { print $2}' ./settings/settings.csv)                           # B time
-glo_B_c=$(awk -F ";" '$1 == "glo_B_c" { print $2}' ./settings/settings.csv)                           # B cores
-glo_B_a=`expr $n_spe \* $n_algo`                                                                      # B array extent
+periods=$(get_value "proj_periods")      # Projection periods evaluated
+n_periods=$(count_items "$periods")      # Number of projection periods
 
-glo_C_m=$(awk -F ";" '$1 == "glo_C_m" { print $2}' ./settings/settings.csv)                           # C memory
-glo_C_t=$(awk -F ";" '$1 == "glo_C_t" { print $2}' ./settings/settings.csv)                           # C time
-glo_C_c=$(awk -F ";" '$1 == "glo_C_c" { print $2}' ./settings/settings.csv)                           # C cores
-glo_C_a=$n_spe                                                                                        # C array extent
+# Define file patterns to clean
+file_patterns=("*.err" "*.out")
 
-## REG
-reg_A_m=$(awk -F ";" '$1 == "reg_A_m" { print $2}' ./settings/settings.csv)                           # A memory
-reg_A_t=$(awk -F ";" '$1 == "reg_A_t" { print $2}' ./settings/settings.csv)                           # A time
-reg_A_c=$(awk -F ";" '$1 == "reg_A_c" { print $2}' ./settings/settings.csv)                           # A cores
-reg_A_a=$n_spe                                                                                        # A array extent
+# Define log_dirs
+log_dirs=(
+  "$wp/scripts/$project/main/1_mainGLO/"
+  "$wp/scripts/$project/main/2_mainREG/"
+  "$wp/scripts/$project/main/3_mainFUT/"
+  "$wp/scripts/$project/main/4_mainEND/"
+  "$wp/scripts/$project/main/5_aggregator/"
+)
 
-reg_B_m=$(awk -F ";" '$1 == "reg_B_m" { print $2}' ./settings/settings.csv)                           # B memory
-reg_B_t=$(awk -F ";" '$1 == "reg_B_t" { print $2}' ./settings/settings.csv)                           # B time
-reg_B_c=$(awk -F ";" '$1 == "reg_B_c" { print $2}' ./settings/settings.csv)                           # B cores
-reg_B_a=`expr $n_spe \* $n_algo \* $n_nesting`                                                        # B array extent
+# Loop through directories and file patterns to remove log files
+for dir in "${log_dirs[@]}"; do
+    for pattern in "${file_patterns[@]}"; do
+      find "$dir" -type f -name "$pattern" -exec rm -f {} \; 2>/dev/null || true
+    done
+done
 
-reg_C_m=$(awk -F ";" '$1 == "reg_C_m" { print $2}' ./settings/settings.csv)                           # C memory
-reg_C_t=$(awk -F ";" '$1 == "reg_C_t" { print $2}' ./settings/settings.csv)                           # C time
-reg_C_c=$(awk -F ";" '$1 == "reg_C_c" { print $2}' ./settings/settings.csv)                           # C cores
-reg_C_a=`expr $n_spe \* $n_nesting`                                                                   # C array extent   
-
-## FUT
-fut_A_m=$(awk -F ";" '$1 == "fut_A_m" { print $2}' ./settings/settings.csv)                           # A memory
-fut_A_t=$(awk -F ";" '$1 == "fut_A_t" { print $2}' ./settings/settings.csv)                           # A time
-fut_A_c=$(awk -F ";" '$1 == "fut_A_c" { print $2}' ./settings/settings.csv)                           # A cores
-fut_A_a=`expr $n_spe \* $n_algo \* $n_scenarios`                                                      # A array extent
-
-fut_B_m=$(awk -F ";" '$1 == "fut_B_m" { print $2}' ./settings/settings.csv)                           # B memory
-fut_B_t=$(awk -F ";" '$1 == "fut_B_t" { print $2}' ./settings/settings.csv)                           # B time
-fut_B_c=$(awk -F ";" '$1 == "fut_B_c" { print $2}' ./settings/settings.csv)                           # B cores
-fut_B_a=`expr $n_spe \* $n_scenarios`                                                                 # B array extent
-
-fut_C_m=$(awk -F ";" '$1 == "fut_C_m" { print $2}' ./settings/settings.csv)                           # C memory
-fut_C_t=$(awk -F ";" '$1 == "fut_C_t" { print $2}' ./settings/settings.csv)                           # C time
-fut_C_c=$(awk -F ";" '$1 == "fut_C_c" { print $2}' ./settings/settings.csv)                           # C cores
-fut_C_a=`expr $n_spe \* $n_algo \* $n_nesting \* $n_scenarios`                                        # C array extent
-
-fut_D_m=$(awk -F ";" '$1 == "fut_D_m" { print $2}' ./settings/settings.csv)                           # D memory
-fut_D_t=$(awk -F ";" '$1 == "fut_D_t" { print $2}' ./settings/settings.csv)                           # D time
-fut_D_c=$(awk -F ";" '$1 == "fut_D_c" { print $2}' ./settings/settings.csv)                           # D cores
-fut_D_a=`expr $n_spe \* $n_nesting \* $n_scenarios`                                                   # D array extent
-
-## END_A
-end_A_m=$(awk -F ";" '$1 == "end_A_m" { print $2}' ./settings/settings.csv)                           # D memory
-end_A_t=$(awk -F ";" '$1 == "end_A_t" { print $2}' ./settings/settings.csv)                           # D time
-end_A_c=$(awk -F ";" '$1 == "end_A_c" { print $2}' ./settings/settings.csv)                           # D cores
-end_A_a=$n_spe                                                                                        # D array extent
-
-# Clean existing log files
-rm $wp/scripts/$project/main/0_mainPRE/pre_B*.err 2>/dev/null
-rm $wp/scripts/$project/main/0_mainPRE/pre_B*.out 2>/dev/null
-rm $wp/scripts/$project/main/1_mainGLO/*.err 2>/dev/null
-rm $wp/scripts/$project/main/1_mainGLO/*.out 2>/dev/null
-rm $wp/scripts/$project/main/2_mainREG/*.err 2>/dev/null
-rm $wp/scripts/$project/main/2_mainREG/*.out 2>/dev/null
-rm $wp/scripts/$project/main/3_mainFUT/*.err 2>/dev/null
-rm $wp/scripts/$project/main/3_mainFUT/*.out 2>/dev/null
-rm $wp/scripts/$project/main/4_mainEND/*.err 2>/dev/null
-rm $wp/scripts/$project/main/4_mainEND/*.out 2>/dev/null
 
 # Clean scratch output folder if requested
-clear_sop=$(awk -F ";" '$1 == "clear_sop" { print $2}' ./settings/settings.csv)
-if [ $clear_sop = "TRUE" ]
-then
-rm -r $sop/outputs/$project/* 2>/dev/null
-rm -r $sop/tmp/$project/* 2>/dev/null
+clear_sop=$(get_value "clear_sop")
+if [ "$clear_sop" = "TRUE" ]; then
+    echo "Clearing scratch output and temporary directories..."
+    rm -r $sop/outputs/$project/* 2>/dev/null || true
+    rm -r $sop/tmp/$project/* 2>/dev/null || true
 fi
 
-# Start running jobs
-## n_levels of analyses (1=GLO; 2=GLO+REG)?
-n_levels=$(awk -F ";" '$1 == "n_levels" { print $2}' ./settings/settings.csv)
+# Retrieve n_levels and do_proj values from settings.csv
+n_levels=$(get_value "n_levels")  # Number of levels of analyses
+do_proj=$(get_value "do_proj")    # Do future analyses?
 
-## Do future analyses?
-do_proj=$(awk -F ";" '$1 == "do_proj" { print $2}' ./settings/settings.csv)
+# PRE_B Job
+cd $wp/scripts/$project/main
+PRE_B_m=$(get_value "pre_B_m")
+PRE_B_t=$(get_value "pre_B_t")
+PRE_B_c=$(get_value "pre_B_c")
 
-## PRE_B
-cd $wp/scripts/$project/main/0_mainPRE
-sbatch --wait --account=$acc --partition=$part --mem=$pre_B_m --time=$pre_B_t --cpus-per-task=$pre_B_c --ntasks=1 job_pre_B.sh
-echo PRE modelling datasets generated
+pre_B_job() {
+  local job_name="pre_B"
+  local log_dir="./logs"
+  local job_command="export OMP_NUM_THREADS=1; Rscript pre_B.R"
+  mkdir -p "$log_dir"
+  submit_job "$job_name" "$PRE_B_m" "$PRE_B_t" "$PRE_B_c" 1 "$job_command" "" "$log_dir" "$acc"
+}
+cd "$wp/scripts/$project/main/0_mainPRE"
+pre_B_job
 
-## GLO level
-cd $wp/scripts/$project/main/1_mainGLO
-sbatch --wait --account=$acc --partition=$part --mem=$glo_A_m --time=$glo_A_t --cpus-per-task=$glo_A_c --ntasks=1 --array [1-$glo_A_a] job_glo_A.sh
-echo GLO data preparation and covariate selection done
-sbatch --wait --account=$acc --partition=$part --mem=$glo_B_m --time=$glo_B_t --cpus-per-task=$glo_B_c --ntasks=1 --array [1-$glo_B_a] job_glo_B.sh
-echo GLO modelling done
-sbatch --wait --account=$acc --partition=$part --mem=$glo_C_m --time=$glo_C_t --cpus-per-task=$glo_C_c --ntasks=1 --array [1-$glo_C_a] job_glo_C.sh
-echo GLO ensembling done
+# GLOBAL level
+cd "$wp/scripts/$project/main"
+# GLO_A job
+GLO_A_m=$(get_value "glo_A_m")
+GLO_A_t=$(get_value "glo_A_t")
+GLO_A_c=$(get_value "glo_A_c")
+GLO_A_a=$n_spe
 
-if [ $n_levels -gt 1 ]
-then 
-## REG level
-cd $wp/scripts/$project/main/2_mainREG
-sbatch --wait --account=$acc --partition=$part --mem=$reg_A_m --time=$reg_A_t --cpus-per-task=$reg_A_c --ntasks=1 --array [1-$reg_A_a] job_reg_A.sh
-echo REG data preparation and covariate selection done
-sbatch --wait --account=$acc --partition=$part --mem=$reg_B_m --time=$reg_B_t --cpus-per-task=$reg_B_c --ntasks=1 --array [1-$reg_B_a] job_reg_B.sh
-echo REG modelling done
-sbatch --wait --account=$acc --partition=$part --mem=$reg_C_m --time=$reg_C_t --cpus-per-task=$reg_C_c --ntasks=1 --array [1-$reg_C_a] job_reg_C.sh
-echo REG ensembling and scale nesting done
+glo_A_job() {
+  local job_name="glo_A"
+  local log_dir="./logs"
+  local array_flag="[1-$GLO_A_a]"
+  local job_command="export OMP_NUM_THREADS=1; Rscript glo_A.R \$SLURM_ARRAY_TASK_ID"
+  mkdir -p "$log_dir"
+  submit_job "$job_name" "$GLO_A_m" "$GLO_A_t" "$GLO_A_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+}
+
+# GLO_B job
+GLO_B_m=$(get_value "glo_B_m")
+GLO_B_t=$(get_value "glo_B_t")
+GLO_B_c=$(get_value "glo_B_c")
+GLO_B_a=$((n_spe * n_algo))
+
+glo_B_job() {
+  local job_name="glo_B"
+  local log_dir="./logs"
+  local array_flag="[1-$GLO_B_a]"
+  local job_command="export OMP_NUM_THREADS=1; Rscript glo_B.R \$SLURM_ARRAY_TASK_ID"
+  mkdir -p "$log_dir"
+  submit_job "$job_name" "$GLO_B_m" "$GLO_B_t" "$GLO_B_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+}
+
+# GLO_C job
+GLO_C_m=$(get_value "glo_C_m")
+GLO_C_t=$(get_value "glo_C_t")
+GLO_C_c=$(get_value "glo_C_c")
+GLO_C_a=$n_spe
+
+glo_C_job() {
+  local job_name="glo_C"
+  local log_dir="./logs"
+  local array_flag="[1-$GLO_C_a]"
+  local job_command="export OMP_NUM_THREADS=1; Rscript glo_C.R \$SLURM_ARRAY_TASK_ID"
+  mkdir -p "$log_dir"
+  submit_job "$job_name" "$GLO_C_m" "$GLO_C_t" "$GLO_C_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+}
+
+# Run all GLO jobs
+cd "$wp/scripts/$project/main/1_mainGLO"
+glo_A_job
+glo_B_job
+glo_C_job
+
+if [ $n_levels -gt 1 ]; then 
+    ## REGIONAL level
+    cd "$wp/scripts/$project/main"
+    # REG_A job
+    REG_A_m=$(get_value "reg_A_m")
+    REG_A_t=$(get_value "reg_A_t")
+    REG_A_c=$(get_value "reg_A_c")
+    REG_A_a=$n_spe
+
+    reg_A_job() {
+      local job_name="reg_A"
+      local log_dir="./logs"
+      local array_flag="[1-$REG_A_a]"
+      local job_command="export OMP_NUM_THREADS=1; Rscript reg_A.R \$SLURM_ARRAY_TASK_ID"
+      mkdir -p "$log_dir"
+      submit_job "$job_name" "$REG_A_m" "$REG_A_t" "$REG_A_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+    }
+
+    # REG_B job
+    REG_B_m=$(get_value "reg_B_m")
+    REG_B_t=$(get_value "reg_B_t")
+    REG_B_c=$(get_value "reg_B_c")
+    REG_B_a=$((n_spe * n_algo * n_nesting))
+
+    reg_B_job() {
+      local job_name="reg_B"
+      local log_dir="./logs"
+      local array_flag="[1-$REG_B_a]"
+      local job_command="export OMP_NUM_THREADS=1; Rscript reg_B.R \$SLURM_ARRAY_TASK_ID"
+      mkdir -p "$log_dir"
+      submit_job "$job_name" "$REG_B_m" "$REG_B_t" "$REG_B_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+    }
+
+    # REG_C job
+    REG_C_m=$(get_value "reg_C_m")
+    REG_C_t=$(get_value "reg_C_t")
+    REG_C_c=$(get_value "reg_C_c")
+    REG_C_a=$((n_spe * n_nesting))
+
+    reg_C_job() {
+      local job_name="reg_C"
+      local log_dir="./logs"
+      local array_flag="[1-$REG_C_a]"
+      local job_command="export OMP_NUM_THREADS=1; Rscript reg_C.R \$SLURM_ARRAY_TASK_ID"
+      mkdir -p "$log_dir"
+      submit_job "$job_name" "$REG_C_m" "$REG_C_t" "$REG_C_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+    }
+
+    # Run all REG jobs
+	cd "$wp/scripts/$project/main/2_mainREG"
+    reg_A_job
+    reg_B_job
+    reg_C_job
 fi
 
-## FUT projections
-if [ $do_proj = "TRUE" ]
-then
-cd $wp/scripts/$project/main/3_mainFUT
-sbatch --wait --account=$acc --partition=$part --mem=$fut_A_m --time=$fut_A_t --cpus-per-task=$fut_A_c --ntasks=1 --array [1-$fut_A_a] job_fut_A.sh
-echo individual FUT GLO predictions done
-sbatch --wait --account=$acc --partition=$part --mem=$fut_B_m --time=$fut_B_t --cpus-per-task=$fut_B_c --ntasks=1 --array [1-$fut_B_a] job_fut_B.sh
-echo FUT GLO ensembling done
-if [ $n_levels -gt 1 ]
-then
-sbatch --wait --account=$acc --partition=$part --mem=$fut_C_m --time=$fut_C_t --cpus-per-task=$fut_C_c --ntasks=1 --array [1-$fut_C_a] job_fut_C.sh
-echo individual FUT REG predictions done
-sbatch --wait --account=$acc --partition=$part --mem=$fut_D_m --time=$fut_D_t --cpus-per-task=$fut_D_c --ntasks=1 --array [1-$fut_D_a] job_fut_D.sh
-echo FUT REG ensembling and scale nesting done
-fi
+if [ $do_proj = "TRUE" ]; then
+    ## Projections
+    cd "$wp/scripts/$project/main"
+    # FUT_A job
+    FUT_A_m=$(get_value "fut_A_m")
+    FUT_A_t=$(get_value "fut_A_t")
+    FUT_A_c=$(get_value "fut_A_c")
+    FUT_A_a=$((n_spe * n_scenarios))
+
+    fut_A_job() {
+      local job_name="fut_A"
+      local log_dir="./logs"
+      local array_flag="[1-$FUT_A_a]"
+      local job_command="export OMP_NUM_THREADS=1; Rscript fut_A.R \$SLURM_ARRAY_TASK_ID"
+      mkdir -p "$log_dir"
+      submit_job "$job_name" "$FUT_A_m" "$FUT_A_t" "$FUT_A_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+    }
+
+    # FUT_B job
+    FUT_B_m=$(get_value "fut_B_m")
+    FUT_B_t=$(get_value "fut_B_t")
+    FUT_B_c=$(get_value "fut_B_c")
+    FUT_B_a=$n_spe
+
+    fut_B_job() {
+      local job_name="fut_B"
+      local log_dir="./logs"
+      local array_flag="[1-$FUT_B_a]"
+      local job_command="export OMP_NUM_THREADS=1; Rscript fut_B.R \$SLURM_ARRAY_TASK_ID"
+      mkdir -p "$log_dir"
+      submit_job "$job_name" "$FUT_B_m" "$FUT_B_t" "$FUT_B_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+    }
+
+    # Run all FUT jobs
+	cd "$wp/scripts/$project/main/3_mainFUT"
+    fut_A_job
+    fut_B_job
+
+    if [ $n_levels -gt 1 ]; then
+        cd "$wp/scripts/$project/main"
+        # FUT_C job
+        FUT_C_m=$(get_value "fut_C_m")
+        FUT_C_t=$(get_value "fut_C_t")
+        FUT_C_c=$(get_value "fut_C_c")
+        FUT_C_a=$((n_spe * n_nesting * n_scenarios))
+
+        fut_C_job() {
+          local job_name="fut_C"
+          local log_dir="./logs"
+          local array_flag="[1-$FUT_C_a]"
+          local job_command="export OMP_NUM_THREADS=1; Rscript fut_C.R \$SLURM_ARRAY_TASK_ID"
+          mkdir -p "$log_dir"
+          submit_job "$job_name" "$FUT_C_m" "$FUT_C_t" "$FUT_C_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+        }
+
+        # FUT_D job
+        FUT_D_m=$(get_value "fut_D_m")
+        FUT_D_t=$(get_value "fut_D_t")
+        FUT_D_c=$(get_value "fut_D_c")
+        FUT_D_a=$((n_spe * n_nesting))
+
+        fut_D_job() {
+          local job_name="fut_D"
+          local log_dir="./logs"
+          local array_flag="[1-$FUT_D_a]"
+          local job_command="export OMP_NUM_THREADS=1; Rscript fut_D.R \$SLURM_ARRAY_TASK_ID"
+          mkdir -p "$log_dir"
+          submit_job "$job_name" "$FUT_D_m" "$FUT_D_t" "$FUT_D_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+        }
+
+        # Run all FUT jobs
+		cd "$wp/scripts/$project/main/3_mainFUT"
+        fut_C_job
+        fut_D_job
+    fi
 fi
 
-## END analyses
-cd $wp/scripts/$project/main/4_mainEND
-sbatch --wait --account=$acc --partition=$part --mem=$end_A_m --time=$end_A_t --cpus-per-task=$end_A_c --ntasks=1 --array [1-$end_A_a] job_end_A.sh
-echo Final evaluation done
+## END
+cd "$wp/scripts/$project/main"
+END_A_m=$(get_value "end_A_m")
+END_A_t=$(get_value "end_A_t")
+END_A_c=$(get_value "end_A_c")
+END_A_a=$n_spe
+
+end_A_job() {
+  local job_name="end_A"
+  local log_dir="./logs"
+  local array_flag="[1-$END_A_a]"
+  local job_command="export OMP_NUM_THREADS=1; Rscript end_A.R \$SLURM_ARRAY_TASK_ID"
+  mkdir -p "$log_dir"
+  submit_job "$job_name" "$END_A_m" "$END_A_t" "$END_A_c" 1 "$job_command" "$array_flag" "$log_dir" "$acc"
+}
+cd "$wp/scripts/$project/main/4_mainEND"
+end_A_job
+
+# END_B script
 sacct --starttime $dt -u $own --format JobID,JobName,Elapsed,NCPUs,TotalCPU,CPUTime,ReqMem,MaxRSS,MaxDiskRead,MaxDiskWrite,State,ExitCode > $wp/tmp/$project/sacct/"${ssl_id}_${i}_sacct.txt"
-Rscript end_B.R 1>/dev/null 2>&1
-echo Sacct outputs analysis done
-
-# Pre-fill and save ODMAP protocol
-mkdir $wp/tmp/$project/ODMAP 2>/dev/null
-Rscript end_C.R 1>/dev/null 2>&1
-rsync -a $wp/tmp/$project/ODMAP $svp/outputs/$project
-echo ODMAP protocol generated
+Rscript end_B.R >/dev/null 2>&1 || true
+if [[ $? -eq 0 ]]; then
+  echo "END_B achieved successfully."
+else
+  echo "Error: END_B command failed."
+  exit 1
+fi
 
 # Permissions
 chmod -R 777 $wp/scripts/$project/main
 
-# rsync to saving location before cleaning scratch folder
-cd $sop/outputs/$project/
+# Find and sync relevant model files
+cd "$sop/outputs/$project/"
 find d2_models/ -name '*glm.rds' -o -name '*gam.rds' -o -name '*rf.rds' -o -name '*max.rds' -o -name '*gbm.rds' -o -name '*esm.rds' > $wp/tmp/$project/settings/tmp/modfiles.txt
 rsync -a --files-from=$wp/tmp/$project/settings/tmp/modfiles.txt . $svp/outputs/$project
-echo $(awk -F ";" '$1 == "rsync_exclude" { print $2}' $wp/scripts/$project/main/settings/settings.csv) | sed 's/,/\n/g' > $wp/tmp/$project/settings/tmp/exclfiles.txt
+
+# Generate exclusion list and sync excluding files
+echo $(awk -F ";" '$1 == "rsync_exclude" { print $2}' $wp/scripts/$project/main/settings/settings.psv) | sed 's/,/\n/g' > $wp/tmp/$project/settings/tmp/exclfiles.txt
 rsync -a --exclude-from="$wp/tmp/$project/settings/tmp/exclfiles.txt" $sop/outputs/$project/ $svp/outputs/$project
-echo Main outputs sync to saving location
+
+echo "Outputs synced to saving location."
 done
 
-
-echo Finished!
+# Inform that nsdm.sh is completed
+echo "Finished."

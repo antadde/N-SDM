@@ -87,6 +87,7 @@ pseu.abs_i<-nsdm.bigextract(cov=c(gsub(".rds", ".fst", lr_reg), glo_out_f),
 							cov_info=cov_info,
 							t_match=tmatch_reg,
 							tmatch_scheme=tmatch_scheme_reg,
+                                                                                    nzvt=16,
 							ex_pint=FALSE,
 							nsplits=ncores)
 
