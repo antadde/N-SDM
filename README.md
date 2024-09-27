@@ -14,7 +14,7 @@ Prerequisites for running N-SDM include:
 
 2.	availability of the modules (with versions used for N-SDM development) gcc (9.3.0), r (4.0.5), proj (5.2.0), perl (5.32.1), curl (7.76.1), geos (3.8.1) and gdal (2.4.4)
 
-3.	a clone of the N-SDM/N-SDM GitHub repository in the working directory `git clone --branch v1.0.3 https://github.com/N-SDM/N-SDM.git`
+3.	a clone of the N-SDM/N-SDM GitHub repository in the working directory `git clone https://github.com/N-SDM/N-SDM.git .`
 
 4.	an installation of the nsdm R package `remotes::install_github("N-SDM/N-SDM/scripts/nsdm-project/functions", upgrade=FALSE)`
 
