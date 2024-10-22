@@ -1,5 +1,6 @@
 parameter|value|group|details
 project|nsdm-project|0_global|name of the N-SDM project
+new_sess|TRUE|is this a new N-SDM session? (if FALSE, allows to skip the steps already done)
 w_path|/work/FAC/FBM/DEE/aguisan/4c/N-SDM_FUTEI/|0_global|path to working directory
 scr_path|/work/FAC/FBM/DEE/aguisan/4c/N-SDM_FUTEI/scratch/|0_global|path to scratch directory
 svp_path|/work/FAC/FBM/DEE/aguisan/4c/N-SDM_FUTEI/save/|0_general|path to saving directory
