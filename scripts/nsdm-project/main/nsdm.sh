@@ -199,10 +199,6 @@ rm "$wp/scripts/$project/main/0_mainPRE/logs/"*.err 2>/dev/null || true
 rm "$wp/scripts/$project/main/0_mainPRE/logs/"*.out 2>/dev/null || true
 fi
 
-
-# Display welcome message with project and session ID
-echo "Welcome to this new $project run, Session ID: $ssl_id"
-
 # PRE_A Job
 PRE_A_m=$(get_value "pre_A_m")  # Memory
 PRE_A_t=$(get_value "pre_A_t")  # Time
@@ -213,19 +209,23 @@ local job_name="pre_A_${ssl_id}"   # Use session ID for uniqueness
 local log_dir="./0_mainPRE/logs"
 local job_command="export OMP_NUM_THREADS=1; Rscript ./0_mainPRE/pre_A.R"
 
-# Check if pre_A has already been completed
+# Check if the job has already been completed
 if job_completed "$job_name"; then
-return 0  # Skip the job if it has been completed
+echo "$job_name has already been completed. Skipping..."
+return 0
 fi
+
+# Create logs directory if it doesn't exist
+mkdir -p "$log_dir"
 
 # Submit the job
 submit_job "$job_name" "$PRE_A_m" "$PRE_A_t" "$PRE_A_c" 1 "$job_command" "" "$log_dir"
 
-# Mark pre_A as completed if the job was successful
+# Check if the job was successful
 if [ $? -eq 0 ]; then
-create_checkpoint "$job_name" 1 "$ssl_id"  # Store a checkpoint with session ID
+create_checkpoint "$job_name"  # Mark as completed
 else
-echo "Error: $job_name submission failed."
+echo "Error in job: $job_name"
 exit 1
 fi
 }
@@ -683,20 +683,34 @@ fi
 cd "$wp/scripts/$project/main/4_mainEND"
 end_A_job
 
-# Permissions
-chmod -R 777 $wp/scripts/$project/main
+# Permissions and files sync
+job_name="sync_files_${ssl_id}_${i}"
 
-# Find and sync relevant model files
-cd "$sop/outputs/$project/"
-find d2_models/ -name '*glm.rds' -o -name '*gam.rds' -o -name '*rf.rds' -o -name '*max.rds' -o -name '*gbm.rds' -o -name '*esm.rds' > $wp/tmp/$project/settings/tmp/modfiles.txt
-rsync -a --files-from=$wp/tmp/$project/settings/tmp/modfiles.txt . $svp/outputs/$project
+# Check if the job has already been completed
+if job_completed "$job_name"; then 
+    echo "Job $job_name has already been completed. Skipping..."
+else
+    echo "Starting job $job_name..."
 
-# Generate exclusion list and sync excluding files
-echo $(awk -F ";" '$1 == "rsync_exclude" { print $2}' $wp/scripts/$project/main/settings/settings.psv) | sed 's/,/\n/g' > $wp/tmp/$project/settings/tmp/exclfiles.txt
-rsync -a --exclude-from="$wp/tmp/$project/settings/tmp/exclfiles.txt" $sop/outputs/$project/ $svp/outputs/$project
+    # Permissions
+    chmod -R 777 "$wp/scripts/$project/main"
 
-echo "Outputs synced to saving location."
+    # Find and sync relevant model files
+    cd "$sop/outputs/$project/"
+    find d2_models/ -name '*glm.rds' -o -name '*gam.rds' -o -name '*rf.rds' -o -name '*max.rds' -o -name '*gbm.rds' -o -name '*esm.rds' > "$wp/tmp/$project/settings/tmp/modfiles.txt"
+    rsync -a --files-from="$wp/tmp/$project/settings/tmp/modfiles.txt" . "$svp/outputs/$project"
+
+    # Generate exclusion list and sync excluding files
+    awk -F ";" '$1 == "rsync_exclude" { print $2 }' "$wp/scripts/$project/main/settings/settings.csv" | sed 's/,/\n/g' > "$wp/tmp/$project/settings/tmp/exclfiles.txt"
+    rsync -a --exclude-from="$wp/tmp/$project/settings/tmp/exclfiles.txt" "$sop/outputs/$project/" "$svp/outputs/$project"
+
+    echo "Outputs synced to saving location."
+
+    # Create a checkpoint after successful completion
+    create_checkpoint "$job_name"
+fi
+
 done
 
 # Inform that nsdm.sh is completed
-echo "NSDM run completed."
+echo "NSDM completed."
