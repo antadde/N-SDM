@@ -21,7 +21,7 @@ fi
 # Set trap to call the cleanup function on script exit
 trap cleanup EXIT
 
-# Function to retrieve values from the settings.csv file
+# Function to retrieve values from the settings.psv file
 get_value() {
 local key=$1
 awk -F ";" -v search_key="$key" '$1 == search_key { print $2 }' ./settings/settings.psv
@@ -124,7 +124,7 @@ module load "$(get_value "module_gdal")"
 
 echo "Modules loaded successfully."
 
-# Retrieve main paths from settings.csv
+# Retrieve main paths from settings.psv
 echo "Retrieving main paths..."
 wp=$(get_value "w_path")    # Working path
 sop=$(get_value "scr_path")  # Scratch output path
@@ -136,7 +136,7 @@ echo "Retrieving project name..."
 project=$(get_value "project")
 echo "Project name: $project"
 
-# General definitions from settings.csv
+# General definitions from settings.psv
 echo "Retrieving general HPC definitions..."
 own=$(get_value "sess_own")  # Session account
 acc=$(get_value "account")   # HPC account
@@ -299,7 +299,7 @@ rm -r $sop/outputs/$project/* 2>/dev/null || true
 rm -r $sop/tmp/$project/* 2>/dev/null || true
 fi
 
-# Retrieve n_levels and do_proj values from settings.csv
+# Retrieve n_levels and do_proj values from settings.psv
 n_levels=$(get_value "n_levels")  # Number of levels of analyses
 do_proj=$(get_value "do_proj")    # Do future analyses?
 
@@ -701,7 +701,7 @@ else
     rsync -a --files-from="$wp/tmp/$project/settings/tmp/modfiles.txt" . "$svp/outputs/$project"
 
     # Generate exclusion list and sync excluding files
-    awk -F ";" '$1 == "rsync_exclude" { print $2 }' "$wp/scripts/$project/main/settings/settings.csv" | sed 's/,/\n/g' > "$wp/tmp/$project/settings/tmp/exclfiles.txt"
+    awk -F ";" '$1 == "rsync_exclude" { print $2 }' "$wp/scripts/$project/main/settings/settings.psv" | sed 's/,/\n/g' > "$wp/tmp/$project/settings/tmp/exclfiles.txt"
     rsync -a --exclude-from="$wp/tmp/$project/settings/tmp/exclfiles.txt" "$sop/outputs/$project/" "$svp/outputs/$project"
 
     echo "Outputs synced to saving location."
