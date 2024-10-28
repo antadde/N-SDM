@@ -24,7 +24,7 @@ trap cleanup EXIT
 # Function to retrieve values from the settings.psv file
 get_value() {
 local key=$1
-awk -F ";" -v search_key="$key" '$1 == search_key { print $2 }' ./settings/settings.psv
+awk -F "|" -v search_key="$key" '$1 == search_key { print $2 }' ./settings/settings.psv
 }
 
 # Function to submit jobs
