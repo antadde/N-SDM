@@ -70,99 +70,122 @@ nsdm.covinfo(cov_path=cov_path, save_path=paste0(w_path,"scripts/",project,"/mai
 			 
 cov_info<-read_excel(paste0(w_path,"scripts/", project, "/main/settings/predictors-available.xlsx"))
 			 
-# Rewrite glo rasters masked with mask_reg if not already done
-lr_glo<-cov_info$file[cov_info$level=="glo"]
-if(n_levels>1){
-if(length(grep("msk", lr_glo)) != length(lr_glo)/2){
-msk_reg<-readRDS(mask_reg)
-for(m in lr_glo){
-r<-readRDS(m)
-r_msk<-raster::mask(r, msk_reg, inverse=TRUE)
-saveRDS(r_msk, gsub(".rds", "_msk.rds", m, fixed=T))
-nsdm.covinfo(cov_path=cov_path, save_path=paste0(w_path,"scripts/",project,"/main/settings/"),
-             time_cov=cov_time, focal_cov=cov_focal)			 
-cov_info<-read_excel(paste0(w_path,"scripts/", project, "/main/settings/predictors-available.xlsx"))
-}
-}
+# Rewrite global rasters masked with mask_reg if not already done
+lr_glo <- cov_info$file[cov_info$level == "glo" & cov_info$period == "present"]
+
+if (n_levels > 1) {
+# Identify files that are already masked (ending with "_msk.rds")
+  msk_files <- grep("_msk\\.rds$", lr_glo, value = TRUE)
+  
+  # Identify files that are not masked (do not have a corresponding "_msk.rds" file)
+  non_msk_elements <- lr_glo[!lr_glo %in% msk_files & !file.exists(sub(".rds$", "_msk.rds", lr_glo))]
+  
+  # Mask only the files that haven't been processed
+  if (length(non_msk_elements) > 0) {
+    msk_reg <- readRDS(mask_reg)
+    
+    for (m in non_msk_elements) {
+      print(paste("Processing:", m))
+      r <- readRDS(m)
+      crs(r) <- crs(msk_reg)
+      r_msk <- readAll(raster::mask(r, msk_reg, inverse = TRUE))
+      saveRDS(r_msk, gsub(".rds", "_msk.rds", m, fixed = TRUE))
+    }
+    
+    # Reload and update covariate information
+    cov_info <- read_excel(paste0(w_path, "scripts/", project, "/main/settings/predictors-available.xlsx"))
+    nsdm.covinfo(
+      cov_path = cov_path,
+      save_path = paste0(w_path, "scripts/", project, "/main/settings/"),
+      time_cov = cov_time,
+      focal_cov = cov_focal
+    )
+  } else {
+    message("All files are already masked.")
+  }
 }
 
-# list availabe covariates
-if(n_levels>1){
-lr_glo<-cov_info$file[cov_info$level=="glo" & cov_info$attribute=="msk"]
+# List available covariates
+lr_glo <- if (n_levels > 1) {
+  cov_info$file[cov_info$level == "glo" & cov_info$attribute == "msk"]
 } else {
-lr_glo<-cov_info$file[cov_info$level=="glo"]
+  cov_info$file[cov_info$level == "glo"]
 }
-if(n_levels>1){lr_reg<-cov_info$file[cov_info$level=="reg"]
-lr<-c(lr_glo, lr_reg)
-} else {
-lr<-lr_glo}
 
-# Create fst versions 
+lr <- if (n_levels > 1) {
+  lr_reg <- cov_info$file[cov_info$level == "reg"]
+  c(lr_glo, lr_reg)
+} else {
+  lr_glo
+}
+
+# Create FST versions
 threads_fst(nr_of_threads = 1)
 
-# if not already done: check if fst version exists
-k<-sapply(lr, function(f){file.exists(gsub(".rds", ".fst", f, fixed=T))})
-lr2fst<-lr[!k]
+# Check if FST versions already exist
+k <- sapply(lr, function(f) file.exists(gsub(".rds", ".fst", f, fixed = TRUE)))
+lr2fst <- lr[!k]
 
-# otherwise do it now
-if(length(lr2fst) > 0){
-pp<-mclapply(lr2fst, function(c){
-r<-readRDS(c)
-r_df<-as.data.frame(r)
-write.fst(r_df, gsub(".rds", ".fst", c, fixed=T), 75)
-names(r)
-}, mc.cores=ncores)}
-
-# Check for incomplete fst conversions (less than half of the orginal size)
-fst_sz<-sapply(lr, function(f){
-file.size(gsub(".rds", ".fst", f, fixed=T)) < file.size(f)/2
-})
-if(TRUE %in% fst_sz){
-lr2fst<-names(fst_sz[which(fst_sz)])
-pp<-mclapply(lr2fst, function(c){
-r<-readRDS(c)
-r_df<-as.data.frame(r)
-write.fst(r_df, gsub(".rds", ".fst", c, fixed=T), 75)
-names(r)
-}, mc.cores=ncores)
+# Create missing FST files
+if (length(lr2fst) > 0) {
+  mclapply(lr2fst, function(c) {
+    r <- readRDS(c)
+    r_df <- as.data.frame(r)
+    write.fst(r_df, gsub(".rds", ".fst", c, fixed = TRUE), 75)
+	invisible(NULL)
+  }, mc.cores = ncores)
 }
 
+# Check for incomplete FST conversions (less than half the original size)
+fst_sz <- sapply(lr, function(f) {
+  file.size(gsub(".rds", ".fst", f, fixed = TRUE)) < file.size(f) / 2
+})
+
+if (any(fst_sz)) {
+  lr2fst <- names(fst_sz[fst_sz])
+  mclapply(lr2fst, function(c) {
+    r <- readRDS(c)
+    r_df <- as.data.frame(r)
+    write.fst(r_df, gsub(".rds", ".fst", c, fixed = TRUE), 75)
+    invisible(NULL)
+  }, mc.cores = ncores)
+}
 
 # Create regional and global reference rasters
-## for glo if bioclim layer available use it; else first one
-if(length(grep("bio1", lr_glo, value=T))>0){
-rst_glo<-readRDS(grep("bio1", lr_glo, value=T)[1])
-}else{
-rst_glo<-readRDS(lr_glo[1])}
+## Global: Use bioclim layer if available, else use the first one
+rst_glo <- if (length(grep("bio1", lr_glo, value = TRUE)) > 0) {
+  readRDS(grep("bio1", lr_glo, value = TRUE)[1])
+} else {
+  readRDS(lr_glo[1])
+}
 
-## for reg if bioclim layer available use it; else first one
-if(n_levels>1){
-if(length(grep("bio1", lr_reg, value=T))>0){
-rst_reg<-readRDS(grep("bio1", lr_reg, value=T)[1])
-}else{
-rst_reg<-readRDS(lr_reg[1])}
+## Regional: Use bioclim layer if available, else use the first one
+if (n_levels > 1) {
+  rst_reg <- if (length(grep("bio1", lr_reg, value = TRUE)) > 0) {
+    readRDS(grep("bio1", lr_reg, value = TRUE)[1])
+  } else {
+    readRDS(lr_reg[1])
+  }
 }
 
 # Save covariate data settings
-## reference rasters
-if(n_levels>1){
-l<-list(rst_reg=rst_reg, rst_glo=rst_glo)
+## Reference rasters
+l <- if (n_levels > 1) {
+  list(rst_reg = rst_reg, rst_glo = rst_glo)
 } else {
-l<-list(rst_glo=rst_glo)}
+  list(rst_glo = rst_glo)
+}
+saveRDS(l, paste0(w_path, "tmp/", project, "/settings/ref-rasters.rds"))
 
-saveRDS(l,  
-        paste0(w_path,"tmp/",project,"/settings/ref-rasters.rds"))
-		
-## covariates list and info
-if(n_levels>1){
-l2<-list(lr_reg=lr_reg, lr_glo=lr_glo, cov_info=cov_info)
+## Covariates list and info
+l2 <- if (n_levels > 1) {
+  list(lr_reg = lr_reg, lr_glo = lr_glo, cov_info = cov_info)
 } else {
-l2<-list(lr_glo=lr_glo, cov_info=cov_info)}
+  list(lr_glo = lr_glo, cov_info = cov_info)
+}
+saveRDS(l2, paste0(w_path, "tmp/", project, "/settings/covariates-list.rds"))
 
-saveRDS(l2, 
-        paste0(w_path,"tmp/",project,"/settings/covariates-list.rds"))
-
-print(paste0("Covariate settings defined"))
+print("Covariate settings defined")
 
 ### =========================================================================
 ### C- Refine the list of species to be modelled

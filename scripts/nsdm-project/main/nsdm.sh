@@ -192,14 +192,14 @@ echo "Setting permissions for project directories..."
 chmod -R 777 "$wp/data/$project" 2>/dev/null || true
 chmod -R 777 "$wp/scripts/$project" 2>/dev/null || true
 chmod -R 777 "$wp/tmp/$project" 2>/dev/null || true
+
+echo "Cleaning existing log files from mainPRE..."
+rm "$wp/scripts/$project/main/0_mainPRE/logs/"*.err 2>/dev/null || true
+rm "$wp/scripts/$project/main/0_mainPRE/logs/"*.out 2>/dev/null || true
 fi
 
 # PRE_A Job
 # Clean up old log files from the mainPRE script if they exist
-echo "Cleaning existing log files from mainPRE..."
-rm "$wp/scripts/$project/main/0_mainPRE/logs/"*.err 2>/dev/null || true
-rm "$wp/scripts/$project/main/0_mainPRE/logs/"*.out 2>/dev/null || true
-
 PRE_A_m=$(get_value "pre_A_m")  # Memory
 PRE_A_t=$(get_value "pre_A_t")  # Time
 PRE_A_c=$(get_value "pre_A_c")  # Cores
@@ -290,13 +290,12 @@ find "$dir" -type f -name "$pattern" -exec rm -f {} \; 2>/dev/null || true
 done
 done
 
-
 # Clean scratch output folder if requested
 clear_sop=$(get_value "clear_sop")
-if [ "$clear_sop" = "TRUE" ]; then
+if [ "$clear_sop" = "TRUE" ] && [ "$new_sess" = "TRUE" ]; then
 echo "Clearing scratch output and temporary directories..."
-rm -r $sop/outputs/$project/* 2>/dev/null || true
-rm -r $sop/tmp/$project/* 2>/dev/null || true
+rm -r "$sop/outputs/$project/*" 2>/dev/null || true
+rm -r "$sop/tmp/$project/*" 2>/dev/null || true
 fi
 
 # Retrieve n_levels and do_proj values from settings.psv
