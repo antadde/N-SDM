@@ -268,16 +268,9 @@ if (n_levels > 1) {
 # F.4 Save Results
 pseu.abs_i_glo@env_vars <- cov.embed_i$covdata
 
-nsdm.savethis(
-  object = list(
-    pseu.abs_i = pseu.abs_i_glo, 
-    filter = names(cov.filter_i), 
-    embed = cov.embed_i, 
-    covstk = stk
-  ),
-  species_name = ispi_name,
-  save_path = paste0(scr_path, "/outputs/", project, "/d1_covsels/glo")
-)
+nsdm.savethis(object=list(pseu.abs_i=pseu.abs_i_glo, filter=names(cov.filter_i), embed=cov.embed_i, covstk=stk),
+              species_name=ispi_name,
+              save_path=paste0(scr_path,"/outputs/",project,"/d1_covsels/glo"))
 
 cat("Covariate selection completed successfully.\n")
 cat("Finished.\n")
