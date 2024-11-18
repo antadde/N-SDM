@@ -98,7 +98,7 @@ nsdm.flex3<-function(x=numeric(),
   mod_args_j@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])%in% c("Presence", "X", "Y"))]), 
                                        label = lis$train[[x]][,"Presence"])}  
   modi<-do.call(mod_args_j@mod,mod_args_j@args)
-  saveRDS.lgb.Booster(modi, paste0(tmp_path_gbm,"/",taxon,"_rep",x,"_mod",j,"_",level,".rds"))}
+  lgb.save(modi, paste0(tmp_path_gbm,"/",taxon,"_rep",x,"_mod",j,"_",level,".rds"))}
   
   ### GLM or GAM
   if(mod_args_j@mod %in% c("glm", "mgcv_gam", "mgcv_fx", "esm")){

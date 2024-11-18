@@ -96,7 +96,7 @@ tmp_path_gbm<-paste0(scr_path,"/tmp/",project,"/gbm")
 pred<-list()
 for(k in 1:outerloop){
 if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
-mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
+mod_m$m@fits[[modinp_top_n]][[k]]<-lgb.load(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
 testa_GLO[[k]]<- testa_GLO[[k]][,-which(colnames(testa_GLO[[k]]) %in% c("X","Y"))]}
 if("try-error" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 pred_i<-rep(NA, nrow(testa_GLO[[k]]))
@@ -171,7 +171,7 @@ pred<-list()
 glo_prob<-list(); glo_out<-readRDS(list.files(paste0(scr_path,"outputs/",project,"/d8_ensembles/glo/", ispi_name), pattern=".rds", full.names=T))
 for(k in 1:outerloop){
 if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
-mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
+mod_m$m@fits[[modinp_top_n]][[k]]<-lgb.load(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
 testa_REG_multiply[[k]]<- testa_REG_multiply[[k]][,-which(colnames(testa_REG_multiply[[k]]) %in% c("X","Y"))]}
 if("try-error" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 pred_i<-rep(NA, nrow(testa_REG_multiply[[k]]))
@@ -249,7 +249,7 @@ tmp_path_gbm<-paste0(scr_path,"/tmp/",project,"/gbm")
 pred<-list()
 for(k in 1:outerloop){
 if("lgb.Booster" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
-mod_m$m@fits[[modinp_top_n]][[k]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
+mod_m$m@fits[[modinp_top_n]][[k]]<-lgb.load(paste0(tmp_path_gbm, "/", ispi_name,"_rep",k,"_mod",gsub(".*-","",modinp_top_n),"_",level,".rds"))
 testa_REG_covariate[[k]]<- testa_REG_covariate[[k]][,-which(colnames(testa_REG_covariate[[k]]) %in% c("X","Y"))]}
 if("try-error" %in% class(mod_m$m@fits[[modinp_top_n]][[k]])){
 pred_i<-rep(NA, nrow(testa_REG_covariate[[k]]))

@@ -101,7 +101,7 @@ nsdm.evaluate3<-function(x,tester=data.frame(),thres=numeric(),crit="pp=op",prev
   
   # Make predictions
    if("lgb.Booster" %in% class(fit_j[[g]])){
-   fit_j[[g]]<-readRDS.lgb.Booster(paste0(tmp_path_gbm, "/", taxon,"_rep",g,"_mod",j,"_",level,".rds"))
+   fit_j[[g]]<-lgb.load(paste0(tmp_path_gbm, "/", taxon,"_rep",g,"_mod",j,"_",level,".rds"))
    testa[[g]]<- testa[[g]][,-which(colnames(testa[[g]]) %in% c("X","Y"))]}
    
    pred=nsdm.prd(fit_j[[g]], testa[[g]])

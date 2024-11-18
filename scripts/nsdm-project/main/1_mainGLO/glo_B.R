@@ -148,7 +148,7 @@ suppressWarnings(nsdm.savethis(object=prmod,
 			     compression=TRUE,
                  save_path=paste0(scr_path,"/outputs/",project,"/d2_models/glo")))
 			  
-if(model_name=="gbm") saveRDS.lgb.Booster(prmod@fits[[1]][[1]], paste0(scr_path,"/outputs/",project,"/d2_models/glo/",ispi_name,"/gbm/",ispi_name,"_",model_name,".rds"))
+if(model_name=="gbm") lgb.save(prmod@fits[[1]][[1]], paste0(scr_path,"/outputs/",project,"/d2_models/glo/",ispi_name,"/gbm/",ispi_name,"_",model_name,".rds"))
 	
 							  
 cat(paste0('Top model ',names(modinp_top), ' refitted on full dataset for predictions \n'))

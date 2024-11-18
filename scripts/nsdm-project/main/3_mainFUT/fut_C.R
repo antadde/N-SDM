@@ -73,7 +73,7 @@ prmod<-nsdm.loadthis(model_name=model_name, species_name=ispi_name,
 
 # Specific loading strategy for lgb.booster			  
 if("lgb.Booster" %in% class(prmod)){
-prmod<-readRDS.lgb.Booster(paste0(scr_path,"/outputs/",project,"/d2_models/reg/",nesting_method,"/",ispi_name,"/gbm/",ispi_name,"_gbm.rds"))
+prmod<-lgb.load(paste0(scr_path,"/outputs/",project,"/d2_models/reg/",nesting_method,"/",ispi_name,"/gbm/",ispi_name,"_gbm.rds"))
 prmod2<-prmod
 prmod<-nsdm.loadthis(model_name="glm", species_name=ispi_name,
               read_path=paste0(scr_path,"/outputs/",project,"/d2_models/reg/",nesting_method))

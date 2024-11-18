@@ -118,9 +118,26 @@ dir.create(tmp_path_gbm, recursive=TRUE)
 
 for(p in 1:nrow(params_gbm)){
 param_gbm<-params_gbm[p,]
-multi_gbm<-nsdm.multi("lgb.train",list(num_leaves=2^as.numeric(param_gbm$max_depth)-1, min_data_in_leaf=as.numeric(param_gbm$min_data_in_leaf), max_depth=as.numeric(param_gbm$max_depth), objective="binary",
-                                   learning_rate=as.numeric(param_gbm$learning_rate), num_iterations=as.numeric(param_gbm$num_iterations), verbose=-10),
-                                   weight=weighting, tag=paste0("gbm-",p))
+#multi_gbm<-nsdm.multi("lgb.train",list(num_leaves=2^as.numeric(param_gbm$max_depth)-1, min_data_in_leaf=as.numeric(param_gbm$min_data_in_leaf), max_depth=as.numeric(param_gbm$max_depth), objective="binary",
+#                                   learning_rate=as.numeric(param_gbm$learning_rate), num_iterations=as.numeric(param_gbm$num_iterations), verbose=-10),
+#                                   weight=weighting, tag=paste0("gbm-",p))						   
+multi_gbm <- nsdm.multi(
+  "lgb.train",
+  list(
+    params = list(
+      num_leaves = 2^as.numeric(param_gbm$max_depth) - 1,
+      min_data_in_leaf = as.numeric(param_gbm$min_data_in_leaf),
+      max_depth = as.numeric(param_gbm$max_depth),
+      objective = "binary",
+      learning_rate = as.numeric(param_gbm$learning_rate)
+    ),
+    nrounds = as.numeric(param_gbm$num_iterations),
+    verbose = -10
+  ),
+  weight = weighting,
+  tag = paste0("gbm-", p)
+)
+
 modinp<-append(modinp, multi_gbm)
 }
 }
