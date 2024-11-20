@@ -118,5 +118,5 @@ nsdm.covinfo <- function(
   
   # Save covariate table
   row.names(pred_table) <- NULL
-  fwrite(pred_table, file.path(save_path, "predictors_available.csv"))
+fwrite(pred_table, file.path(save_path, "predictors_available.psv"), sep = "|")
 }
