@@ -2,15 +2,15 @@
 #'
 #' Generate Covariate Information Table
 #'
-#' This function generates a covariate information table in `.xlsx` format based on the provided covariate paths and names.
+#' This function generates a covariate information table in `.psv` format based on the provided covariate paths and names.
 #'
 #' @param cov_path A character string specifying the root directory where covariates are stored.
-#' @param save_path A character string specifying the destination path to save the `.xlsx` covariate information table.
+#' @param save_path A character string specifying the destination path to save the `.psv` covariate information table.
 #' @param time_cov A character vector specifying the categories or datasets that include temporally dynamic covariates.
 #' @param focal_cat A character vector specifying the categories or datasets that include covariates with focal statistics.
 #'
-#' @return An `.xlsx` file containing the covariate information table.
-#' @details This function processes the covariate paths to identify dynamic and focal covariates, and saves the resulting information table in Excel format.
+#' @return An `.psv` file containing the covariate information table.
+#' @details This function processes the covariate paths to identify dynamic and focal covariates, and saves the resulting information table in psv format.
 #'
 #' @export
 #' @author Antoine Adde
@@ -34,7 +34,7 @@ nsdm.covinfo <- function(
   
   # List all available layers and extract their information
   setwd(cov_path)
-  full_pred_list <- system(paste("find -L", cov_path, "-type f -name '*.tif'"), intern = TRUE)
+  full_pred_list <- system(paste("find -L", cov_path, "-type f \\( -name '*.tif' -o -name '*.rds' \\)"), intern = TRUE)
   pred_list <- gsub(cov_path, "", full_pred_list)
   pred_list <- gsub("^/", "", pred_list)
 
@@ -88,13 +88,13 @@ nsdm.covinfo <- function(
       
       # Extract variable and attribute
       pred_table$variable[i] <- split[length(split) - 1]
-      pred_table$attribute[i] <- str_match(pred_list[i], paste0(pred_table$variable[i], "_\\s*(.*?)\\s*.tif"))[2]
+      pred_table$attribute[i] <- str_match(pred_list[i], paste0(pred_table$variable[i], "_\\s*(.*?)\\s*\\.(tif|rds)$"))[2]
       
     } else {
       # Static covariates
       pred_table$period[i] <- "present"
       pred_table$variable[i] <- split[length(split) - 1]
-      pred_table$attribute[i] <- str_match(pred_list[i], paste0("_", pred_table$variable[i], "_\\s*(.*?)\\s*.tif"))[2]
+      pred_table$attribute[i] <- str_match(pred_list[i], paste0("_", pred_table$variable[i], "_\\s*(.*?)\\s*\\.(tif|rds)$"))[2]
     }
     
     # Add focal statistics if applicable
