@@ -15,26 +15,37 @@ nsdm.disaggregate(
 )
 }
 \arguments{
-\item{pres}{Data.frame containing species occurence data with key columns "species" (taxon name), "year" (observation year), "uncertainty" (coordinate uncertainty)}
+\item{pres}{A \code{data.frame} containing species occurrence data with the following key columns:
+\itemize{
+\item \code{species}: Taxon name.
+\item \code{X} and \code{Y}: Coordinates.
+\item \code{year}: Observation year.
+\item \code{uncertainty}: Coordinate uncertainty (in meters or another unit consistent with \code{max_uncertain}).
+}}
 
-\item{rst}{Reference raster used in subsequent analyses}
+\item{rst}{A reference \verb{Raster*} object used in subsequent analyses. Defines the spatial resolution and extent for the disaggregation.}
 
-\item{thindist}{Distance (numeric; in rst units) used for spatial disaggregation (minimal distance between two occurences)}
+\item{thindist}{A numeric value specifying the minimum spatial distance (in the units of \code{rst}) between two occurrences for spatial disaggregation.}
 
-\item{thinyear}{Time period (numeric; in years) used for temporal disaggregation (minimal number of years between two occurences at same pixel)}
+\item{thinyear}{A numeric value specifying the minimum temporal separation (in years) between two occurrences at the same raster pixel.}
 
-\item{max_uncertain}{Maximum coordinate uncertainty (numeric; in "uncertainty unit) for an occurence to be retained in the modelling set}
+\item{max_uncertain}{A numeric value specifying the maximum allowable coordinate uncertainty for an occurrence to be retained in the modeling dataset.}
 
-\item{min_occ}{Minimal number of occurences (numeric) required for a species to be modelled}
+\item{min_occ}{A numeric value specifying the minimum number of occurrences required for a species to be included in the modeling dataset.}
 
-\item{ncores}{Number of cores (numeric) used during parallel operations}
+\item{ncores}{A numeric value specifying the number of cores to use for parallel operations during disaggregation.}
 }
 \value{
-An updated Spatial point dataframe object with disaggregated species occurence data
+A \code{sf} object containing the updated and disaggregated species occurrence data.
 }
 \description{
-Spatiotemporal disaggregation of species data
+Spatiotemporal Disaggregation of Species Data
+}
+\details{
+This function performs spatiotemporal disaggregation of species occurrence data by ensuring a minimum distance between occurrences in space and time, removing records with high coordinate uncertainty, and filtering species with insufficient occurrences for modeling.
+
+The function ensures that species occurrences meet the specified spatial and temporal separation criteria. It also removes occurrences with high coordinate uncertainty and filters out species that do not meet the minimum occurrence threshold. The function is optimized for parallel processing when \code{ncores} is greater than 1.
 }
 \author{
-Antoine Adde (aadde@unil.ch)
+Antoine Adde (antoine.adde@eawag.ch)
 }
