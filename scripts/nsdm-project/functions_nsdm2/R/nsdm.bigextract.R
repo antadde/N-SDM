@@ -23,15 +23,15 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
   pa<-data@pa
   years<-data@years
   
-  # Isolate fst and rds covariates
-  cov_rds<-cov[grep(".rds", cov)] # should only be mainGLO
+  # Isolate fst and tif covariates
+  cov_tif<-cov[grep(".tif", cov)] # should only be mainGLO
   cov_fst<-cov[grep(".fst", cov)] 
 
   ### ------------------------
   ### Arrange layers for temporal matching or not
   ### ------------------------
   # Retrieve cov-info table
-  cov_info_fst<-data.frame(cov_info[match(gsub(".fst","",basename(cov_fst)), gsub(".rds","",basename(cov_info$file))),])
+  cov_info_fst<-data.frame(cov_info[match(gsub(".fst","",basename(cov_fst)), gsub(".tif","",basename(cov_info$file))),])
   if(length(which(is.na(cov_info_fst$variable)==TRUE))>0) cov_info_fst<-cov_info_fst[-which(is.na(cov_info_fst$variable)),]
   times<-cov_info_fst[,c("start_year", "end_year", "variable", "dataset")]
   times[,1:2] <- lapply(times[,1:2], function(x) as.numeric(as.character(x)))
@@ -205,10 +205,10 @@ env_vars<-env_vars[,-which(apply(env_vars, 2, function(x) length(unique(x)))<nzv
 ### ------------------------
 ### Extract mainGLO
 ### ------------------------
-if(length(cov_rds)>0){
+if(length(cov_tif)>0){
 cells<-cellFromXY(rst_ref, xy)
-l<-readRDS(cov_rds)
-r<-raster::as.data.frame(l)
+l<-rast(cov_tif)
+r<-as.data.frame(l)
 xt_glo<-data.frame(r[cells,1])
 names(xt_glo)<-names(r)
 env_vars<-cbind(env_vars, xt_glo)
