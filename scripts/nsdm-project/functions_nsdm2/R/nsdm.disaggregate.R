@@ -42,6 +42,7 @@ if (!"year" %in% names(pres)) {
 }
 
 # Prepare reference raster with target resolution for spatial disaggregation
+terraOptions(progress = 0)  # Suppress progress output
 fact=round(thindist / res(rst)[1])
 rstthin <- terra::aggregate(rst, fact = fact)
 
