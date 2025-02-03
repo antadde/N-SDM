@@ -290,7 +290,10 @@ if (!is.null(env_vars) && ncol(env_vars) > 0) {
 }
 
 # Identify unmatched layers from cov_info
-filtered_out_layers$unmatched_covariates <- setdiff(gsub("\\.tif$", "", basename(cov_info$file)), colnames(env_vars))
+filtered_out_layers$unmatched_covariates <- setdiff(
+  gsub("_msk$", "", gsub("\\.tif$", "", basename(cov_info$file))),  # Remove ".tif" and "_msk"
+  colnames(env_vars)  # Existing covariate names
+)
 
 ### ------------------------
 ### Extract mainGLO
