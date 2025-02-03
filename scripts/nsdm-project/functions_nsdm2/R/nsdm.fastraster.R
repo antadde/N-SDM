@@ -1,21 +1,25 @@
 #' nsdm.fastraster
 #'
-#' Parallel loading of raster data
+#' Parallelized loading of raster datasets using multiple cores.
 #'
-#' @param files A character vector containing paths to individual raster layers
-#' @param nsplits Number of cores (numeric) to be used during parallel loading
+#' @param files A character vector containing file paths to raster layers (`.tif`).
+#' @param nsplits A numeric value specifying the number of CPU cores to use for parallel loading. 
+#'   Defaults to `parallel::detectCores() - 1` if NULL.
 #'
-#' @return A raster stack
-#' @author Antoine Adde (aadde@unil.ch)
+#' @return A `SpatRaster`.
+#' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
 nsdm.fastraster <- function(files, nsplits=parallel::detectCores()-1){
 
 ix<-splitIndices(length(files), nsplits)
 
-stk<-mclapply(ix, function(x){lapply(files[x],readRDS)}, mc.cores = nsplits) 
+stk<-mclapply(ix, function(x){lapply(files[x], rast)}, mc.cores = nsplits) 
 
-stk2<-raster::stack(unlist(stk))
+# Extract SpatRasters from nested lists
+raster_list <- unlist(stk, recursive = TRUE)
 
-return(stk2)
-}
+# Stack them into a single SpatRaster
+raster_stack <- rast(raster_list)
+
+return(raster_stack)}
