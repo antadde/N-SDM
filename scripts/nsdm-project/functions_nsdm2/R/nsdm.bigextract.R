@@ -351,5 +351,6 @@ if (length(na_ix) > 0) {
   data@xy <- xy
   data@pa <- pa
   data@years <- years
+
+return(data)
 }
-return(data)}
