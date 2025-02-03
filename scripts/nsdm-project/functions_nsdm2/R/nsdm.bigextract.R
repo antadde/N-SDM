@@ -49,19 +49,17 @@ tempo_t <- times[complete.cases(times), ]
 stat_t <- times[!complete.cases(times), ]
 
 # Generate period interval look-up table
-ints <- unique(tempo_t[, c("start_year", "end_year", "dataset")])
-p_ints_t <- data.frame()
-for (dt in unique(ints$dataset)) {
-  a <- ints[ints$dataset == dt, ]
-  a$diff <- a$end_year - a$start_year
-  a_ix <- which(a$end_year == max(a$end_year))
-  if (length(a_ix) > 1) a_ix <- a_ix[which(a$diff[a_ix] == max(a$diff[a_ix]))]
-  a$int <- ifelse(length(unique(a$diff)) > 1, "int", "no_int")
-  p_ints_t <- rbind(p_ints_t, data.frame(dataset = dt, 
-                                          start_year = a$start_year[a_ix], 
-                                          end_year = a$end_year[a_ix], 
-                                          int = a$int[a_ix]))
-}
+ints<-unique(tempo_t[,c("start_year", "end_year", "dataset")])
+   p_ints_t<-data.frame()
+   for(dt in unique(ints$dataset)){
+   a<-ints[ints$dataset==dt,]
+   a$diff<-a$end_year-a$start_year
+   a_ix<-which(a$end_year==max(a$end_year))
+   if(length(a_ix)>1) a_ix<-a_ix[which(a$diff[a_ix]==max(a$diff[a_ix]))]
+   if(table(a$diff)[1]>1){a$int<-"no_int"; a$int[which.max(a$end_year)]<-"int"} else {a$int<-"int"}
+   p_ints_t_i<-data.frame(dataset=dt, start_year=a$start_year[a_ix], end_year=a$end_year[a_ix], int=a$int[a_ix])
+   p_ints_t<-rbind(p_ints_t, p_ints_t_i)
+   }
 
 # If temporal matching is enabled
 if (exists("t_match") && t_match) {
