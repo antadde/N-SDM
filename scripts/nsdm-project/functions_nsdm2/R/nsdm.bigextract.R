@@ -244,6 +244,9 @@ if (!is.null(cov_nomatch) && length(cov_nomatch) > 0) {
 ### Combine and clean
 ### ------------------------
 
+# Initialize a list to track filtered-out layers
+filtered_out_layers <- list(unique_values = NULL, near_zero_variance = NULL)
+
 # Safely combine presence and absence data
 if (!is.null(xt_pres) && !is.null(xt_abs)) {
   env_vars <- rbind(xt_pres, xt_abs)
@@ -259,6 +262,7 @@ if (!is.null(env_vars) && ncol(env_vars) > 0) {
   unique_cols <- which(lenv == 1)
 
   if (length(unique_cols) > 0) {
+    filtered_out_layers$unique_values <- colnames(env_vars)[unique_cols]  # Store removed layers
     if (ncol(env_vars) > length(unique_cols)) {
       env_vars <- env_vars[, -unique_cols, drop = FALSE]
     } else {
@@ -271,6 +275,7 @@ if (!is.null(env_vars) && ncol(env_vars) > 0) {
   if (is.numeric(nzvt)) {
     nzv_cols <- which(apply(env_vars, 2, function(x) length(unique(x))) < nzvt)
     if (length(nzv_cols) > 0) {
+      filtered_out_layers$near_zero_variance <- colnames(env_vars)[nzv_cols]  # Store removed layers
       if (ncol(env_vars) > length(nzv_cols)) {
         env_vars <- env_vars[, -nzv_cols, drop = FALSE]
       } else {
@@ -279,10 +284,13 @@ if (!is.null(env_vars) && ncol(env_vars) > 0) {
       }
     }
   }
-
+  
 } else {
   warning("env_vars is NULL or empty after combining presences and absences.")
 }
+
+# Identify unmatched layers from cov_info
+filtered_out_layers$unmatched_covariates <- setdiff(gsub("\\.tif$", "", basename(cov_info$file)), colnames(env_vars))
 
 ### ------------------------
 ### Extract mainGLO
@@ -350,5 +358,5 @@ if (length(na_ix) > 0) {
   data@pa <- pa
   data@years <- years
 
-return(data)
+return(list(data = data, filtered_out_layers = filtered_out_layers))
 }
