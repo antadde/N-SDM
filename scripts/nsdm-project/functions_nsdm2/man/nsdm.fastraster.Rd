@@ -7,16 +7,17 @@
 nsdm.fastraster(files, nsplits = parallel::detectCores() - 1)
 }
 \arguments{
-\item{files}{A character vector containing paths to individual raster layers}
+\item{files}{A character vector containing file paths to raster layers (\code{.tif}).}
 
-\item{nsplits}{Number of cores (numeric) to be used during parallel loading}
+\item{nsplits}{A numeric value specifying the number of CPU cores to use for parallel loading.
+Defaults to \code{parallel::detectCores() - 1} if NULL.}
 }
 \value{
-A raster stack
+A \code{SpatRaster}.
 }
 \description{
-Parallel loading of raster data
+Parallelized loading of raster datasets using multiple cores.
 }
 \author{
-Antoine Adde (aadde@unil.ch)
+Antoine Adde (antoine.adde@eawag.ch)
 }

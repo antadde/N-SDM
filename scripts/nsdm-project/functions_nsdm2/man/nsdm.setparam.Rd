@@ -16,28 +16,28 @@ nsdm.setparam(
 )
 }
 \arguments{
-\item{model_name}{A character string indicating the name of the target modelling algorithm}
+\item{model_name}{A character string specifying the modeling algorithm to use (e.g., "glm", "gam", "rf", "gbm", "max", "esm").}
 
-\item{param_grid}{A character string indicating the complete path where the .xlsx document containing the parameter settings is stored}
+\item{param_grid}{A character string indicating the complete file path where the \code{.xlsx} document containing the parameter settings is stored.}
 
-\item{covariate_names}{A character vector indicating covariate names}
+\item{covariate_names}{A character vector specifying the names of covariates to be included in the models.}
 
-\item{tmp_path}{A character string indicating the path where to store temporary outputs}
+\item{tmp_path}{A character string specifying the directory where temporary outputs should be stored.}
 
-\item{ncov.esm}{If the ESM framework is used, a numeric value indicating the total number of covariates evaluated}
+\item{ncov.esm}{(Optional) A numeric value specifying the total number of covariates evaluated when using the ESM (Ensemble of Small Models) framework.}
 
-\item{comb.esm}{If the ESM framework is used, a numeric value indicating the number of covariates combined in each individual small model}
+\item{comb.esm}{(Optional) A numeric value indicating the number of covariates combined in each individual small model under the ESM framework.}
 
-\item{weights}{A numeric vector of weights to be applied}
+\item{weights}{A numeric vector specifying the weights to be applied in the models. If a single value is provided, no weighting is applied.}
 
-\item{nthreads}{Number (numeric) of cores to be used during parallel operations}
+\item{nthreads}{A numeric value specifying the number of cores to be used for parallel computations.}
 }
 \value{
-List with elements of class 'multi.input' which specify models to be fitted
+A list containing elements of class \code{'multi.input'}, each representing a model configuration to be fitted.
 }
 \description{
-Define model parameter settings
+Define model parameter settings for various modeling algorithms.
 }
 \author{
-Antoine Adde (aadde@unil.ch)
+Antoine Adde (\email{antoine.adde@eawag.ch})
 }

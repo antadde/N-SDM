@@ -14,7 +14,9 @@ nsdm.fastraster <- function(files, nsplits=parallel::detectCores()-1){
 
 ix<-splitIndices(length(files), nsplits)
 
-stk<-mclapply(ix, function(x){lapply(files[x], rast)}, mc.cores = nsplits) 
+stk <- mclapply(ix, function(x) { 
+  lapply(files[x], function(f) toMemory(rast(f)))
+}, mc.cores = nsplits)
 
 # Extract SpatRasters from nested lists
 raster_list <- unlist(stk, recursive = TRUE)
