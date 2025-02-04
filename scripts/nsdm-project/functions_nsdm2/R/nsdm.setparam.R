@@ -53,6 +53,21 @@ for (algo in unique_algos) {
   subdataframes[[algo]] <- df_t
 }
 
+subdataframes <- lapply(subdataframes, function(df) {
+  df[] <- lapply(df, function(col) {
+    # Remove leading/trailing spaces
+    col <- trimws(col)
+    
+    # Check if column is character and all non-NA values are numeric-like
+    if (is.character(col) && all(grepl("^[-]?[0-9]*[.,]?[0-9]+$", col[!is.na(col)]))) {
+      as.numeric(gsub(",", ".", col))  # Convert numbers with comma decimals to proper numeric
+    } else {
+      col  # Keep as character
+    }
+  })
+  return(df)
+})
+
 # Weighting?
 if(length(weights)==1){
   weighting=FALSE
