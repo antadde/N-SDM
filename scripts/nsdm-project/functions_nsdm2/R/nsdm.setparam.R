@@ -1,24 +1,57 @@
 #' nsdm.setparam
 #'
-#' Define model parameter settings
+#' Define model parameter settings for various modeling algorithms.
 #'
-#' @param model_name A character string indicating the name of the target modelling algorithm
-#' @param param_grid A character string indicating the complete path where the .xlsx document containing the parameter settings is stored
-#' @param covariate_names A character vector indicating covariate names
-#' @param tmp_path A character string indicating the path where to store temporary outputs
-#' @param ncov.esm If the ESM framework is used, a numeric value indicating the total number of covariates evaluated
-#' @param comb.esm If the ESM framework is used, a numeric value indicating the number of covariates combined in each individual small model
-#' @param weights A numeric vector of weights to be applied
-#' @param nthreads Number (numeric) of cores to be used during parallel operations
+#' @param model_name A character string specifying the modeling algorithm to use (e.g., "glm", "gam", "rf", "gbm", "max", "esm").
+#' @param param_grid A character string indicating the complete file path where the `.xlsx` document containing the parameter settings is stored.
+#' @param covariate_names A character vector specifying the names of covariates to be included in the models.
+#' @param tmp_path A character string specifying the directory where temporary outputs should be stored.
+#' @param ncov.esm (Optional) A numeric value specifying the total number of covariates evaluated when using the ESM (Ensemble of Small Models) framework.
+#' @param comb.esm (Optional) A numeric value indicating the number of covariates combined in each individual small model under the ESM framework.
+#' @param weights A numeric vector specifying the weights to be applied in the models. If a single value is provided, no weighting is applied.
+#' @param nthreads A numeric value specifying the number of cores to be used for parallel computations.
 #'
-#' @return List with elements of class 'multi.input' which specify models to be fitted
-#' @author Antoine Adde (aadde@unil.ch)
+#' @return A list containing elements of class `'multi.input'`, each representing a model configuration to be fitted.
+#' 
+#' @author Antoine Adde (\email{antoine.adde@eawag.ch})
 #' @export
 
 nsdm.setparam <- function(model_name, param_grid, covariate_names, tmp_path, ncov.esm=NULL, comb.esm=NULL, weights=1, nthreads){
-# Import parameter grid
-grid.list<-lapply(excel_sheets(param_grid), read_excel, path = param_grid)
-names(grid.list)<-excel_sheets(param_grid)
+# Load data
+grid_list <- fread(param_grid)  # Ensure 'param_grid' is correctly assigned
+
+# Initialize a list to store subdataframes
+subdataframes <- list()
+
+# Get unique algorithms
+unique_algos <- unique(grid_list$Algorithm)
+
+# Loop over each unique algorithm
+for (algo in unique_algos) {
+  # Subset data for the current algorithm
+  df <- grid_list[Algorithm == algo]
+  
+  # Store original parameter names
+  param_names <- df$Parameter  
+  
+  # Remove Algorithm and Parameter columns before transposing
+  df_t <- df[, -c(1,2)]  
+
+  # Transpose the dataframe
+  df_t <- t(df_t)
+
+  # Convert to a data frame
+  df_t <- as.data.frame(df_t, stringsAsFactors = FALSE)
+
+  # Assign correct column names
+  colnames(df_t) <- param_names
+
+  # Reset row names
+  rownames(df_t) <- NULL  
+
+  # Store in list with algorithm name as key
+  subdataframes[[algo]] <- df_t
+}
 
 # Weighting?
 if(length(weights)==1){
@@ -31,7 +64,7 @@ modinp<-list() # list where all model settings will be stored
 
 ## GLM
 if(model_name=="glm"){
-params_glm<-data.frame(grid.list[["glm"]])
+params_glm<-na.omit(data.frame(subdataframes[["glm"]]))
 
 multis_glm<-list()
 for(p in 1:nrow(params_glm)){
@@ -48,10 +81,10 @@ mgcv_gam<<-mgcv::bam
 mgcv_gam_fx<<-mgcv::bam
 
 ## with penalization
-if(nrow(grid.list[["gam.auto"]])>1){
-  params_gam_auto<-na.omit(expand.grid(data.frame(grid.list[["gam.auto"]])))
+if(nrow(subdataframes[["gam.auto"]])>1){
+  params_gam_auto<-na.omit(expand.grid(data.frame(subdataframes[["gam.auto"]])))
 } else {
-params_gam_auto<-data.frame(grid.list[["gam.auto"]])
+params_gam_auto<-na.omit(data.frame(subdataframes[["gam.auto"]]))
 }
 
 multis_gam_auto<-list()
@@ -63,7 +96,7 @@ multis_gam_auto<-append(multis_gam_auto, multi_gam)
 }
 
 ## pure regression splines without penalization
-params_gam_fx<-data.frame(grid.list[["gam.fx"]])
+params_gam_fx<-na.omit(data.frame(subdataframes[["gam.fx"]]))
 
 multis_gam_fx<-list()
 for(p in 1:nrow(params_gam_fx)){
@@ -77,10 +110,10 @@ modinp<-append(multis_gam_auto,multis_gam_fx)
 
 ## Maxent; Note for Maxent default weights: "upweighting of background points" (https://par.nsf.gov/servlets/purl/10079053)
 if(model_name=="max"){
-if(nrow(grid.list[["max"]])>1){
-  params_maxent<-na.omit(expand.grid(data.frame(grid.list[["max"]])))
+if(nrow(subdataframes[["max"]])>1){
+  params_maxent<-na.omit(expand.grid(data.frame(subdataframes[["max"]])))
 } else {
-  params_maxent<-data.frame(grid.list[["max"]])
+  params_maxent<-na.omit(data.frame(subdataframes[["max"]]))
 }
 
 for(p in 1:nrow(params_maxent)){
@@ -92,10 +125,10 @@ modinp<-append(modinp, multi_maxent)
 
 ## RF
 if(model_name=="rf"){
-if(nrow(grid.list[["rf"]])>1){
-  params_rf<-na.omit(expand.grid(data.frame(grid.list[["rf"]])))
+if(nrow(subdataframes[["rf"]])>1){
+  params_rf<-na.omit(expand.grid(data.frame(subdataframes[["rf"]])))
 } else {
-  params_rf<-data.frame(grid.list[["rf"]])
+  params_rf<-na.omit(data.frame(subdataframes[["rf"]]))
 }
 
 for(p in 1:nrow(params_rf)){
@@ -108,19 +141,16 @@ modinp<-append(modinp, multi_rf)
 
 ## (light)GBM
 if(model_name=="gbm"){
-if(nrow(grid.list[["gbm"]])>1){
-  params_gbm<-na.omit(expand.grid(data.frame(grid.list[["gbm"]])))
+if(nrow(subdataframes[["gbm"]])>1){
+  params_gbm<-na.omit(expand.grid(data.frame(subdataframes[["gbm"]])))
 } else {
-  params_gbm<-data.frame(grid.list[["gbm"]])
+  params_gbm<-na.omit(data.frame(subdataframes[["gbm"]]))
 }
 tmp_path_gbm<-paste0(tmp_path, "/gbm")
 dir.create(tmp_path_gbm, recursive=TRUE)
 
 for(p in 1:nrow(params_gbm)){
-param_gbm<-params_gbm[p,]
-#multi_gbm<-nsdm.multi("lgb.train",list(num_leaves=2^as.numeric(param_gbm$max_depth)-1, min_data_in_leaf=as.numeric(param_gbm$min_data_in_leaf), max_depth=as.numeric(param_gbm$max_depth), objective="binary",
-#                                   learning_rate=as.numeric(param_gbm$learning_rate), num_iterations=as.numeric(param_gbm$num_iterations), verbose=-10),
-#                                   weight=weighting, tag=paste0("gbm-",p))						   
+param_gbm<-params_gbm[p,]		   
 multi_gbm <- nsdm.multi(
   "lgb.train",
   list(
@@ -147,7 +177,6 @@ if(model_name=="esm"){
 covs<-covariate_names[1:ncov.esm]
 combs<-combn(covs, comb.esm)
 
-
 ### Generate list of all possible formulas
 formulas<-list()
 for (j in 1:ncol(combs)){
@@ -162,8 +191,5 @@ for(p in 1:length(formulas)){
   modinp<-append(modinp, multi_esm)
 }
 }
-
 names(modinp)<- unlist(lapply(modinp, function(x){x@tag}))
-
-return(modinp)
-}
+return(modinp)}
