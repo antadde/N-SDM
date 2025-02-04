@@ -1,26 +1,30 @@
 #' nsdm.retrieve4pred
 #'
-#' Prepare covariate data for prediction
+#' Prepare covariate data for prediction.
 #'
-#' @param covstk A raster stack containing the covariate layers used for prediction
-#' @param scaleparam Attribute part of a scaled matrix containing the scaling parameters to be reapplied
-#' @param mask A character string for the path to .rds file containing the raster with cells to be masked (value of 0) when predicting
-#' @param observational A character vector containing the names of "observational" covariates for which the same value (obsval) will be used for prediction
-#' @param obsval A character string indicating the strategy used to set the common value for observational covariates ("zero", "median", or "max"imum)
+#' @param covstk A RasterStack containing the covariate layers used for prediction.
+#' @param scaleparam A data frame or matrix containing the scaling parameters to be reapplied.
+#' @param mask A character string specifying the path to an `.rds` file containing a raster where cells with a value of `0` will be masked during prediction.
+#' @param observational A character vector specifying the names of "observational" covariates, which will be assigned a constant value (`obsval`) for prediction.
+#' @param obsval A character string indicating the strategy for setting the common value for observational covariates. Options: `"zero"`, `"median"`, or `"max"`.
 #'
-#' @return A data.frame object on which predictions will be applied and a companion vector containing the indices for non-na cells on the original raster stack
-#' @author Antoine Adde (aadde@unil.ch)
+#' @return A list containing:
+#' \item{data}{A `data.frame` containing the covariate values for prediction.}
+#' \item{valid_cells}{An index vector identifying non-NA cells in the original raster stack.}
+#'
+#' @author Antoine Adde (\email{antoine.adde@eawag.ch})
 #' @export
+
 
 nsdm.retrieve4pred <- function(covstk, scaleparam, mask=NULL, observational=NULL, obsval=NULL){
 # Transform as data.frame and retrieve non-na cells indices
-covdf<-raster::as.data.frame(covstk, row.names=T)
+covdf<-as.data.frame(covstk, row.names=T)
 covdf<-covdf[complete.cases(covdf), ]
 covdf_ix<-as.numeric(row.names(covdf))
 
 # If a mask is provided, mask predictions
 if(length(mask)>0){
-m<-readRDS(mask)
+m<-rast(mask)
 tbm<-which(m[]==0)
 tbr<-which(covdf_ix %in% tbm)
 if(length(tbr)>1){
