@@ -45,8 +45,6 @@ for (i in seq_along(model_names)) {
 
 stack_map<-rast(stack_map)
 
-print(stack_map)
-
 # Initialize results table
 res <- data.frame(matrix(nrow = nlyr(stack_map), ncol = 3))
 colnames(res) <- c("model_name", "score", "discard")
@@ -84,7 +82,6 @@ for (i in seq_along(model_names)) {
   }
 }
 
-
 # Check if models fulfill discard threshold, and remove if needed
 if (!"esm" %in% model_names) {
   if (!is.null(discthre)) {
@@ -111,7 +108,7 @@ if (weighting) {
 keep_indices <- setdiff(seq_len(nlyr(stack_map)), discard_indices)
 stack_map <- terra::subset(stack_map, keep_indices)
   }
-  ensemble <- app(stack_map, mean, w = as.numeric(res[,"score"]), na.rm = TRUE)
+  ensemble <- terra::app(stack_map, mean, w = as.numeric(res[,"score"]), na.rm = TRUE)
 } else {
   ensemble <- mean(stack_map, na.rm = TRUE)
 }
@@ -135,8 +132,8 @@ ensemble_sd <- rasterstack_sd_fast(stack_map)
 ensemble_cv <- (ensemble_sd / ensemble_mn) * 100
 
 # Final rounding and type conversion
-ensemble_cv <- round(ensemble_cv)
-ensemble_mn <- round(ensemble_mn)
+ensemble_cv <- terra::round(ensemble_cv)
+ensemble_mn <- terra::round(ensemble_mn)
 
 storage.mode(values(ensemble_cv)) <- "integer"  # Corrected for terra
 storage.mode(values(ensemble_mn)) <- "integer"
