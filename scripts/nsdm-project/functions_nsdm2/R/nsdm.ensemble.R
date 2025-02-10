@@ -1,42 +1,67 @@
 #' nsdm.ensemble
 #'
-#' Ensemble prediction surfaces obtained by individual algorithms
+#' Ensemble prediction surfaces obtained by individual algorithms.
 #'
-#' @param model_names A character string indicating the modelling algorithms to ensemble
-#' @param species_name A character string indicating the name of the taxon
-#' @param map_path A character string indicating the path where algorithm-specific prediction surfaces are stored
-#' @param score_path A character string indicating the path where algorithm-specific evaluation metrics are stored
-#' @param discthre A numeric value for the threshold for weight_metric under which to discard an algorithm
-#' @param weighting Logical. If TRUE, weight individual algorithms by weight_metric
-#' @param weight_metric A character string indicating the name of the metric used for weighting or discarding
-#' @param level A character vector indicating the name of the level considered (e.g., glo or reg)
-#' @param nesting_name A character vector indicating the name of the nesting strategy for which predicted values are provided
-#' @param scenar_name A character vector indicating the name of the scenario for which predicted values are provided
-#' @param period_name A character vector indicating the name of the period for which predicted values are provided
+#' @param model_names A character vector indicating the modelling algorithms to ensemble.
+#' @param species_name A character string indicating the name of the taxon.
+#' @param map_path A character string indicating the path where algorithm-specific prediction surfaces are stored.
+#' @param score_path A character string indicating the path where algorithm-specific evaluation metrics are stored.
+#' @param discthre A numeric value specifying the threshold for `weight_metric`, below which an algorithm is discarded. 
+#'                 If `NULL`, no models are discarded.
+#' @param weighting Logical. If `TRUE`, individual algorithms are weighted by `weight_metric`.
+#' @param weight_metric A character string indicating the name of the metric used for weighting or discarding models.
+#' @param level A character string indicating the name of the level considered (e.g., "glo" or "reg").
+#' @param nesting_name A character string indicating the name of the nesting strategy for which predicted values are provided.
+#' @param scenar_name A character string indicating the name of the scenario for which predicted values are provided.
+#' @param period_name A character string indicating the name of the period for which predicted values are provided.
 #'
-#' @return A list of two rasters: "ensemble" (average) and "ensemble_cv" (coefficient of variation)
-#' @author Antoine Adde (aadde@unil.ch)
+#' @return A named list of two `SpatRaster` objects:
+#' \describe{
+#'   \item{"ensemble"}{A `SpatRaster` representing the average ensemble prediction.}
+#'   \item{"ensemble_cv"}{A `SpatRaster` representing the coefficient of variation of the ensemble.}
+#' }
+#'
+#' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
 nsdm.ensemble <- function(model_names, species_name, level=NA, nesting_name=NA, scenar_name=NA, period_name=NA, map_path, score_path=NULL, discthre=NULL, weighting=FALSE, weight_metric="Score"){
   
-# Retrieve prediction maps
-stack_map <- list()
+  # Initialize a list to store raster objects
+  stack_map_list <- list()
 
-for (i in seq_along(model_names)) {
-  model_name <- model_names[i]
-  full_map_path <- file.path(map_path, species_name, model_name)  # Better path handling
-  map_files <- list.files(full_map_path, pattern="\\.rds$", full.names = TRUE, recursive = TRUE)
+  for (i in seq_along(model_names)) {
+    model_name <- model_names[i]
+    full_map_path <- file.path(map_path, species_name, model_name)
+    map_files <- list.files(full_map_path, pattern="\\.rds$", full.names = TRUE, recursive = TRUE)
 
-  if (length(map_files) > 0) {
-    map2 <- lapply(map_files, readRDS)  # Read RDS files
-    map <- rast(map2)  # Convert list to SpatRaster
+    if (length(map_files) > 0) {
+      map2 <- lapply(map_files, readRDS)  # Read RDS files
 
-    stack_map <- c(stack_map, list(map))  # Store each map as a list element
+      # Ensure all elements in map2 are SpatRaster
+      valid_maps <- lapply(map2, function(m) {
+        if (inherits(m, "SpatRaster")) {
+          return(m)
+        } else {
+          warning(paste("Skipping non-SpatRaster object in", full_map_path))
+          return(NULL)
+        }
+      })
+
+      valid_maps <- Filter(Negate(is.null), valid_maps)  # Remove NULLs
+
+      if (length(valid_maps) > 0) {
+        map <- rast(valid_maps)  # Convert list to SpatRaster
+        stack_map_list[[length(stack_map_list) + 1]] <- map  # Append to list
+      }
+    }
   }
-}
 
-stack_map<-rast(stack_map)
+  # Ensure stack_map is created properly
+  if (length(stack_map_list) == 0) {
+    stop("No valid SpatRaster objects found in the provided directories.")
+  }
+
+stack_map<-rast(stack_map_list)
 
 # Initialize results table
 res <- data.frame(matrix(nrow = nlyr(stack_map), ncol = 3))
