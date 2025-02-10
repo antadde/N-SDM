@@ -26,8 +26,8 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
       model_nameu <- names(maps)[m]
       
       # Define save path
-      save_this_path <- file.path(save_path, species_name, model_name, model_nameu)
-      suppressWarnings(dir.create(save_this_path, recursive = TRUE))
+ save_this_path <- do.call(file.path, as.list(c(save_path, species_name, model_nameu)))
+ suppressWarnings(dir.create(save_this_path, recursive = TRUE))
       
       # Define filenames
       f_fit_tif <- file.path(save_this_path, paste0(names(map), ".tif"))
@@ -55,8 +55,8 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
     map <- toMemory(maps)  # Load raster completely in memory
     
     # Define save path
-    save_this_path <- file.path(save_path, species_name, model_name)
-    suppressWarnings(dir.create(save_this_path, recursive = TRUE))
+ save_this_path <- do.call(file.path, as.list(c(save_path, species_name, model_name)))
+ suppressWarnings(dir.create(save_this_path, recursive = TRUE))
     
     # Define filenames
     f_fit_tif <- file.path(save_this_path, paste0(names(map), ".tif"))
