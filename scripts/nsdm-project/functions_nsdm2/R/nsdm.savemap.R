@@ -45,7 +45,7 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
       
       if (format %in% c("both", "rds")) {
         tryCatch({
-          saveRDS(map, f_fit_rds, compress = TRUE)
+          saveRDS(wrap(map), f_fit_rds, compress = TRUE)
         }, error = function(e) warning(paste("Failed to save RDS:", f_fit_rds, "-", e$message)))
       }
     }
@@ -74,7 +74,7 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
     
     if (format %in% c("both", "rds")) {
       tryCatch({
-        saveRDS(map, f_fit_rds, compress = TRUE)
+        saveRDS(wrap(map), f_fit_rds, compress = TRUE)
       }, error = function(e) warning(paste("Failed to save RDS:", f_fit_rds, "-", e$message)))
     }
   }
