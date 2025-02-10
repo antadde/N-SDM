@@ -45,6 +45,8 @@ for (i in seq_along(model_names)) {
 
 stack_map<-rast(stack_map)
 
+print(stack_map)
+
 # Initialize results table
 res <- data.frame(matrix(nrow = nlyr(stack_map), ncol = 3))
 colnames(res) <- c("model_name", "score", "discard")
@@ -95,7 +97,7 @@ if (!"esm" %in% model_names) {
   if (!is.null(discthre)) {
     discard_indices <- which(as.logical(res[,"discard"]))
     if (length(discard_indices) > 0) {
-      stack_map <- subset(stack_map, -discard_indices)  # terra::subset() replaces dropLayer()
+      stack_map <- terra::subset(stack_map, -discard_indices)  # terra::subset() replaces dropLayer()
       res <- res[-discard_indices, , drop = FALSE]
     }
   }
