@@ -20,7 +20,7 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
   }
   
   # Handle ESM models
-  if (model_name == "esm") {
+  if (!is.null(model_name) && model_name == "esm") {
     for (m in seq_along(maps)) {  # Safe iteration over maps
       map <- toMemory(maps[[m]])  # Ensure the raster is loaded in memory
       model_nameu <- names(maps)[m]
