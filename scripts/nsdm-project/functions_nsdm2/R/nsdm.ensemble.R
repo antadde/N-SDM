@@ -110,7 +110,7 @@ stack_map <- terra::subset(stack_map, keep_indices)
   }
   ensemble <- terra::app(stack_map, mean, w = as.numeric(res[,"score"]), na.rm = TRUE)
 } else {
-  ensemble <- mean(stack_map, na.rm = TRUE)
+  ensemble <- terra::app(stack_map, mean, na.rm=TRUE)
 }
 
 ensemble_mn <- ensemble  # Store mean ensemble
