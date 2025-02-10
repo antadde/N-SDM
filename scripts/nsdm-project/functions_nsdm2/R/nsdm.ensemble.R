@@ -107,7 +107,7 @@ if (!"esm" %in% model_names) {
 if (weighting) {
   discard_indices <- which(as.logical(res[,"discard"]))
   if (length(discard_indices) > 0) {
-    stack_map <- subset(stack_map, -discard_indices)
+    stack_map <- terra::subset(stack_map, -discard_indices)
   }
   ensemble <- app(stack_map, mean, w = as.numeric(res[,"score"]), na.rm = TRUE)
 } else {
@@ -119,10 +119,10 @@ ensemble_mn <- ensemble  # Store mean ensemble
 # Compute coefficient of variation using terra
 rasterstack_sd_fast <- function(x) {
   s0 <- nlyr(x)
-  s1 <- subset(x, 1)
+  s1 <- terra::subset(x, 1)
   s2 <- s1^2
   for (ri in 2:s0) {
-    r <- subset(x, ri)
+    r <- terra::subset(x, ri)
     s1 <- s1 + r
     s2 <- s2 + r^2
   }
