@@ -97,7 +97,8 @@ if (!"esm" %in% model_names) {
   if (!is.null(discthre)) {
     discard_indices <- which(as.logical(res[,"discard"]))
     if (length(discard_indices) > 0) {
-      stack_map <- terra::subset(stack_map, -discard_indices)  # terra::subset() replaces dropLayer()
+keep_indices <- setdiff(seq_len(nlyr(stack_map)), discard_indices)
+stack_map <- terra::subset(stack_map, keep_indices)
       res <- res[-discard_indices, , drop = FALSE]
     }
   }
@@ -107,7 +108,8 @@ if (!"esm" %in% model_names) {
 if (weighting) {
   discard_indices <- which(as.logical(res[,"discard"]))
   if (length(discard_indices) > 0) {
-    stack_map <- terra::subset(stack_map, -discard_indices)
+keep_indices <- setdiff(seq_len(nlyr(stack_map)), discard_indices)
+stack_map <- terra::subset(stack_map, keep_indices)
   }
   ensemble <- app(stack_map, mean, w = as.numeric(res[,"score"]), na.rm = TRUE)
 } else {
