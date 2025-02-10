@@ -26,42 +26,24 @@
 
 nsdm.ensemble <- function(model_names, species_name, level=NA, nesting_name=NA, scenar_name=NA, period_name=NA, map_path, score_path=NULL, discthre=NULL, weighting=FALSE, weight_metric="Score"){
   
-  # Initialize a list to store raster objects
-  stack_map_list <- list()
+# Retrieve prediction maps
+stack_map <- list()
 
-  for (i in seq_along(model_names)) {
-    model_name <- model_names[i]
-    full_map_path <- file.path(map_path, species_name, model_name)
-    map_files <- list.files(full_map_path, pattern="\\.rds$", full.names = TRUE, recursive = TRUE)
+for (i in seq_along(model_names)) {
+  model_name <- model_names[i]
+  full_map_path <- file.path(map_path, species_name, model_name)  # Better path handling
+  map_files <- list.files(full_map_path, pattern="\\.rds$", full.names = TRUE, recursive = TRUE)
 
-    if (length(map_files) > 0) {
-      map2 <- lapply(map_files, readRDS)  # Read RDS files
+  if (length(map_files) > 0) {
+    map2 <- lapply(map_files, readRDS)  # Read RDS files
+	map2 <- lapply(map2, unwrap)
+    map <- rast(map2)  # Convert list to SpatRaster
 
-      # Ensure all elements in map2 are SpatRaster
-      valid_maps <- lapply(map2, function(m) {
-        if (inherits(m, "SpatRaster")) {
-          return(m)
-        } else {
-          warning(paste("Skipping non-SpatRaster object in", full_map_path))
-          return(NULL)
-        }
-      })
-
-      valid_maps <- Filter(Negate(is.null), valid_maps)  # Remove NULLs
-
-      if (length(valid_maps) > 0) {
-        map <- rast(valid_maps)  # Convert list to SpatRaster
-        stack_map_list[[length(stack_map_list) + 1]] <- map  # Append to list
-      }
-    }
+    stack_map <- c(stack_map, list(map))  # Store each map as a list element
   }
+}
 
-  # Ensure stack_map is created properly
-  if (length(stack_map_list) == 0) {
-    stop("No valid SpatRaster objects found in the provided directories.")
-  }
-
-stack_map<-rast(stack_map_list)
+stack_map<-rast(stack_map)
 
 # Initialize results table
 res <- data.frame(matrix(nrow = nlyr(stack_map), ncol = 3))
