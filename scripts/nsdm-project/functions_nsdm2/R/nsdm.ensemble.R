@@ -32,13 +32,11 @@ stack_map <- list()
 for (i in seq_along(model_names)) {
   model_name <- model_names[i]
   full_map_path <- file.path(map_path, species_name, model_name)  # Better path handling
-  map_files <- list.files(full_map_path, pattern="\\.rds$", full.names = TRUE, recursive = TRUE)
+  map_files <- list.files(full_map_path, pattern="\\.tif$", full.names = TRUE, recursive = TRUE)
 
   if (length(map_files) > 0) {
-    map2 <- lapply(map_files, readRDS)  # Read RDS files
-	map2 <- lapply(map2, unwrap)
+    map2 <- lapply(map_files, rast)
     map <- rast(map2)  # Convert list to SpatRaster
-
     stack_map <- c(stack_map, list(map))  # Store each map as a list element
   }
 }
