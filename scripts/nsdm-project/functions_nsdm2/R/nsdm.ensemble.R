@@ -21,100 +21,121 @@
 nsdm.ensemble <- function(model_names, species_name, level=NA, nesting_name=NA, scenar_name=NA, period_name=NA, map_path, score_path=NULL, discthre=NULL, weighting=FALSE, weight_metric="Score"){
   
 # Retrieve prediction maps
-stack_map<-raster::stack()
-for(i in 1:length(model_names)){
-  model_name<-model_names[i]
-  full_map_path<-paste0(paste(map_path, species_name, model_name,sep="/"))
-  map_files<-list.files(full_map_path, pattern=".rds", full.names = TRUE, recursive = TRUE)
-  map2<-lapply(map_files, readRDS)
-  map<-raster::stack(unlist(map2))
-  stack_map<-raster::stack(stack_map, map)
+stack_map <- list()
+
+for (i in seq_along(model_names)) {
+  model_name <- model_names[i]
+  full_map_path <- file.path(map_path, species_name, model_name)  # Better path handling
+  map_files <- list.files(full_map_path, pattern="\\.rds$", full.names = TRUE, recursive = TRUE)
+
+  if (length(map_files) > 0) {
+    map2 <- lapply(map_files, readRDS)  # Read RDS files
+    map <- rast(map2)  # Convert list to SpatRaster
+
+    stack_map <- c(stack_map, list(map))  # Store each map as a list element
+  }
 }
 
-# Compute ensembling evaluation table
-res<-data.frame(matrix(nrow=raster::nlayers(stack_map), ncol = 3))
-colnames(res)<-c("model_name", "score", "discard")
-for(i in 1:length(model_names)){
-  model_name<-model_names[i]
-  full_score_path<-paste0(paste(score_path, species_name, model_name,sep="/"), paste0("/",species_name,"_",model_name,".rds"))
-  score<-readRDS(full_score_path)
-## Identify selected model(s) and retrieve scores
-  if(model_name=="esm"){
-    esm_ix<-grep("_esm",names(stack_map))
-    esm_names<-paste("esm", stri_extract_first_regex(names(stack_map)[esm_ix], "[0-9]+"), sep="-")
-    score_val<-score[weight_metric,esm_names]
-    ## store outputs
-    res[esm_ix,"score"]<-score_val
-    res[esm_ix,"model_name"]<-esm_names
+stack_map<-rast(stack_map)
+
+# Initialize results table
+res <- data.frame(matrix(nrow = nlyr(stack_map), ncol = 3))
+colnames(res) <- c("model_name", "score", "discard")
+
+for (i in seq_along(model_names)) {
+  model_name <- model_names[i]
+  full_score_path <- file.path(score_path, species_name, model_name, paste0(species_name, "_", model_name, ".rds"))
+
+  if (file.exists(full_score_path)) {
+    score <- readRDS(full_score_path)  # Read RDS safely
+
+    # Identify selected model(s) and retrieve scores
+    if (model_name == "esm") {
+      esm_ix <- grep("_esm", names(stack_map))  # Find ESM-related layers
+      esm_names <- paste("esm", stri_extract_first_regex(names(stack_map)[esm_ix], "[0-9]+"), sep="-")
+
+      if (!is.null(score[weight_metric, esm_names])) {
+        score_val <- score[weight_metric, esm_names]
+        res[esm_ix, "score"] <- score_val
+        res[esm_ix, "model_name"] <- esm_names
+      }
+    } else {
+      if (length(score) > 1) {
+        score_val <- sort(score[weight_metric, ], decreasing = TRUE)[1]  # Ensure proper sorting
+        res[i, "score"] <- as.numeric(score_val)
+        res[i, "model_name"] <- model_name
+      } else {
+        score_val <- score[weight_metric, ]
+        res[i, "score"] <- score_val
+        res[i, "model_name"] <- model_name
+      }
+    }
   } else {
-  if(length(score)>1){
-    score_val<-data.frame(sort(score[weight_metric,],decreasing=T)[1])
-    ## store outputs
-    res[i,"score"]<-as.numeric(score_val)
-    res[i,"model_name"]<-model_name
-  } else {
-   score_val<-score[weight_metric,]
-   ## store outputs
-   res[i,"score"]<-score_val
-   res[i,"model_name"]<-model_name
+    warning(paste("File not found:", full_score_path))
   }
-  }
-  }
+}
+
 
 # Check if models fulfill discard threshold, and remove if needed
-## Check
-if(!"esm" %in% model_names){
-if(discthre!="NULL"){
-res[,"discard"]<-res[,"score"]<discthre
+if (!"esm" %in% model_names) {
+  if (!is.null(discthre)) {
+    res[,"discard"] <- res[,"score"] < discthre
+  } else {
+    res[,"discard"] <- FALSE  # Corrected: Use logical FALSE instead of string
+  }
+
+  # Discard models below the threshold
+  if (!is.null(discthre)) {
+    discard_indices <- which(as.logical(res[,"discard"]))
+    if (length(discard_indices) > 0) {
+      stack_map <- subset(stack_map, -discard_indices)  # terra::subset() replaces dropLayer()
+      res <- res[-discard_indices, , drop = FALSE]
+    }
+  }
+}
+
+# Perform weighted or unweighted ensemble
+if (weighting) {
+  discard_indices <- which(as.logical(res[,"discard"]))
+  if (length(discard_indices) > 0) {
+    stack_map <- subset(stack_map, -discard_indices)
+  }
+  ensemble <- app(stack_map, mean, w = as.numeric(res[,"score"]), na.rm = TRUE)
 } else {
-res[,"discard"]<-"FALSE" 
+  ensemble <- mean(stack_map, na.rm = TRUE)
 }
 
-## Discard
-if(discthre!="NULL"){
-stack_map<-raster::dropLayer(stack_map, c(which(as.logical(res[,"discard"]))))
-res<-res[-which(as.logical(res[,"discard"])),]
-}
-}
+ensemble_mn <- ensemble  # Store mean ensemble
 
-# do weighted ensemble
-if(weighting){
-  stack_map<-raster::dropLayer(stack_map, c(which(as.logical(res[,"discard"]))))
-  ensemble<-raster::weighted.mean(stack_map, w=as.numeric(res[,"score"]), na.rm=T)
-} else {
-# or un-weighted
-ensemble <- raster::mean(stack_map)
-}
-ensemble_mn<-ensemble
-
-# Compute coefficient of variation	  
+# Compute coefficient of variation using terra
 rasterstack_sd_fast <- function(x) {
-  s0 <- nlayers(x)
-  s1 <- raster(x, layer=1)
+  s0 <- nlyr(x)
+  s1 <- subset(x, 1)
   s2 <- s1^2
-  for(ri in 2:s0) {
-    r <- raster(x, layer=ri)
+  for (ri in 2:s0) {
+    r <- subset(x, ri)
     s1 <- s1 + r
     s2 <- s2 + r^2
   }
-  sqrt((s0 * s2 - s1 * s1)/(s0 * (s0 - 1)))
+  sqrt((s0 * s2 - s1 * s1) / (s0 * (s0 - 1)))
 }
 
-ensemble_sd<-rasterstack_sd_fast(stack_map) 
-ensemble_cv<-(ensemble_sd/ensemble_mn)*100
+ensemble_sd <- rasterstack_sd_fast(stack_map)
+ensemble_cv <- (ensemble_sd / ensemble_mn) * 100
 
-# return
-ensemble_cv<-round(ensemble_cv)
-ensemble_mn<-round(ensemble_mn)
+# Final rounding and type conversion
+ensemble_cv <- round(ensemble_cv)
+ensemble_mn <- round(ensemble_mn)
 
-storage.mode(ensemble_cv[]) = "integer"
-storage.mode(ensemble_mn[]) = "integer"
+storage.mode(values(ensemble_cv)) <- "integer"  # Corrected for terra
+storage.mode(values(ensemble_mn)) <- "integer"
 
-crs(ensemble_cv)<-proj4string(crs(readRDS(map_files[1])))
-crs(ensemble_mn)<-proj4string(crs(readRDS(map_files[1])))
+# Rename layers
+ensemble_name <- paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble", sep = "_")
+ensemble_cv_name <- paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble_cv", sep = "_")
 
-names(ensemble_mn)<-gsub("_NA", "", paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble", sep="_"))
-names(ensemble_cv)<-gsub("_NA", "", paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble_cv", sep="_"))
+names(ensemble_mn) <- gsub("_NA", "", ensemble_name)
+names(ensemble_cv) <- gsub("_NA", "", ensemble_cv_name)
 
-return(list(ensemble=ensemble_mn, ensemble_cv=ensemble_cv))
+return(list(ensemble=toMemory(ensemble_mn), ensemble_cv=toMemory(ensemble_cv)))
 }
