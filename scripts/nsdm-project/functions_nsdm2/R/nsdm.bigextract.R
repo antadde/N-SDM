@@ -26,7 +26,7 @@ pa <- data@pa
 years <- data@years
 
 # Isolate fst and tif covariates
-cov_rds <- cov[grep("\\.rds$", cov)]  # should only be mainGLO
+cov_tif <- cov[grep("\\.tif$", cov)]  # should only be mainGLO
 cov_fst <- cov[grep("\\.fst$", cov)]
 
 ### ------------------------
@@ -300,7 +300,7 @@ filtered_out_layers$unmatched_covariates <- setdiff(
 ### Extract mainGLO
 ### ------------------------
 
-if (!is.null(cov_rds) && length(cov_rds) > 0) {
+if (!is.null(cov_tif) && length(cov_tif) > 0) {
   
   # Ensure `xy` is valid before extracting cells
   if (!is.null(xy) && nrow(xy) > 0) {
@@ -309,11 +309,10 @@ if (!is.null(cov_rds) && length(cov_rds) > 0) {
     cells <- cellFromXY(rst_ref, xy)
 
     # Ensure all raster files exist before loading
-    if (all(file.exists(cov_rds))) {
+    if (all(file.exists(cov_tif))) {
       
       # Load raster stack
-      l <- readRDS(cov_rds)
-	  l <- unwrap(l)
+      l <- rast(cov_tif)
       
       # Convert raster to dataframe
       r <- as.data.frame(l)
