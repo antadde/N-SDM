@@ -10,6 +10,5 @@ Authors@R:
 Depends: data.table, stringi, stringr, plyr, parallel, terra, sf, zoo, fst, tools, glmnet, gam, mgcv, randomForest, RRF, lightgbm, ranger, maxnet, caret, ROCR, chron
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
