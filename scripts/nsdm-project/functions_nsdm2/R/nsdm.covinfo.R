@@ -6,7 +6,7 @@
 #'
 #' @param cov_path A character string specifying the root directory where covariates are stored.
 #' @param save_path A character string specifying the destination path to save the `.xlsx` covariate information table.
-#' @param time_cov A character vector specifying the categories or datasets that include temporally dynamic covariates.
+#' @param time_cov A character vector specifying the categories or datasets that include temporally dynamic covariates (with scenarios).
 #' @param focal_cat A character vector specifying the categories or datasets that include covariates with focal statistics.
 #'
 #' @return An `.xlsx` file containing the covariate information table.
@@ -67,10 +67,10 @@ nsdm.covinfo <- function(
     split <- strsplit(pred_list[i], split = '/')[[1]]
     cada <- pred_table$cada[i]
     
-    # Determine if covariate is dynamic (future, present) or static
+    # Determine if covariate is available for scenarions
     if (cada %in% time_cov) {
-      if (grepl("future", pred_list[i])) {
-        pred_table$period[i] <- "future"
+      if (grepl("scenario", pred_list[i])) {
+        pred_table$period[i] <- "scenario"
         pred_table$scenario[i] <- split[length(split) - 2]
         pred_table$sub_period[i] <- split[length(split) - 3]
       } else if (grepl("present", pred_list[i])) {
