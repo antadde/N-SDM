@@ -127,7 +127,7 @@ if (!is.null(cov_nomatch_diff) && length(cov_nomatch_diff) > 0) {
     if (file.exists(i)) {
       r <- read_fst(i)
       xt <- data.frame(r[cells, 1])
-      names(xt) <- basename(file_path_sans_ext(i))
+      names(xt) <- gsub("_msk", "", basename(file_path_sans_ext(i)))
       return(xt)
     } else {
       warning(paste("File not found:", i))
@@ -143,7 +143,7 @@ if (!is.null(cov_tomatch) && length(cov_tomatch) > 0) {
     if (file.exists(i)) {
       r <- read_fst(i)
       xt <- data.frame(r[cells, 1])
-      names(xt) <- basename(file_path_sans_ext(i))
+      names(xt) <- gsub("_msk", "", basename(file_path_sans_ext(i)))
       return(xt)
     } else {
       warning(paste("File not found:", i))
@@ -218,7 +218,7 @@ if (!is.null(cov_nomatch) && length(cov_nomatch) > 0) {
     if (file.exists(i)) {
       r <- read_fst(i)
       xt <- data.frame(r[cells, 1])
-      names(xt) <- basename(file_path_sans_ext(i))
+      names(xt) <- gsub("_msk", "", basename(file_path_sans_ext(i)))
       return(xt)
     } else {
       warning(paste("File not found:", i))
