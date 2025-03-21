@@ -38,7 +38,7 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
         tryCatch({
           suppressWarnings(
  writeRaster(map, f_fit_tif, filetype = "GTiff", datatype = "INT2U",
-                   overwrite = TRUE, gdal = c("COMPRESS=ZSTD", "PREDICTOR=2", "TILED=YES"))
+                   overwrite = TRUE, gdal = c("COMPRESS=LZW", "PREDICTOR=2", "TILED=YES"))
           )
         }, error = function(e) warning(paste("Failed to save TIFF:", f_fit_tif, "-", e$message)))
       }
@@ -67,7 +67,7 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
       tryCatch({
         suppressWarnings(
         writeRaster(map, f_fit_tif, filetype = "GTiff", datatype = "INT2U",
-                   overwrite = TRUE, gdal = c("COMPRESS=ZSTD", "PREDICTOR=2", "TILED=YES"))
+                   overwrite = TRUE, gdal = c("COMPRESS=LZW", "PREDICTOR=2", "TILED=YES"))
         )
       }, error = function(e) warning(paste("Failed to save TIFF:", f_fit_tif, "-", e$message)))
     }
