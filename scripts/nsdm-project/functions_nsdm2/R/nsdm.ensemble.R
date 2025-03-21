@@ -31,13 +31,17 @@ stack_map <- list()
 
 for (i in seq_along(model_names)) {
   model_name <- model_names[i]
-  full_map_path <- file.path(map_path, species_name, model_name)  # Better path handling
-  map_files <- list.files(full_map_path, pattern="\\.tif$", full.names = TRUE, recursive = TRUE)
+  if(model_name=="esm") {
+  full_map_paths <- list.files(file.path(map_path, species_name), pattern = "^esm", full.names = TRUE)
+  map_files <- list.files(full_map_paths, pattern="\\.tif$", full.names = TRUE, recursive = TRUE)
+  } else {
+  full_map_path <- file.path(map_path, species_name, model_name)
+  map_files <- list.files(full_map_path, pattern="\\.tif$", full.names = TRUE, recursive = TRUE) }
 
   if (length(map_files) > 0) {
     map2 <- lapply(map_files, rast)
-    map <- rast(map2)  # Convert list to SpatRaster
-    stack_map <- c(stack_map, list(map))  # Store each map as a list element
+    map <- rast(map2)
+    stack_map <- c(stack_map, list(map))  
   }
 }
 
@@ -52,7 +56,7 @@ for (i in seq_along(model_names)) {
   full_score_path <- file.path(score_path, species_name, model_name, paste0(species_name, "_", model_name, ".rds"))
 
   if (file.exists(full_score_path)) {
-    score <- readRDS(full_score_path)  # Read RDS safely
+    score <- readRDS(full_score_path) 
 
     # Identify selected model(s) and retrieve scores
     if (model_name == "esm") {
@@ -66,7 +70,7 @@ for (i in seq_along(model_names)) {
       }
     } else {
       if (length(score) > 1) {
-        score_val <- sort(score[weight_metric, ], decreasing = TRUE)[1]  # Ensure proper sorting
+        score_val <- sort(score[weight_metric, ], decreasing = TRUE)[1]  
         res[i, "score"] <- as.numeric(score_val)
         res[i, "model_name"] <- model_name
       } else {
@@ -85,7 +89,7 @@ if (!"esm" %in% model_names) {
   if (!is.null(discthre)) {
     res[,"discard"] <- res[,"score"] < discthre
   } else {
-    res[,"discard"] <- FALSE  # Corrected: Use logical FALSE instead of string
+    res[,"discard"] <- FALSE 
   }
 
   # Discard models below the threshold
@@ -133,7 +137,7 @@ ensemble_cv <- (ensemble_sd / ensemble_mn) * 100
 ensemble_cv <- terra::round(ensemble_cv)
 ensemble_mn <- terra::round(ensemble_mn)
 
-storage.mode(values(ensemble_cv)) <- "integer"  # Corrected for terra
+storage.mode(values(ensemble_cv)) <- "integer"
 storage.mode(values(ensemble_mn)) <- "integer"
 
 # Rename layers

@@ -21,8 +21,8 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
   
   # Handle ESM models
   if (!is.null(model_name) && model_name == "esm") {
-    for (m in seq_along(maps)) {  # Safe iteration over maps
-      map <- toMemory(maps[[m]])  # Ensure the raster is loaded in memory
+    for (m in seq_along(maps)) { 
+      map <- toMemory(maps[[m]])
       model_nameu <- names(maps)[m]
       
       # Define save path
@@ -38,7 +38,7 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
         tryCatch({
           suppressWarnings(
  writeRaster(map, f_fit_tif, filetype = "GTiff", datatype = "INT2U",
-                   overwrite = TRUE, gdal = c("COMPRESS=LZW", "PREDICTOR=2"))
+                   overwrite = TRUE, gdal = c("COMPRESS=ZSTD", "PREDICTOR=2", "TILED=YES"))
           )
         }, error = function(e) warning(paste("Failed to save TIFF:", f_fit_tif, "-", e$message)))
       }
@@ -52,7 +52,7 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
     
   } else {  # Single-model case
     
-    map <- toMemory(maps)  # Load raster completely in memory
+    map <- toMemory(maps)
     
     # Define save path
  save_this_path <- do.call(file.path, as.list(c(save_path, species_name, model_name)))
@@ -66,8 +66,8 @@ nsdm.savemap <- function(maps, save_path, species_name, model_name = NULL, forma
     if (format %in% c("both", "tif")) {
       tryCatch({
         suppressWarnings(
- writeRaster(map, f_fit_tif, filetype = "GTiff", datatype = "INT2U",
-                   overwrite = TRUE, gdal = c("COMPRESS=LZW", "PREDICTOR=2"))
+        writeRaster(map, f_fit_tif, filetype = "GTiff", datatype = "INT2U",
+                   overwrite = TRUE, gdal = c("COMPRESS=ZSTD", "PREDICTOR=2", "TILED=YES"))
         )
       }, error = function(e) warning(paste("Failed to save TIFF:", f_fit_tif, "-", e$message)))
     }
