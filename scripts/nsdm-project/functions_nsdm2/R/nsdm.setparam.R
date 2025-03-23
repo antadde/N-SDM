@@ -175,6 +175,7 @@ if(model_name == "rf") {
         min.node.size = as.numeric(param_rf$min.node.size),
         probability = TRUE,
         num.threads = nthreads,
+		verbose = FALSE,
         case.weights = weighting
       ),
       tag = paste0("rf-", p),
