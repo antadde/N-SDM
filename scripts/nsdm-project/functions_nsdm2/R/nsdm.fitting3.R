@@ -13,14 +13,14 @@
 #' @param mod_args List of class 'multi.input' containing information on models to be fitted
 #' @param timer Logical (TRUE or FALSE) indicating if model computation time is to be saved
 #' @param level A charachter string indicating the level evaluated (e.g. glo or reg)
-#' @param ncores Number of cores to be used during parallel operations
 #' @param save  should the model be saved in a structured way? (not implemented yet)
 #' @param project character indicating the name of the project within which the models are run (later used to define saving directories)
 #' @param path where to save? (not implemented yet)
+#' @param ncores Number of cores to be used during parallel operations
 #' @param tmp_path Character indicating the path where to store temporary outputs
 #'
 #' @return A nsdm.fit object including slots for meta info, testing data for evaluation, and model objects
-#' @author Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (aadde@unil.ch)
+#' @author Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
 
@@ -32,11 +32,11 @@ nsdm.flex3<-function(x=numeric(),
                    reps,
                    mod_args=list(),
 				   timer=FALSE,
-				   level,
-				   ncores,
 				   save=FALSE,
                    project=NA,
                    path=NA,
+				   level,
+				   ncores,
 				   tmp_path){
 
  # Check supplied model types
@@ -109,6 +109,13 @@ nsdm.flex3<-function(x=numeric(),
   ### RF
   if(mod_args_j@mod=="randomForest"){
   if(mod_args_j@weight) mod_args_j@args$weights=wt
+   mod_args_j@args$data=lis$train[[x]]
+   mod_args_j@args$data$Presence=as.factor(mod_args_j@args$data$Presence)
+   modi=do.call(mod_args_j@mod, mod_args_j@args)}
+   
+   ### RF with Ranger
+  if(mod_args_j@mod=="ranger"){
+  if(mod_args_j@weight) mod_args_j@args$case.weights=wt
    mod_args_j@args$data=lis$train[[x]]
    mod_args_j@args$data$Presence=as.factor(mod_args_j@args$data$Presence)
    modi=do.call(mod_args_j@mod, mod_args_j@args)}
