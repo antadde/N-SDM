@@ -20,7 +20,7 @@
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
-nsdm.check_base_structure_and_covariates <- function(data_dir, cov_dir, sp_dir, n_levels = 2) {
+nsdm.datacheck <- function(data_dir, cov_dir, sp_dir, n_levels = 2) {
   # Step 1: Check required subfolders
   required_dirs <- if (n_levels > 1) {
     c("masks", "species/glo", "species/reg", "covariates/glo", "covariates/reg")
@@ -28,7 +28,7 @@ nsdm.check_base_structure_and_covariates <- function(data_dir, cov_dir, sp_dir, 
     c("masks", "species/reg", "covariates/reg")
   }
 
-  missing_dirs <- required_dirs[!dir.exists(file.path(data_dir, required_dirs))]
+  missing_dirs <- required_dirs[!dir.exists(file.path(data_dir, missing_dirs))]
   if (length(missing_dirs) > 0) {
     stop("❌ Missing required folders:\n", paste(file.path(data_dir, missing_dirs), collapse = "\n"))
   } else {
@@ -56,6 +56,48 @@ nsdm.check_base_structure_and_covariates <- function(data_dir, cov_dir, sp_dir, 
             paste(invalid_paths, collapse = "\n"))
   } else {
     message("✅ All covariate folders seem to respect the expected structure.")
+  }
+
+  # Step 2a: Check file names match the folder structure
+  tif_paths <- list.files(cov_dir, pattern = "\\.tif$", recursive = TRUE, full.names = TRUE)
+  mismatched_filenames <- sapply(tif_paths, function(path) {
+    path_parts <- strsplit(gsub(paste0("^", cov_dir, "/"), "", path), "/")[[1]]
+    fname <- basename(path)
+    # Build expected filename from path parts
+    folder_parts <- path_parts[-length(path_parts)]  # drop filename
+    base_expected <- paste(c(tail(folder_parts, 5), tail(folder_parts, 1)), collapse = "_")
+    !startsWith(fname, base_expected)
+  })
+
+  if (any(mismatched_filenames)) {
+    bad_files <- tif_paths[mismatched_filenames]
+    message("🚨 Filenames not mirrored by folder structure (expected structure violation):\n",
+            paste(bad_files, collapse = "\n"))
+  } else {
+    message("✅ All .tif filenames reflect their folder structure.")
+  }
+
+  # Step 2b: Check only "_" are used and "-" are forbidden
+  all_files <- list.files(cov_dir, recursive = TRUE, full.names = TRUE)
+  all_relative_paths <- gsub(paste0("^", cov_dir, "/"), "", all_files)
+
+  # Hyphen check
+  has_dash <- grep("-", all_relative_paths, value = TRUE)
+  if (length(has_dash) > 0) {
+    message("🚨 Hyphens ('-') found in folder or file names (should be avoided):\n",
+            paste(has_dash, collapse = "\n"))
+  } else {
+    message("✅ No hyphens found in file or folder names.")
+  }
+
+  # Underscore check: check that underscores separate known folder components
+  # We flag only suspicious names (e.g., double underscores, trailing/leading)
+  weird_underscores <- grep("(^_|_$|__+)", all_relative_paths, value = TRUE)
+  if (length(weird_underscores) > 0) {
+    message("🚨 Suspicious use of underscores in file or folder names:\n",
+            paste(weird_underscores, collapse = "\n"))
+  } else {
+    message("✅ No unusual use of underscores in file or folder names.")
   }
 
   # Step 3: Run consistency checks for each level
