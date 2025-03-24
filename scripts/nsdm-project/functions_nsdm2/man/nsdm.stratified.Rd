@@ -30,5 +30,5 @@ nsdm.stratified(
 Stratified sampling
 }
 \author{
-Ananda Mahto (mrdwab@gmail.com) and Antoine Adde (aadde@unil.ch)
+Ananda Mahto (mrdwab@gmail.com) and Antoine Adde (antoine.adde@eawag.ch)
 }

@@ -19,34 +19,39 @@ nsdm.ensemble(
 )
 }
 \arguments{
-\item{model_names}{A character string indicating the modelling algorithms to ensemble}
+\item{model_names}{A character vector indicating the modelling algorithms to ensemble.}
 
-\item{species_name}{A character string indicating the name of the taxon}
+\item{species_name}{A character string indicating the name of the taxon.}
 
-\item{level}{A character vector indicating the name of the level considered (e.g., glo or reg)}
+\item{level}{A character string indicating the name of the level considered (e.g., "glo" or "reg").}
 
-\item{nesting_name}{A character vector indicating the name of the nesting strategy for which predicted values are provided}
+\item{nesting_name}{A character string indicating the name of the nesting strategy for which predicted values are provided.}
 
-\item{scenar_name}{A character vector indicating the name of the scenario for which predicted values are provided}
+\item{scenar_name}{A character string indicating the name of the scenario for which predicted values are provided.}
 
-\item{period_name}{A character vector indicating the name of the period for which predicted values are provided}
+\item{period_name}{A character string indicating the name of the period for which predicted values are provided.}
 
-\item{map_path}{A character string indicating the path where algorithm-specific prediction surfaces are stored}
+\item{map_path}{A character string indicating the path where algorithm-specific prediction surfaces are stored.}
 
-\item{score_path}{A character string indicating the path where algorithm-specific evaluation metrics are stored}
+\item{score_path}{A character string indicating the path where algorithm-specific evaluation metrics are stored.}
 
-\item{discthre}{A numeric value for the threshold for weight_metric under which to discard an algorithm}
+\item{discthre}{A numeric value specifying the threshold for \code{weight_metric}, below which an algorithm is discarded.
+If \code{NULL}, no models are discarded.}
 
-\item{weighting}{Logical. If TRUE, weight individual algorithms by weight_metric}
+\item{weighting}{Logical. If \code{TRUE}, individual algorithms are weighted by \code{weight_metric}.}
 
-\item{weight_metric}{A character string indicating the name of the metric used for weighting or discarding}
+\item{weight_metric}{A character string indicating the name of the metric used for weighting or discarding models.}
 }
 \value{
-A list of two rasters: "ensemble" (average) and "ensemble_cv" (coefficient of variation)
+A named list of two \code{SpatRaster} objects:
+\describe{
+\item{"ensemble"}{A \code{SpatRaster} representing the average ensemble prediction.}
+\item{"ensemble_cv"}{A \code{SpatRaster} representing the coefficient of variation of the ensemble.}
+}
 }
 \description{
-Ensemble prediction surfaces obtained by individual algorithms
+Ensemble prediction surfaces obtained by individual algorithms.
 }
 \author{
-Antoine Adde (aadde@unil.ch)
+Antoine Adde (antoine.adde@eawag.ch)
 }

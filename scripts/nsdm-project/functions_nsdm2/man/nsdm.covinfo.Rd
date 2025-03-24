@@ -11,7 +11,7 @@ nsdm.covinfo(cov_path, save_path, time_cov, focal_cov)
 
 \item{save_path}{A character string specifying the destination path to save the \code{.xlsx} covariate information table.}
 
-\item{time_cov}{A character vector specifying the categories or datasets that include temporally dynamic covariates.}
+\item{time_cov}{A character vector specifying the categories or datasets that include temporally dynamic covariates (with scenarios).}
 
 \item{focal_cat}{A character vector specifying the categories or datasets that include covariates with focal statistics.}
 }
@@ -27,5 +27,5 @@ This function generates a covariate information table in \code{.xlsx} format bas
 This function processes the covariate paths to identify dynamic and focal covariates, and saves the resulting information table in Excel format.
 }
 \author{
-Antoine Adde
+Antoine Adde (antoine.adde@eawag.ch)
 }

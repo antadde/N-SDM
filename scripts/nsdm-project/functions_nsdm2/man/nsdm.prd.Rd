@@ -10,5 +10,5 @@ nsdm.prd(mod, tst)
 Feed the predict functions depending on model type
 }
 \author{
-Philipp Brun (philipp.brun@wsl.ch)
+Antoine Adde (antoine.adde@eawag.ch)
 }

@@ -13,8 +13,7 @@
 #' @details This function processes the covariate paths to identify dynamic and focal covariates, and saves the resulting information table in Excel format.
 #'
 #' @export
-#' @author Antoine Adde
-#' @contact antoine.adde@eawag.ch
+#' @author Antoine Adde (antoine.adde@eawag.ch)
 
 nsdm.covinfo <- function(
   cov_path,

@@ -9,7 +9,6 @@ nsdm.evaluate3(
   tester = data.frame(),
   thres = numeric(),
   crit = "pp=op",
-  prevalence_correction = FALSE,
   level,
   ncores = ncores,
   tmp_path = NULL
@@ -24,9 +23,7 @@ nsdm.evaluate3(
 
 \item{crit}{A character string indicating which threshold criterion should be considered? Currently 'pp=op'(predicted prevalence = observed prevalence), 'maxTSS' (threshold yielding maximum TSS), and 'external' (thresholds manually supplied) are possible}
 
-\item{prevalence_correction}{Logical (TRUE FALSE) should imbalanced presence/absence data be upsampled to prevalence 0.5 for model evaluation.}
-
-\item{level}{A character string indicating the evaluated level (e.g. CH or EU)}
+\item{level}{A character string indicating the evaluated level (REG or GLO)}
 
 \item{ncores}{Number of cores to be used during parallel operations}
 
@@ -37,7 +34,4 @@ An object of class 'nsdm.evaluation'
 }
 \description{
 Parallel evaluation of nsdm.fit models with a suite of model assessment metrics (parallel version)
-}
-\author{
-Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (aadde@unil.ch)
 }

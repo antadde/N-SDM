@@ -9,8 +9,7 @@
 #' @param replace This allows you to subset the groups in the sampling process. This is a list. For instance, if your group variable was "Group", and it contained three strata, "A", "B", and "C", but you only wanted to sample from "A" and "C", you can use select = list(Group = c("A", "C"))
 #' @param bothSets
 #'
-#' @return
-#' @author Ananda Mahto (mrdwab@gmail.com) and Antoine Adde (aadde@unil.ch)
+#' @author Ananda Mahto (mrdwab@gmail.com) and Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 nsdm.stratified <- function(df, group, size, select = NULL, 
                        replace = FALSE, bothSets = FALSE) {

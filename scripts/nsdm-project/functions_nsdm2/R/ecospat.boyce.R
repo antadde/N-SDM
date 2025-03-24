@@ -11,7 +11,6 @@
 #' @param rm.duplicate if TRUE, the correlation exclude successive duplicated values
 #' @param method correlation method used to compute the boyce index
 #'
-#' @return
 #' @author Blaise Petitpierre (blaise.petitpierre@unil.ch)
 #' @export
 

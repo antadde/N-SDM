@@ -13,11 +13,11 @@ nsdm.flex3(
   reps,
   mod_args = list(),
   timer = FALSE,
-  level,
-  ncores,
   save = FALSE,
   project = NA,
   path = NA,
+  level,
+  ncores,
   tmp_path
 )
 }
@@ -39,15 +39,15 @@ nsdm.flex3(
 
 \item{timer}{Logical (TRUE or FALSE) indicating if model computation time is to be saved}
 
-\item{level}{A charachter string indicating the level evaluated (e.g. glo or reg)}
-
-\item{ncores}{Number of cores to be used during parallel operations}
-
 \item{save}{should the model be saved in a structured way? (not implemented yet)}
 
 \item{project}{character indicating the name of the project within which the models are run (later used to define saving directories)}
 
 \item{path}{where to save? (not implemented yet)}
+
+\item{level}{A charachter string indicating the level evaluated (e.g. glo or reg)}
+
+\item{ncores}{Number of cores to be used during parallel operations}
 
 \item{tmp_path}{Character indicating the path where to store temporary outputs}
 
@@ -60,5 +60,5 @@ A nsdm.fit object including slots for meta info, testing data for evaluation, an
 Model fitting (parallel version)
 }
 \author{
-Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (aadde@unil.ch)
+Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (antoine.adde@eawag.ch)
 }

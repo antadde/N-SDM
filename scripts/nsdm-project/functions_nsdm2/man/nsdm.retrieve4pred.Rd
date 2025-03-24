@@ -13,22 +13,24 @@ nsdm.retrieve4pred(
 )
 }
 \arguments{
-\item{covstk}{A raster stack containing the covariate layers used for prediction}
+\item{covstk}{A RasterStack containing the covariate layers used for prediction.}
 
-\item{scaleparam}{Attribute part of a scaled matrix containing the scaling parameters to be reapplied}
+\item{scaleparam}{A data frame or matrix containing the scaling parameters to be reapplied.}
 
-\item{mask}{A character string for the path to .rds file containing the raster with cells to be masked (value of 0) when predicting}
+\item{mask}{A character string specifying the path to an \code{.rds} file containing a raster where cells with a value of \code{0} will be masked during prediction.}
 
-\item{observational}{A character vector containing the names of "observational" covariates for which the same value (obsval) will be used for prediction}
+\item{observational}{A character vector specifying the names of "observational" covariates, which will be assigned a constant value (\code{obsval}) for prediction.}
 
-\item{obsval}{A character string indicating the strategy used to set the common value for observational covariates ("zero", "median", or "max"imum)}
+\item{obsval}{A character string indicating the strategy for setting the common value for observational covariates. Options: \code{"zero"}, \code{"median"}, or \code{"max"}.}
 }
 \value{
-A data.frame object on which predictions will be applied and a companion vector containing the indices for non-na cells on the original raster stack
+A list containing:
+\item{data}{A \code{data.frame} containing the covariate values for prediction.}
+\item{valid_cells}{An index vector identifying non-NA cells in the original raster stack.}
 }
 \description{
-Prepare covariate data for prediction
+Prepare covariate data for prediction.
 }
 \author{
-Antoine Adde (aadde@unil.ch)
+Antoine Adde (\email{antoine.adde@eawag.ch})
 }

@@ -17,30 +17,30 @@ nsdm.map(
 )
 }
 \arguments{
-\item{template}{An empty raster layer to fill with predicted values}
+\item{template}{An empty raster layer to fill with predicted values.}
 
-\item{nona_ix}{Numeric indices of cells that should be filled with predicted values}
+\item{nona_ix}{Numeric indices of cells that should be filled with predicted values.}
 
-\item{pred}{List containing vectors of fitted values (one list by modelling algorithm)}
+\item{pred}{A list where each element corresponds to a modeling algorithm and contains vectors of fitted values.}
 
-\item{species_name}{A character string indicating the name of the taxon for which models are fitted}
+\item{species_name}{A character string indicating the name of the taxon for which models are fitted.}
 
-\item{model_name}{A character vector indicating the name of the modelling algorithm(s) for which predicted values are provided}
+\item{model_name}{A character string indicating the name of the modeling algorithm used.}
 
-\item{level}{A character vector indicating the name of the level considered (e.g., glo or loc)}
+\item{level}{A character string indicating the spatial level considered (e.g., "glo" for global, "loc" for local).}
 
-\item{nesting_name}{A character vector indicating the name of the nesting strategy for which predicted values are provided}
+\item{nesting_name}{A character string indicating the nesting strategy for which predicted values are provided.}
 
-\item{scenar_name}{A character vector indicating the name of the scenario for which predicted values are provided}
+\item{scenar_name}{A character string indicating the scenario for which predicted values are provided.}
 
-\item{period_name}{A character vector indicating the name of the period for which predicted values are provided}
+\item{period_name}{A character string indicating the time period for which predicted values are provided.}
 }
 \value{
-A list of rasters filled with predicted values
+A list of rasters filled with predicted values (for ESM models) or a single raster (for other models).
 }
 \description{
-Fill empty template rasters with predicted values
+Fill an empty raster template with predicted values.
 }
 \author{
-Antoine Adde (aadde@unil.ch)
+Antoine Adde (antoine.adde@eawag.ch)
 }
