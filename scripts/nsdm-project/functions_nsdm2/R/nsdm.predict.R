@@ -58,19 +58,33 @@ ndata_bck<-rbind.fill(ndata)
 
 ## RF with ranger
 if ("ranger" %in% class(model)) {
-  ndata <- parallel::mclapply(
-    splits_ix,
-    function(x) {
-      preds <- predict(model, data = nwdata[x, ], type = "response", verbose = FALSE)$predictions
-      if (is.matrix(preds)) {
-        data.frame(fit = preds[, 2])  # probability of class 1
-      } else {
-        data.frame(fit = preds)  # if only 2-class case returns vector
-      }
-    },
-    mc.cores = nsplits
-  )
-  ndata_bck <- plyr::rbind.fill(ndata)
+  # ndata <- parallel::mclapply(
+    # splits_ix,
+    # function(x) {
+      # preds <- predict(model, data = nwdata[x, ], type = "response", verbose = FALSE)$predictions
+      # if (is.matrix(preds)) {
+        # data.frame(fit = preds[, 2])  # probability of class 1
+      # } else {
+        # data.frame(fit = preds)  # if only 2-class case returns vector
+      # }
+    # },
+    # mc.cores = nsplits
+  # )
+  # ndata_bck <- plyr::rbind.fill(ndata)
+future::plan("multicore", workers = nsplits)  # or "multicore" on Linux
+
+ndata <- future.apply::future_lapply(
+  splits_ix,
+  function(x) {
+    preds <- predict(model, data = nwdata[x, ], type = "response")$predictions
+    if (is.matrix(preds)) {
+      data.frame(fit = preds[, 2])
+    } else {
+      data.frame(fit = preds)
+    }
+  }
+)
+ndata_bck <- data.table::rbindlist(ndata, fill = TRUE)
 }
 
 ## GBM
