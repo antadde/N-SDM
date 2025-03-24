@@ -73,7 +73,7 @@ if(length(weights)==1){
   weighting=FALSE
 } else {
   weighting=TRUE}
-
+  
 # Set model settings
 modinp<-list() # list where all model settings will be stored
 
@@ -139,53 +139,53 @@ modinp<-append(modinp, multi_maxent)
 }
 
 # ## RF
-# if(model_name=="rf"){
-# if(nrow(subdataframes[["rf"]])>1){
-  # params_rf<-na.omit(expand.grid(data.frame(subdataframes[["rf"]])))
-# } else {
-  # params_rf<-na.omit(data.frame(subdataframes[["rf"]]))
-# }
+if(model_name=="rf"){
+if(nrow(subdataframes[["rf"]])>1){
+  params_rf<-na.omit(expand.grid(data.frame(subdataframes[["rf"]])))
+} else {
+  params_rf<-na.omit(data.frame(subdataframes[["rf"]]))
+}
 
-# for(p in 1:nrow(params_rf)){
-# param_rf<-params_rf[p,]
-# form_rf<-as.formula(paste("Presence~", paste(covariate_names, collapse=" + ")))
-# multi_rf<-nsdm.multi("randomForest",list(formula=form_rf,ntree=as.numeric(param_rf$num.trees), mtry=floor(sqrt(length(covariate_names))), nodesize = as.numeric(param_rf$min.node.size), classwt=c("0"=min(weights), "1"=max(weights))), tag=paste0("rf-",p), weight=weighting)
-# modinp<-append(modinp, multi_rf)
-# }
-# }
+for(p in 1:nrow(params_rf)){
+param_rf<-params_rf[p,]
+form_rf<-as.formula(paste("Presence~", paste(covariate_names, collapse=" + ")))
+multi_rf<-nsdm.multi("randomForest",list(formula=form_rf,ntree=as.numeric(param_rf$num.trees), mtry=floor(sqrt(length(covariate_names))), nodesize = as.numeric(param_rf$min.node.size), classwt=c("0"=min(weights), "1"=max(weights))), tag=paste0("rf-",p), weight=weighting)
+modinp<-append(modinp, multi_rf)
+}
+}
 
 ## RF with ranger
-if(model_name == "rf") {
-  if(nrow(subdataframes[["rf"]]) > 1){
-    params_rf <- na.omit(expand.grid(data.frame(subdataframes[["rf"]])))
-  } else {
-    params_rf <- na.omit(data.frame(subdataframes[["rf"]]))
-  }
+# if(model_name == "rf") {
+  # if(nrow(subdataframes[["rf"]]) > 1){
+    # params_rf <- na.omit(expand.grid(data.frame(subdataframes[["rf"]])))
+  # } else {
+    # params_rf <- na.omit(data.frame(subdataframes[["rf"]]))
+  # }
 
-  for(p in 1:nrow(params_rf)) {
-    param_rf <- params_rf[p, ]
-    form_rf <- as.formula(paste("Presence ~", paste(covariate_names, collapse = " + ")))
+  # for(p in 1:nrow(params_rf)) {
+    # param_rf <- params_rf[p, ]
+    # form_rf <- as.formula(paste("Presence ~", paste(covariate_names, collapse = " + ")))
 
-    multi_rf <- nsdm.multi(
-      "ranger",
-      list(
-        formula = form_rf,
-        num.trees = as.numeric(param_rf$num.trees),
-        mtry = floor(sqrt(length(covariate_names))),
-        min.node.size = as.numeric(param_rf$min.node.size),
-        probability = TRUE,
-        num.threads = nthreads,
-		verbose = FALSE,
-		importance= "impurity",
-        case.weights = weighting
-      ),
-      tag = paste0("rf-", p),
-      weight = weighting
-    )
+    # multi_rf <- nsdm.multi(
+      # "ranger",
+      # list(
+        # formula = form_rf,
+        # num.trees = as.numeric(param_rf$num.trees),
+        # mtry = floor(sqrt(length(covariate_names))),
+        # min.node.size = as.numeric(param_rf$min.node.size),
+        # probability = TRUE,
+        # num.threads = nthreads,
+		# verbose = FALSE,
+		# importance= "impurity",
+        # case.weights = weighting
+      # ),
+      # tag = paste0("rf-", p),
+      # weight = weighting
+    # )
 
-    modinp <- append(modinp, multi_rf)
-  }
-}
+    # modinp <- append(modinp, multi_rf)
+  # }
+# }
 
 
 ## (light)GBM
