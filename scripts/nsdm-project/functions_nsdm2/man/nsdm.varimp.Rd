@@ -16,5 +16,5 @@ A list containing the values of the relative importance for each individual cova
 Covariate importance computation
 }
 \author{
-Antoine Adde (aadde@unil.ch)
+Antoine Adde (antoine.adde@eawag.ch)
 }

@@ -16,25 +16,27 @@ ecospat.boyce(
 )
 }
 \arguments{
-\item{fit}{A vector or Raster-Layer containing the predicted suitability values}
+\item{fit}{A vector or a SpatRaster containing the predicted suitability values.}
 
-\item{obs}{A vector containing the predicted suitability values or xy-coordinates (if fit is a Raster-Layer) of the validation points (presence records)}
+\item{obs}{A vector containing the predicted suitability values of validation points,
+or xy-coordinates (if fit is a RasterLayer/SpatRaster).}
 
-\item{nclass}{Number of classes or vector with classes threshold. If nclass=0, Boyce index is calculated with a moving window (see next parameters)}
+\item{nclass}{Number of classes or a vector with class thresholds.
+If nclass = 0, a moving window approach is used.}
 
-\item{window.w}{width of the moving window (by default 1/10 of the suitability range)}
+\item{window.w}{Width of the moving window (default = 1/10 of suitability range).}
 
-\item{res}{resolution of the moving window (by default 100 focals)}
+\item{res}{Resolution of the moving window (default = 100 focal points).}
 
-\item{PEplot}{if True, plot the predicted to expected ratio along the suitability class}
+\item{PEplot}{Logical. If TRUE, plot predicted/expected ratios.}
 
-\item{rm.duplicate}{if TRUE, the correlation exclude successive duplicated values}
+\item{rm.duplicate}{Logical. If TRUE, remove successive duplicated values.}
 
-\item{method}{correlation method used to compute the boyce index}
+\item{method}{Correlation method used for the Boyce index ('spearman' or 'pearson').}
+}
+\value{
+A list with F.ratio (Predicted/Expected), cor (Boyce index), and HS (suitability classes).
 }
 \description{
 Updated ecospat.boyce (ecospat package) function for calculating Boyce index as in Hirzel et al. 2006
-}
-\author{
-Blaise Petitpierre (blaise.petitpierre@unil.ch)
 }
