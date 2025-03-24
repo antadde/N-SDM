@@ -205,7 +205,7 @@ temp_m[,2,i]<-logit2prob(X1[[1]]$y)
 	dev.off()
 	temp[[1]]<-temp_m
     names(temp)[1]<-model_name
-	}
+	}}}
 
 ########
 ## Ranger ##
@@ -284,12 +284,11 @@ temp_m_l <- mclapply(1:NbVar, parplot_fast, mc.cores = ncores)
   names(temp)[1] <- model_name
 }
 
-
 ##############
 ## GLM, GAM ##
 ##############
 
-if(class(models@fits[[1]][[1]])[2]!="randomForest"  & class(models@fits[[1]][[1]])[1]!="lgb.Booster" & class(models@fits[[1]][[1]])[1]!="maxnet"){
+if(class(models@fits[[1]][[1]])[1]!="ranger" class(models@fits[[1]][[1]])[2]!="randomForest"  & class(models@fits[[1]][[1]])[1]!="lgb.Booster" & class(models@fits[[1]][[1]])[1]!="maxnet"){
 temp<-list() # list where results will be stored
 
 for(m in 1:length(models@fits)){ # Loop over models (1 in regular cases but much more in esm settings)
