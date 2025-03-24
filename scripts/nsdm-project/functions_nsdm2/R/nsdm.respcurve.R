@@ -208,6 +208,85 @@ temp_m[,2,i]<-logit2prob(X1[[1]]$y)
 	}
 	}
 
+########
+## Ranger ##
+########
+
+if (inherits(models@fits[[1]][[1]], "ranger")) {
+  temp <- list()
+  model <- models@fits[[1]][[1]]
+  NbVar <- ncol(Data)
+  Data_sub <- Data[sample(nrow(Data), min(1000, nrow(Data))), ]
+
+  
+  # Custom partial dependence function
+parplot_fast <- function(ix) {
+  var_name <- colnames(Data_sub)[ix]
+  grid_vals <- seq(min(Data_sub[[ix]]), max(Data_sub[[ix]]), length.out = 25)
+  
+  # Repeat Data_sub 25 times and modify one column
+  repeated_data <- Data_sub[rep(1:nrow(Data_sub), times = 25), ]
+  repeated_data[[var_name]] <- rep(grid_vals, each = nrow(Data_sub))
+  
+  preds <- predict(model, data = repeated_data)$predictions
+  preds_matrix <- matrix(preds, ncol = 25)
+  avg_preds <- colMeans(preds_matrix)
+  
+  list(x = grid_vals, y = avg_preds)
+}
+
+    # Apply in parallel
+temp_m_l <- mclapply(1:NbVar, parplot_fast, mc.cores = ncores)
+  
+  # Store results
+  temp_m <- array(0, dim = c(25, 2, NbVar), dimnames = list(NULL, c("Var", "Pred"), colnames(Data)))
+  for (i in 1:NbVar) {
+    temp_m[, 1, i] <- temp_m_l[[i]]$x
+    temp_m[, 2, i] <- temp_m_l[[i]]$y
+  }
+  
+  # Rescale using provided scale parameters
+  if (!is.null(scaleparam)) {
+    for (i in 1:NbVar) {
+      temp_m[, 1, i] <- temp_m[, 1, i] * scaleparam$`scaled:scale`[names(Data)[i]] + 
+        scaleparam$`scaled:center`[names(Data)[i]]
+    }
+  }
+  
+  # Plotting
+  if (plotting == TRUE) {
+    save_this_path <- file.path(save_path, species_name, model_name)
+    suppressWarnings(dir.create(save_this_path, recursive = TRUE))
+    pdf(file.path(save_this_path, paste0(species_name, "_", model_name, ".pdf")))
+    
+    # Layout
+    W.width <- ceiling(sqrt(NbVar))
+    W.height <- ceiling(NbVar / W.width)
+    mat <- matrix(c(rep(1, W.width), 1:(W.height * W.width) + 1), ncol = W.width, byrow = TRUE)
+    layout(mat, widths = rep(1, W.width), heights = c(0.3, rep(1, W.height)))
+    par(mar = c(0.1, 0.1, 0.1, 0.1))
+    plot(0, 0, xlim = c(0, 1), ylim = c(0, 1), type = "n", axes = FALSE)
+    polygon(c(-2, -2, 2, 2), c(-2, 2, 2, -2), col = "#f5fcba", border = NA)
+    text(0.5, 0.8, labels = paste("Response curves:", species_name, toupper(model_name)), 
+         cex = 1.6, col = "#4c57eb", pos = 1)
+    par(mar = c(3, 3, 1.5, 1))
+    
+    # Draw curves
+    for (i in 1:dim(temp_m)[3]) {
+      temp_i <- temp_m[,,i]
+      temp_i <- temp_i[order(temp_i[,1]),]
+      plot(temp_i[,1] / factor, temp_i[,2], ylim = c(0, 1), xlab = "", ylab = "", 
+           type = "l", main = colnames(Data)[i], cex.axis = 0.8, cex.main = 0.8)
+    }
+    
+    dev.off()
+  }
+  
+  temp[[1]] <- temp_m
+  names(temp)[1] <- model_name
+}
+
+
 ##############
 ## GLM, GAM ##
 ##############
