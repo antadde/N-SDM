@@ -288,7 +288,7 @@ temp_m_l <- mclapply(1:NbVar, parplot_fast, mc.cores = ncores)
 ## GLM, GAM ##
 ##############
 
-if(class(models@fits[[1]][[1]])[1]!="ranger" class(models@fits[[1]][[1]])[2]!="randomForest"  & class(models@fits[[1]][[1]])[1]!="lgb.Booster" & class(models@fits[[1]][[1]])[1]!="maxnet"){
+if(class(models@fits[[1]][[1]])[1]!="ranger" & class(models@fits[[1]][[1]])[2]!="randomForest"  & class(models@fits[[1]][[1]])[1]!="lgb.Booster" & class(models@fits[[1]][[1]])[1]!="maxnet"){
 temp<-list() # list where results will be stored
 
 for(m in 1:length(models@fits)){ # Loop over models (1 in regular cases but much more in esm settings)
