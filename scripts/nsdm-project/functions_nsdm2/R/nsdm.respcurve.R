@@ -206,7 +206,6 @@ temp_m[,2,i]<-logit2prob(X1[[1]]$y)
 	temp[[1]]<-temp_m
     names(temp)[1]<-model_name
 	}
-	}
 
 ########
 ## Ranger ##
