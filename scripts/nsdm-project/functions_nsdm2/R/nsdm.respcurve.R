@@ -143,7 +143,7 @@ temp_m[,2,i]<-X1[[1]]$y
 ########
 ## RF ##
 ########
-if(class(models@fits[[1]][[1]])[2]=="randomForest"){
+if (inherits(models@fits[[1]][[1]], "randomForest")) {
 temp<-list() # list where results will be stored
 
 # Retrieve model fit
@@ -283,7 +283,6 @@ temp_m_l <- mclapply(1:NbVar, parplot_fast, mc.cores = ncores)
   
   temp[[1]] <- temp_m
   names(temp)[1] <- model_name
-}
 }
 
 
