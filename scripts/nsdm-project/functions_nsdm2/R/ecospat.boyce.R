@@ -2,74 +2,95 @@
 #'
 #' Updated ecospat.boyce (ecospat package) function for calculating Boyce index as in Hirzel et al. 2006
 #'
-#' @param fit A vector or Raster-Layer containing the predicted suitability values
-#' @param obs A vector containing the predicted suitability values or xy-coordinates (if fit is a Raster-Layer) of the validation points (presence records)
-#' @param nclass Number of classes or vector with classes threshold. If nclass=0, Boyce index is calculated with a moving window (see next parameters)
-#' @param window.w width of the moving window (by default 1/10 of the suitability range)
-#' @param res resolution of the moving window (by default 100 focals)
-#' @param PEplot if True, plot the predicted to expected ratio along the suitability class
-#' @param rm.duplicate if TRUE, the correlation exclude successive duplicated values
-#' @param method correlation method used to compute the boyce index
+#' @param fit A vector or a SpatRaster containing the predicted suitability values.
+#' @param obs A vector containing the predicted suitability values of validation points,
+#'            or xy-coordinates (if fit is a RasterLayer/SpatRaster).
+#' @param nclass Number of classes or a vector with class thresholds.
+#'               If nclass = 0, a moving window approach is used.
+#' @param window.w Width of the moving window (default = 1/10 of suitability range).
+#' @param res Resolution of the moving window (default = 100 focal points).
+#' @param PEplot Logical. If TRUE, plot predicted/expected ratios.
+#' @param rm.duplicate Logical. If TRUE, remove successive duplicated values.
+#' @param method Correlation method used for the Boyce index ('spearman' or 'pearson').
 #'
-#' @author Blaise Petitpierre (blaise.petitpierre@unil.ch)
+#' @return A list with F.ratio (Predicted/Expected), cor (Boyce index), and HS (suitability classes).
 #' @export
 
 ecospat.boyce <- function(fit, obs, nclass = 0, window.w = "default", res = 100, 
                           PEplot = TRUE, rm.duplicate = TRUE, method = 'spearman') {
   
-  #### internal function calculating predicted-to-expected ratio for each class-interval
+  # Internal function to compute predicted-to-expected ratio
   boycei <- function(interval, obs, fit) {
-    pi <- sum(as.numeric(obs >= interval[1] & obs <= interval[2])) / length(obs)
-    ei <- sum(as.numeric(fit >= interval[1] & fit <= interval[2])) / length(fit)
-    return(round(pi/ei,10))
+    pi <- sum(obs >= interval[1] & obs <= interval[2]) / length(obs)
+    ei <- sum(fit >= interval[1] & fit <= interval[2]) / length(fit)
+    return(round(pi / ei, 10))
   }
   
-  if (class(fit) == "RasterLayer") {
-    if (class(obs) == "data.frame" || class(obs) == "matrix") {
-      obs <- extract(fit, obs)
+  # Handle SpatRaster input
+  if (inherits(fit, "SpatRaster")) {
+    if (is.data.frame(obs) || is.matrix(obs)) {
+      obs <- terra::extract(fit, as.data.frame(obs), ID = FALSE)
+      obs <- as.numeric(obs[, 1])
     }
-    fit <- getValues(fit)
-    fit <- fit[!is.na(fit)]
+    fit <- terra::values(fit, na.rm = TRUE)
+    fit <- as.numeric(fit)
   }
   
-  mini <- min(fit,obs)
-  maxi <- max(fit,obs)
+  mini <- min(fit, obs)
+  maxi <- max(fit, obs)
   
-  if(length(nclass)==1){
-    if (nclass == 0) { #moving window
-      if (window.w == "default") {window.w <- (max(fit) - min(fit))/10}
-      vec.mov <- seq(from = mini, to = maxi - window.w, by = (maxi - mini - window.w)/res)
-      vec.mov[res + 1] <- vec.mov[res + 1] + 1  #Trick to avoid error with closed interval in R
+  if (length(nclass) == 1) {
+    if (nclass == 0) {
+      # Moving window approach
+      if (window.w == "default") {
+        window.w <- (max(fit) - min(fit)) / 10
+      }
+      vec.mov <- seq(from = mini, to = maxi - window.w, by = (maxi - mini - window.w) / res)
+      vec.mov[res + 1] <- vec.mov[res + 1] + 1  # Avoid closed interval error
       interval <- cbind(vec.mov, vec.mov + window.w)
-    } else{ #window based on nb of class
-      vec.mov <- seq(from = mini, to = maxi, by = (maxi - mini)/nclass)
+    } else {
+      # Fixed number of bins
+      vec.mov <- seq(from = mini, to = maxi, by = (maxi - mini) / nclass)
       interval <- cbind(vec.mov, c(vec.mov[-1], maxi))
     }
-  } else{ #user defined window
-    vec.mov <- c(mini, sort(nclass[!nclass>maxi|nclass<mini]))
+  } else {
+    # User-defined breaks
+    vec.mov <- c(mini, sort(nclass[!nclass > maxi | nclass < mini]))
     interval <- cbind(vec.mov, c(vec.mov[-1], maxi))
   }
   
+  # Compute P/E ratios
   f <- apply(interval, 1, boycei, obs, fit)
-  to.keep <- which(f != "NaN")  # index to keep no NaN data
+  to.keep <- which(!is.nan(f))
   f <- f[to.keep]
+  
+  # Compute correlation (Boyce index)
   if (length(f) < 2) {
-    b <- NA  #at least two points are necessary to draw a correlation
+    b <- NA  # Need at least 2 bins for correlation
+    r <- NULL
   } else {
-    r<-1:length(f)
-    if(rm.duplicate == TRUE){
-      r <- c(1:length(f))[f != c( f[-1],TRUE)]  #index to remove successive duplicates
+    r <- seq_along(f)
+    if (rm.duplicate) {
+      r <- which(f != c(f[-1], TRUE))
     }
-    b <- cor(f[r], vec.mov[to.keep][r], method = method)  # calculation of the correlation (i.e. Boyce index) after removing successive duplicated values
+    b <- cor(f[r], vec.mov[to.keep][r], method = method)
   }
-  HS <- apply(interval, 1, sum)/2  # mean habitat suitability in the moving window
-  if(length(nclass)==1 & nclass == 0) {
-    HS[length(HS)] <- HS[length(HS)] - 1  #Correction of the 'trick' to deal with closed interval
+  
+  # Calculate average suitability in each bin
+  HS <- rowMeans(interval)
+  if (length(nclass) == 1 && nclass == 0) {
+    HS[length(HS)] <- HS[length(HS)] - 1  # Correct "trick"
   }
-  HS <- HS[to.keep]  #exclude the NaN
-  if (PEplot == TRUE) {
-    plot(HS, f, xlab = "Habitat suitability", ylab = "Predicted/Expected ratio", col = "grey", cex = 0.75)
-    points(HS[r], f[r], pch = 19, cex = 0.75)
+  HS <- HS[to.keep]
+  
+  # Optional plot
+  if (PEplot) {
+    plot(HS, f, xlab = "Habitat suitability", ylab = "Predicted/Expected ratio",
+         col = "grey", cex = 0.75)
+    if (!is.null(r)) {
+      points(HS[r], f[r], pch = 19, cex = 0.75)
+    }
   }
+  
   return(list(F.ratio = f, cor = round(b, 3), HS = HS))
 }
