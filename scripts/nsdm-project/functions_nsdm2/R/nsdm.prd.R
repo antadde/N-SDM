@@ -34,7 +34,7 @@ nsdm.prd <- function(mod, tst) {
     
     pred <- predict(mod,
                     data = tst,
-                    type = "response")$predictions
+                    type = "response")$predictions[, 2]  # Probability for class 1
     
   }
 
