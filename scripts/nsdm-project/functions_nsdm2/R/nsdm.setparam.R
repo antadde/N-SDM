@@ -176,6 +176,7 @@ if(model_name == "rf") {
         probability = TRUE,
         num.threads = nthreads,
 		verbose = FALSE,
+		importance= "impurity",
         case.weights = weighting
       ),
       tag = paste0("rf-", p),

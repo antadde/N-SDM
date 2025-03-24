@@ -5,7 +5,7 @@
 #' @param models A nsdm.fit object containing fitted model(s)
 #'
 #' @return A list containing the values of the relative importance for each individual covariate and model
-#' @author Antoine Adde (aadde@unil.ch)
+#' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
 nsdm.varimp <- function(models){
@@ -45,6 +45,14 @@ imp_scaled$Variable<-gsub("[\\(\\)]", "", regmatches(imp_scaled$Variable, gregex
 if(c("randomForest") %in% class(model)){
 imp<-randomForest::importance(model)
 imp_scaled <- data.frame(Variable=rownames(imp), Importance=scale(imp,FALSE,max(imp)))
+}
+
+if(c("ranger") %in% class(model)){
+  imp <- model$variable.importance
+  imp_scaled <- data.frame(
+    Variable = names(imp),
+    Importance = scale(imp, center = FALSE, scale = max(imp))
+  )
 }
 
 if(c("maxnet") %in% class(model)){
