@@ -211,7 +211,6 @@ temp_m[,2,i]<-logit2prob(X1[[1]]$y)
 ########
 ## Ranger ##
 ########
-
 if (inherits(models@fits[[1]][[1]], "ranger")) {
   temp <- list()
   model <- models@fits[[1]][[1]]
@@ -284,6 +283,7 @@ temp_m_l <- mclapply(1:NbVar, parplot_fast, mc.cores = ncores)
   
   temp[[1]] <- temp_m
   names(temp)[1] <- model_name
+}
 }
 
 
