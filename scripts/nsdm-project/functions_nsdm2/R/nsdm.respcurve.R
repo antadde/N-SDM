@@ -205,7 +205,7 @@ temp_m[,2,i]<-logit2prob(X1[[1]]$y)
 	dev.off()
 	temp[[1]]<-temp_m
     names(temp)[1]<-model_name
-	}}}
+	}}
 
 ########
 ## Ranger ##
@@ -283,6 +283,7 @@ temp_m_l <- mclapply(1:NbVar, parplot_fast, mc.cores = ncores)
   temp[[1]] <- temp_m
   names(temp)[1] <- model_name
 }
+
 
 ##############
 ## GLM, GAM ##
@@ -363,7 +364,7 @@ Xp[,i] <- mean(Data2[,i])
 	temp[[m]]<-temp_m
 	names(temp)[m]<-model_nameu
 	}
-}
+}}
 }
 
 if(model_name=="esm")return(temp)
