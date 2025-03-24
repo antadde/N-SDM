@@ -36,28 +36,12 @@ model_nameu<-names(models@fits)[m]
 if(c("glm") %in% class(model) & !("gam") %in% class(model)){
 ndata<-parallel::mclapply(splits_ix, function(x){round(data.frame(fit=predict(model, nwdata[x,], se.fit = FALSE, type = "response")),2)}, mc.cores = nsplits)
 ndata_bck<-rbind.fill(ndata)
-#ndata<-parallel::mclapply(splits_ix, function(x){data.frame(predict(model, nwdata[x,], se.fit = TRUE))[,1:2]}, mc.cores = nsplits)
-#ndata<-rbind.fill(ndata)
-#names(ndata)<-c("fit_link", "se_link")
-# Compute confidence interval
-#ilink <- family(model)$linkinv
-#ndata_bck <- data.frame(fit  = ilink(ndata$fit_link),
-#                        upr = ilink(ndata$fit_link + (1.96 * ndata$se_link)),
-#                        lwr = ilink(ndata$fit_link - (1.96 * ndata$se_link)))
 }
 
 ## GAM
 if(c("gam") %in% class(model)){
 ndata<-parallel::mclapply(splits_ix, function(x){data.frame(fit=round(predict(model, nwdata[x,], se.fit = FALSE, gc.level=1, type = "response", block.size=round(nrow(nwdata[x,])/3)),2))}, mc.cores = nsplits)
 ndata_bck<-rbind.fill(ndata)
-#ndata<-parallel::mclapply(splits_ix, function(x){data.frame(predict(model, nwdata[x,], se.fit = TRUE, block.size=0))[,1:2]}, mc.cores = nsplits)
-#ndata<-rbind.fill(ndata)
-#names(ndata)<-c("fit_link", "se_link")
-# Compute confidence interval
-# ilink <- family(model)$linkinv
-# ndata_bck <- data.frame(fit  = ilink(ndata$fit_link),
-#                        upr = ilink(ndata$fit_link + (1.96 * ndata$se_link)),
-#                        lwr = ilink(ndata$fit_link - (1.96 * ndata$se_link)))
 }
 
 ## Maxent
@@ -70,6 +54,23 @@ ndata_bck<-rbind.fill(ndata)
 if(c("randomForest") %in% class(model)){
 ndata<-parallel::mclapply(splits_ix, function(x){data.frame(fit=predict(model, nwdata[x,], type="prob")[,2])}, mc.cores = nsplits)
 ndata_bck<-rbind.fill(ndata)
+}
+
+## RF with ranger
+if ("ranger" %in% class(model)) {
+  ndata <- parallel::mclapply(
+    splits_ix,
+    function(x) {
+      preds <- predict(model, data = nwdata[x, ], type = "response", verbose = FALSE)$predictions
+      if (is.matrix(preds)) {
+        data.frame(fit = preds[, 2])  # probability of class 1
+      } else {
+        data.frame(fit = preds)  # if only 2-class case returns vector
+      }
+    },
+    mc.cores = nsplits
+  )
+  ndata_bck <- plyr::rbind.fill(ndata)
 }
 
 ## GBM

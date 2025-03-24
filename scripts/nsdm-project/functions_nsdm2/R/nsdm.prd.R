@@ -11,7 +11,7 @@ nsdm.prd <- function(mod, tst) {
     
     pred <- predict(mod,
                     newdata = tst,
-                    type = "logistic")
+                    type = "cloglog")
     
   } else if (any(c("glm") %in% class(mod))) {
     
