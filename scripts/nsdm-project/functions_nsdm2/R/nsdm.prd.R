@@ -2,48 +2,43 @@
 #'
 #' Feed the predict functions depending on model type
 #'
-#' @author Philipp Brun (philipp.brun@wsl.ch)
+#' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
-nsdm.prd<-function(mod,tst){
-
-  # Generate probabilistic precitions
-  if("maxnet"%in%class(mod)){
-
-    pred<-nsdm.df_or_rast(mod,
-                     nwdat=tst,
-                     type="logistic")
+nsdm.prd <- function(mod, tst) {
+  
+  if ("maxnet" %in% class(mod)) {
     
-  } else if(any(c("glm","ranger")%in%class(mod))){
-
-    pred<-nsdm.df_or_rast(mod=mod,
-                     nwdat=tst,
-                     type="response")
-
-  } else if("gbm"%in%class(mod)){
-
-    pred<-nsdm.df_or_rast(mod,
-                     nwdat=tst,
-                     n.trees=mod$n.trees,
-                     type="response")
-
-  } else if("lgb.Booster"%in%class(mod)){
+    pred <- predict(mod,
+                    newdata = tst,
+                    type = "logistic")
     
-    pred<-nsdm.df_or_rast(mod=mod,
-                     nwdat=tst)
+  } else if (any(c("glm") %in% class(mod))) {
     
-  } else if("randomForest"%in%class(mod)){
-
-    pred<-nsdm.df_or_rast(mod,
-                     nwdat=tst,
-                     type="prob")
+    pred <- predict(mod,
+                    newdata = tst,
+                    type = "response")
+    
+  } else if ("lgb.Booster" %in% class(mod)) {
+    
+    pred <- predict(mod,
+                    data = as.matrix(tst))
+    
+  } else if ("randomForest" %in% class(mod)) {
+    
+    pred <- predict(mod,
+                    newdata = tst,
+                    type = "prob")[, 2]  # Probability for class 1
+    
+  } else if ("ranger" %in% class(mod)) {
+    
+    pred <- predict(mod,
+                    data = tst,
+                    type = "response")$predictions
+    
   }
 
-  # Convert to numeric
-  if(class(tst)=="data.frame"){
-    pred<-as.numeric(pred)
-  }
-
+  pred <- round(as.numeric(pred), 2)
+  
   return(pred)
-
 }
