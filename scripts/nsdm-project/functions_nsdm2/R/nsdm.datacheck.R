@@ -7,7 +7,7 @@
 #'   \item Covariate data follows the expected folder hierarchy.
 #'   \item Covariate data follows the expected naming convention.
 #'   \item For each level ('reg', 'glo'), a subset of raster files is sampled and checked for consistent extent, resolution, CRS, and grid alignment.
-#'   \item The CRS and grid of the rasters are compared to a sample of species coordinates to ensure compatibility.
+#'   \item The CRS and grid of the covariate and mask rasters are compared to a sample of species coordinates to ensure compatibility.
 #' }
 #'
 #' @param data_dir Character. Path to the main data directory (must contain subfolders like 'covariates', 'species', 'masks').
@@ -28,16 +28,42 @@ nsdm.datacheck <- function(data_dir, n_levels) {
   valid_levels <- if (n_levels > 1) c("reg", "glo") else "reg"
 
   # Step 1: Check required subfolders
-  required_dirs <- if (n_levels > 1) {
-    c("masks", "species/glo", "species/reg", "covariates/glo", "covariates/reg")
-  } else {
-    c("masks", "species/reg", "covariates/reg")
-  }
+	required_dirs <- if (n_levels > 1) {
+	  c("masks", "species/glo", "species/reg", "covariates/glo", "covariates/reg")
+	} else {
+	  c("species/glo", "covariates/glo")
+	}
 
-  missing_dirs <- required_dirs[!dir.exists(file.path(data_dir, required_dirs))]
-  if (length(missing_dirs) > 0) {
-    message("❌ Missing required folders:\n", paste(file.path(data_dir, missing_dirs), collapse = "\n"))
-  }
+	# Check for missing directories
+	missing_dirs <- required_dirs[!dir.exists(file.path(data_dir, required_dirs))]
+	if (length(missing_dirs) > 0) {
+	  message("❌ Missing required folders:\n", paste(file.path(data_dir, missing_dirs), collapse = "\n"))
+	}
+
+	# Check for presence of expected data files inside each directory
+	check_dir_has_data <- function(subdir) {
+	  
+	  full_path <- file.path(data_dir, subdir)
+
+	  if (grepl("^species", subdir)) {
+		files <- list.files(full_path, pattern = "\\.psv$", recursive = TRUE)
+		if (length(files) == 0) {
+		  message("🚨 No .psv files found in ", full_path)
+		}
+	  } else if (grepl("^covariates", subdir)) {
+		files <- tif_paths
+		if (length(files) == 0) {
+		  message("🚨 No .tif files found in ", full_path)
+		}
+	  } else if (subdir == "masks") {
+		mask_file <- file.path(full_path, basename(mask_reg))
+		if (!file.exists(mask_file)) {
+		  message("🚨 Missing expected mask file: ", mask_file)
+		}
+	  }
+	}
+
+	invisible(lapply(required_dirs, check_dir_has_data))
 
   # Step 2: Check covariate folder structure
   is_valid_cov_path <- function(path) {
@@ -64,7 +90,7 @@ nsdm.datacheck <- function(data_dir, n_levels) {
   }
 
   # Step 2b: Check for special characters in folder names
-  spec_char <- dirs_with_data[grepl("(?<!\\d)_|_(?!\\d)|[^a-zA-Z0-9/._]", dirs_with_data, perl = TRUE)]
+  spec_char <- dirs_with_data[grepl("_|[^a-zA-Z0-9/\\.]", dirs_with_data)]
   if (length(spec_char) > 0) {
     message("🚨 Suspicious use of special characters in folder names:\n", paste(spec_char, collapse = "\n"))
   }
@@ -74,7 +100,7 @@ nsdm.datacheck <- function(data_dir, n_levels) {
     check_covariate_consistency(level, cov_dir, sp_dir)
   }
 
-  message("✅ Data check procedure completed successfully.")
+  message("✅ Initial data check procedure completed successfully.")
 }
 
 check_covariate_consistency <- function(level = "reg", cov_dir, sp_dir) {
@@ -121,8 +147,8 @@ check_covariate_consistency <- function(level = "reg", cov_dir, sp_dir) {
   if (length(sp_files) == 0) stop("❌ No species file found for level: ", level)
   species_data <- tryCatch(fread(sp_files[1]), error = function(e) NULL)
 
-  if (is.null(species_data) || !all(c("X", "Y") %in% names(species_data))) {
-    stop("❌ Could not read species file or missing required X/Y columns.")
+  if (is.null(species_data) || !all(c("X", "Y", "species") %in% names(species_data))) {
+    stop("❌ Could not read species file or missing required X/Y/species columns.")
   }
 
   sample_coords <- species_data[sample(nrow(species_data), min(100, nrow(species_data))), .(X, Y)]
@@ -140,6 +166,24 @@ check_covariate_consistency <- function(level = "reg", cov_dir, sp_dir) {
   if (is.null(vals)) {
     stop("❌ Species coordinates are not compatible with raster grid (CRS or extent mismatch).")
   }
+  
+# Mask data check
+if (level == "glo" && n_levels == 2) {
+   if (!file.exists(mask_reg)) {
+    stop("❌ Expected mask file not found: ", mask_reg)
+  }
+  m_r <- tryCatch(rast(mask_reg), error = function(e) stop("❌ Failed to load mask file: ", e$message))
+    if (!compareGeom(m_r, r, stopOnError = FALSE)) {
+    stop("❌ 'mask_reg.tif' geometry is not compatible with global raster grid (extent, resolution, or CRS mismatch).")
+  }
 
+rmin <- minmax(m_r)[1]
+rmax <- minmax(m_r)[2]
+
+if (!(rmin == 1 && rmax == 1)) {
+  stop("❌ 'mask_reg.tif' contains values other than 1 and NA. Found range: [", rmin, ", ", rmax, "]")
+}
+}
+  
   invisible(compare_df)
 }
