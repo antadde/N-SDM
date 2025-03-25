@@ -90,9 +90,9 @@ for (i in seq_along(pred_list)) {
   if (has_scenario) {
   scenario_cov <- pred_table[!is.na(scenario)]
   if (all(c("reg", "glo") %in% pred_table$level)) {
-    base_cov <- pred_table[level == "reg" & is.na(scenario)]
+    base_cov <- pred_table[level == "reg" & scenario=="NA"]
   } else if ("glo" %in% pred_table$level) {
-    base_cov <- pred_table[level == "glo" & is.na(scenario)]
+    base_cov <- pred_table[level == "glo" & scenario=="NA"]
   }
   key_cols <- c("variable", "attribute", "focal")
   missing <- fsetdiff(scenario_cov[, ..key_cols], base_cov[, ..key_cols])
