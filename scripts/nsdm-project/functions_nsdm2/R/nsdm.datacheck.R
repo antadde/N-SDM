@@ -16,8 +16,9 @@
 #' @return Invisibly returns a data.frame with consistency results for sampled rasters (extent, resolution, CRS, grid).
 #' If inconsistencies are found, the function stops and reports the problematic files or species mismatches.
 #'
-#' @author Antoine Adde (antoine.adde@eawag.ch)
+#' @author Antoine Adde (\email{antoine.adde@eawag.ch})
 #' @export
+
 nsdm.datacheck <- function(data_dir, n_levels) {
 
   cov_dir <- file.path(data_dir, "covariates")
