@@ -83,7 +83,7 @@ for (i in seq_along(pred_list)) {
   missing <- fsetdiff(glo_cov[, ..key_cols], reg_cov[, ..key_cols])
   if (nrow(missing) > 0) {
   message("❌ The following global covariates are missing in regional data:")
-  print(missing) }
+  print(missing) }}
   
   # Check that if scenario variables are available, they are also in the non-scenario reg ones (if glo and reg levels are available) or only in the non-scenario glo ones if no reg are available
   has_scenario <- any(!is.na(cov_info$scenario))
