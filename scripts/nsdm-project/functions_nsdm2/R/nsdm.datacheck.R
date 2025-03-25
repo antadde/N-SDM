@@ -100,7 +100,7 @@ nsdm.datacheck <- function(data_dir, n_levels) {
     check_covariate_consistency(level, cov_dir, sp_dir)
   }
 
-  message("✅ Initial data check procedure completed successfully.")
+  message("Initial data check procedure completed.")
 }
 
 check_covariate_consistency <- function(level = "reg", cov_dir, sp_dir) {
