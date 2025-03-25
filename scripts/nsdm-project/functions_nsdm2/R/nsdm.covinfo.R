@@ -14,8 +14,7 @@
 
 nsdm.covinfo <- function(
   cov_path,
-  save_path,
-) { 
+  save_path){ 
   
  # List all available layers and extract their information
 setwd(cov_path)
