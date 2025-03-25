@@ -69,11 +69,37 @@ for (i in seq_along(pred_list)) {
   }
 }
 
-  # Clean and format the table
+  # Clean the table
   pred_table <- data.frame(pred_table, stringsAsFactors = FALSE)
   pred_table[is.na(pred_table)] <- "NA"
-  
-  # Save covariate table
   row.names(pred_table) <- NULL
+  pred_table<-data.table(pred_table)
+  
+  # Check that if both reg and glo levels are available, glo variables are also in the regional ones
+  if (all(c("reg", "glo") %in% unique(pred_table$level))) {
+  reg_cov <- cov_info[level == "reg"]
+  glo_cov <- cov_info[level == "glo"]
+  key_cols <- c("year", "variable", "attribute", "focal")
+  missing <- fsetdiff(glo_cov[, ..key_cols], reg_cov[, ..key_cols])
+  if (nrow(missing) > 0) {
+  message("❌ The following global covariates are missing in regional data:")
+  print(missing) }
+  
+  # Check that if scenario variables are available, they are also in the non-scenario reg ones (if glo and reg levels are available) or only in the non-scenario glo ones if no reg are available
+  has_scenario <- any(!is.na(cov_info$scenario))
+  if (has_scenario) {
+  scenario_cov <- cov_info[!is.na(scenario)]
+  if (all(c("reg", "glo") %in% cov_info$level)) {
+    base_cov <- cov_info[level == "reg" & is.na(scenario)]
+  } else if ("glo" %in% cov_info$level) {
+    base_cov <- cov_info[level == "glo" & is.na(scenario)]
+  }
+  key_cols <- c("variable", "attribute", "focal")
+  missing <- fsetdiff(scenario_cov[, ..key_cols], base_cov[, ..key_cols])
+  if (nrow(missing) > 0) {
+  message("❌ The following global covariates are missing in regional data:")
+  print(missing)}}
+
+  # Save covariate table
   fwrite(pred_table, file.path(save_path, "predictors_available.psv"), sep = "|")
 }
