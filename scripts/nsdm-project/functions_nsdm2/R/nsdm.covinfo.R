@@ -100,5 +100,5 @@ for (i in seq_along(pred_list)) {
   print(missing)}}
 
   # Save covariate table
-  fwrite(pred_table, file.path(save_path, "predictors_available.psv"), sep = "|")
+  fwrite(pred_table, file.path(save_path, "ref_covariates_available.psv"), sep = "|")
 }
