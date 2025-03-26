@@ -148,7 +148,7 @@ fst_basenames <- tools::file_path_sans_ext(basename(cov_fst))
 xt_names <- names(xt_pres)
 
 # Match and retrieve paths
-matched_cov_fst <- cov_fst[fst_basenames %in% xt_names]
+matched_cov_fst <- cov_fst[gsub("_msk","",fst_basenames) %in% xt_names]
 
 # Identify cell positions for absence points
 cells <- cellFromXY(rst_ref, xy[pa == 0,])
