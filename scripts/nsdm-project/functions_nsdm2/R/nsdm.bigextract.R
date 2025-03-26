@@ -10,7 +10,6 @@
 #' @param tmatch_scheme A character string specifying the temporal matching scheme:  
 #'   - `"npts"`: nearest previous time slice  
 #'   - `"nts"`: nearest time slice
-#' @param ex_pint Logical; whether to treat period interval covariates as static (`TRUE`) or not (`FALSE`).
 #' @param nzvt A numeric threshold specifying the minimum number of unique values required for a covariate to be retained in the candidate set.
 #' @param nsplits An integer indicating the number of cores to use for parallel extraction.
 #'
@@ -18,7 +17,7 @@
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
-nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_scheme="npts", ex_pint=TRUE, nzvt=10, nsplits=ncores){
+nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_scheme="npts", nzvt=10, nsplits=ncores){
 
  # Get data
 xy <- data@xy
@@ -39,52 +38,38 @@ cov_info_fst <- data.frame(cov_info[match(gsub("\\.fst$", "", basename(cov_fst))
 cov_info_fst <- cov_info_fst[!is.na(cov_info_fst$variable), ]
 
 # Extract relevant time columns
-times <- cov_info_fst[, c("start_year", "end_year", "variable", "dataset")]
-times$start_year <- as.numeric(times$start_year)
-times$end_year <- as.numeric(times$end_year)
+times <- cov_info_fst[, c("year", "variable", "dataset")]
+times$year <- as.numeric(times$year)
 times$id <- seq_len(nrow(times))
 
 # Identify layers for which temporal information is available
 tempo_t <- times[complete.cases(times), ]
 stat_t <- times[!complete.cases(times), ]
 
-# Generate period interval look-up table
-ints<-unique(tempo_t[,c("start_year", "end_year", "dataset")])
-   p_ints_t<-data.frame()
-   for(dt in unique(ints$dataset)){
-   a<-ints[ints$dataset==dt,]
-   a$diff<-a$end_year-a$start_year
-   a_ix<-which(a$end_year==max(a$end_year))
-   if(length(a_ix)>1) a_ix<-a_ix[which(a$diff[a_ix]==max(a$diff[a_ix]))]
-   if(table(a$diff)[1]>1){a$int<-"no_int"; a$int[which.max(a$end_year)]<-"int"} else {a$int<-"int"}
-   p_ints_t_i<-data.frame(dataset=dt, start_year=a$start_year[a_ix], end_year=a$end_year[a_ix], int=a$int[a_ix])
-   p_ints_t<-rbind(p_ints_t, p_ints_t_i)
-   }
-
 # If temporal matching is enabled
-if (exists("t_match") && t_match) {
-  if (ex_pint) {
-    ints <- tempo_t[tempo_t$dataset %in% unique(p_ints_t[p_ints_t$int == "int", ]$dataset), ]
-    for (dt in unique(ints$dataset)) {
-      ints_i <- ints[ints$dataset == dt, ]
-      p_ints_t_i <- p_ints_t[p_ints_t$dataset == dt, ]
-      per_int_ix <- which(ints_i$start_year == p_ints_t_i$start_year & ints_i$end_year == p_ints_t_i$end_year)
-      if (length(per_int_ix) > 0) {
-        stat_t <- rbind(stat_t, ints_i[per_int_ix, ])
-        tempo_t <- tempo_t[-ints_i[per_int_ix, ]$id, ]
-      }
-    }
-  } else {
-      ints <- tempo_t[tempo_t$dataset %in% unique(p_ints_t[p_ints_t$int == "int", ]$dataset), ]
-    for (dt in unique(ints$dataset)) {
-      ints_i <- ints[ints$dataset == dt, ]
-      p_ints_t_i <- p_ints_t[p_ints_t$dataset == dt, ]
-      per_int_ix <- which(ints_i$start_year == p_ints_t_i$start_year & ints_i$end_year == p_ints_t_i$end_year)
-      if (length(per_int_ix) > 0) {
-        stat_t <- rbind(stat_t, ints_i[per_int_ix, ])
-      }
-    }
-  }
+ if (exists("t_match") && t_match) {
+  # if (ex_pint) {
+    # ints <- tempo_t[tempo_t$dataset %in% unique(p_ints_t[p_ints_t$int == "int", ]$dataset), ]
+    # for (dt in unique(ints$dataset)) {
+      # ints_i <- ints[ints$dataset == dt, ]
+      # p_ints_t_i <- p_ints_t[p_ints_t$dataset == dt, ]
+      # per_int_ix <- which(ints_i$start_year == p_ints_t_i$start_year & ints_i$end_year == p_ints_t_i$end_year)
+      # if (length(per_int_ix) > 0) {
+        # stat_t <- rbind(stat_t, ints_i[per_int_ix, ])
+        # tempo_t <- tempo_t[-ints_i[per_int_ix, ]$id, ]
+      # }
+    # }
+  # } else {
+      # ints <- tempo_t[tempo_t$dataset %in% unique(p_ints_t[p_ints_t$int == "int", ]$dataset), ]
+    # for (dt in unique(ints$dataset)) {
+      # ints_i <- ints[ints$dataset == dt, ]
+      # p_ints_t_i <- p_ints_t[p_ints_t$dataset == dt, ]
+      # per_int_ix <- which(ints_i$start_year == p_ints_t_i$start_year & ints_i$end_year == p_ints_t_i$end_year)
+      # if (length(per_int_ix) > 0) {
+        # stat_t <- rbind(stat_t, ints_i[per_int_ix, ])
+      # }
+    # }
+  # }
   
   # Isolate dynamic (to match) and static (no match) layers and subset info tables
   cov_tomatch <- cov_fst[tempo_t$id]
@@ -248,7 +233,7 @@ if (!is.null(cov_nomatch) && length(cov_nomatch) > 0) {
 # Initialize a list to track filtered-out layers
 filtered_out_layers <- list(unique_values = NULL, near_zero_variance = NULL)
 
-# Safely combine presence and absence data
+# Combine presence and absence data
 if (!is.null(xt_pres) && !is.null(xt_abs)) {
   env_vars <- rbind(xt_pres, xt_abs)
 } else {
