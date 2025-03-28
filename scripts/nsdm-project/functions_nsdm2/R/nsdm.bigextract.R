@@ -63,14 +63,14 @@ suppressMessages({
 # Combine extracted data
 xt_pres <- do.call(cbind, xt_pres)
 
-# Only run temporal matching if years are available and t_match is TRUE
-if (!all(is.na(years)) && isTRUE(t_match)) {
+# Only run temporal matching if years are available and t_match is TRUE and temporal covariates are available
+cov_info_fst_tempo <- cov_info_fst[!is.na(cov_info_fst$year), ]
+if (!all(is.na(years)) && isTRUE(t_match) && nrow(cov_info_fst_tempo)>0) {
 
   # Get years corresponding to PA == 1
   y_sp <- years[pa == 1]
 
   # Filter and prepare temporal covariate information
-  cov_info_fst_tempo <- cov_info_fst[!is.na(cov_info_fst$year), ]
   cov_info_fst_tempo <- unique(cov_info_fst_tempo[, c("dataset", "year")])
   cov_info_fst_tempo_split_list <- split(cov_info_fst_tempo, cov_info_fst_tempo$dataset)
 
