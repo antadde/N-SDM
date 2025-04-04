@@ -129,7 +129,7 @@ if(level == "reg"){
 ### =========================================================================
 ### REG MULTIPLY
 ### =========================================================================
-if (any(c("multiply", "nultiplyw") %in% nesting_name)) {
+if (any(c("multiply") %in% nesting_name)) {
 ## Loop on target algorithms
 pred_all <- list()
 for (model in mod_algo) {
@@ -356,7 +356,7 @@ w_glo <- rowMeans(scores)[best_met]
 
 if(level == "reg"){
   # REG-level ensemble without nesting (only possible in multiply model)
-if (any(c("multiply", "nultiplyw") %in% nesting_name)) {
+if (any(c("multiply") %in% nesting_name)) {
     target <- REG_multiply_preds
     scores <- list()
     
@@ -420,11 +420,10 @@ if (any(c("multiply", "nultiplyw") %in% nesting_name)) {
       scores[[z]] <- score
     }
     
-    scores_ensemble[["MUL"]] <- scores	
-  }
+    scores_ensemble[["MUL"]] <- scores
   
   # Multiply weighted nested ensemble
-if ("multiplyw" %in% nesting_name) {
+if (multiply_weighted == TRUE) {
   target <- REG_multiply_preds
   
   # Preprocess GLO probabilities
@@ -462,13 +461,17 @@ if ("multiplyw" %in% nesting_name) {
   }
   
   scores_ensemble[["MULW"]] <- scores
-} 
+}
+  }
 }
 
 #### Return
 scores_array <- lapply(scores_ensemble, simplify2array)
 scores_array <- lapply(scores_array, rowMeans)
 
-return(scores_array)
+if (exists("w_reg") && exists("w_glo")) {
+  return(list(scores_array = scores_array, w_reg = w_reg, w_glo = w_glo))
+} else {
+return(scores_array)}
 }
 
