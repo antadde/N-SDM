@@ -83,7 +83,7 @@ for (model in model_names) {
     pred <- list()
     
     for (k in seq_len(outerloop)) {
-      model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_", level, ".rds"))
+      model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_glo.rds"))
       
       if (inherits(mod_m$m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
         if (file.exists(model_path)) {
