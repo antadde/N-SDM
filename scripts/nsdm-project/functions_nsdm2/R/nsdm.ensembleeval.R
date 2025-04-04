@@ -26,11 +26,10 @@
 #' @export
 
 nsdm.ensembleeval <- function(level, model_names, species_name, nesting_name=NA){
-
+# Retrieve predictions
 ### =========================================================================
 ### GLO
 ### =========================================================================
-################# Retrieve predictions
 ## Loop on target algorithms
 pred_all <- list()
 for (model in model_names) {
@@ -130,15 +129,13 @@ if(level == "reg"){
 ### =========================================================================
 ### REG MULTIPLY
 ### =========================================================================
-if (any(c("multiply", "nultiplyw") %in% nesting_methods)) {
-################# Retrieve predictions
-level <- "reg_multiply"
+if (any(c("multiply", "nultiplyw") %in% nesting_name)) {
 ## Loop on target algorithms
 pred_all <- list()
 for (model in mod_algo) {
   # Retrieve evaluation table and identify best model
   eval_list <- nsdm.loadthis(model_name = model, species_name = ispi_name,
-                             read_path = file.path(scr_path, "outputs", "d3_evals", "reg", "multiply"))
+                             read_path = file.path(scr_path, "outputs", "d3_evals", "reg", nesting_name))
   
   if (!is.null(eval_list) && best_met %in% rownames(eval_list)) {
    modinp_top <- colnames(eval_list)[which.max(eval_list[best_met, ])]
@@ -154,7 +151,7 @@ for (model in mod_algo) {
   # Load best model
   mod_m <- nsdm.loadthis(species_name = ispi_name, model_name = model,
                           tag = paste0(model, "_tune"),
-                          read_path = file.path(scr_path, "outputs", "d2_models", "reg", "multiply"))$model
+                          read_path = file.path(scr_path, "outputs", "d2_models", "reg", nesting_name))$model
   
   # Loop over models (one in regular cases; more for ESMs)
   pop <- list()
@@ -189,7 +186,7 @@ for (model in mod_algo) {
                                   pattern = ".tif", full.names = TRUE))
     
     for (k in seq_len(outerloop)) {
-      model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_", level, ".rds"))
+	  model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", nesting_name, ".rds"))
       
       if (inherits(mod_m$m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
         if (file.exists(model_path)) {
@@ -237,18 +234,16 @@ if (length(pred_all) > 0) {
 ### =========================================================================
 ### REG COVARIATE
 ### =========================================================================
-if("covariate" %in% nesting_methods){
+if (any(c("covariate") %in% nesting_name)) {
 # Load covariate matrix to rescale GLO predictions
 mat <- nsdm.loadthis(species_name = ispi_name, read_path = file.path(scr_path, "outputs", "d1_covsels", "reg"))$env_vars
 
-################# Retrieve predictions
-level <- "reg_covariate"
 ## Loop on target algorithms
 pred_all <- list()
 for (model in mod_algo) {
   # Retrieve evaluation table and identify best model
   eval_list <- nsdm.loadthis(model_name = model, species_name = ispi_name,
-                             read_path = file.path(scr_path, "outputs", "d3_evals", "reg", "covariate"))
+                             read_path = file.path(scr_path, "outputs", "d3_evals", "reg", nesting_name))
   
   if (!is.null(eval_list) && best_met %in% rownames(eval_list)) {
    modinp_top <- colnames(eval_list)[which.max(eval_list[best_met, ])]
@@ -264,7 +259,7 @@ for (model in mod_algo) {
   # Load best model
   mod_m <- nsdm.loadthis(species_name = ispi_name, model_name = model,
                           tag = paste0(model, "_tune"),
-                          read_path = file.path(scr_path, "outputs", "d2_models", "reg", "covariate"))$model
+                          read_path = file.path(scr_path, "outputs", "d2_models", "reg", nesting_name))$model
   
   # Loop over models (one in regular cases; more for ESMs)
   pop <- list()
@@ -296,7 +291,7 @@ for (model in mod_algo) {
     pred <- list()
     
     for (k in seq_len(outerloop)) {
-      model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_", level, ".rds"))
+      model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", nesting_name, ".rds"))
       
       if (inherits(mod_m$m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
         if (file.exists(model_path)) {
@@ -356,10 +351,12 @@ for (z in seq_len(outerloop)) {
   scores[[z]] <- score
 }
 scores_ensemble[["GLO"]] <- scores
+scores <- simplify2array(scores)
+w_glo <- rowMeans(scores)[best_met]
 
 if(level == "reg"){
-  # REG-level ensemble without nesting (only possible in multiply mode)
-  if ("multiply" %in% nesting_methods) {
+  # REG-level ensemble without nesting (only possible in multiply model)
+if (any(c("multiply", "nultiplyw") %in% nesting_name)) {
     target <- REG_multiply_preds
     scores <- list()
     
@@ -372,12 +369,13 @@ if(level == "reg"){
       )
       scores[[z]] <- score
     }
-    
     scores_ensemble[["REG"]] <- scores
+	scores <- simplify2array(scores)
+    w_reg <- rowMeans(scores)[best_met]
   }	
 
   # Covariate nested ensemble
-  if ("covariate" %in% nesting_methods) {
+  if ("covariate" %in% nesting_name) {
     target <- REG_covariate_preds
     scores <- list()
     
@@ -395,9 +393,10 @@ if(level == "reg"){
   }
 
   # Multiply nested ensemble
-  if ("multiply" %in% nesting_methods) {
+  if ("multiply" %in% nesting_name) {
     target <- REG_multiply_preds
-    
+ 
+   # Preprocess GLO probabilities
     glo_prob2 <- lapply(glo_prob, function(eux) {
       eux[eux < 0] <- 0
       return(eux[, 2])
@@ -423,6 +422,47 @@ if(level == "reg"){
     
     scores_ensemble[["MUL"]] <- scores	
   }
+  
+  # Multiply weighted nested ensemble
+if ("multiplyw" %in% nesting_name) {
+  target <- REG_multiply_preds
+  
+  # Preprocess GLO probabilities
+  glo_prob2 <- lapply(glo_prob, function(eux) {
+    eux[eux < 0] <- 0
+    return(eux[, 2])
+  })
+  
+  scores <- list()
+  
+  # Define weights
+  w_sum <- w_reg + w_glo
+  
+  for (z in seq_len(outerloop)) {
+    good_ix <- which(!is.na(glo_prob2[[z]]))
+    target_z <- target[good_ix, z, ]
+    glo_prob2_z <- glo_prob2[[z]][good_ix]
+    papa_REG_multiply_z <- papa_REG_multiply[[z]][good_ix]
+    testa_REG_multiply_z <- testa_REG_multiply[[z]][good_ix, ]
+    
+    # Compute normalized weighted geometric mean
+    target_mean <- rowMeans(as.data.frame(target_z), na.rm = TRUE)
+    weighted_gmean <- (target_mean ^ w_reg) * (glo_prob2_z ^ w_glo)
+    weighted_gmean <- weighted_gmean ^ (1 / w_sum)
+    
+    # Evaluate
+    score <- nsdm.ceval(
+      f = weighted_gmean,
+      pa = papa_REG_multiply_z,
+      tesdat = testa_REG_multiply_z,
+      crit = eval_crit
+    )
+    
+    scores[[z]] <- score
+  }
+  
+  scores_ensemble[["MULW"]] <- scores
+} 
 }
 
 #### Return
