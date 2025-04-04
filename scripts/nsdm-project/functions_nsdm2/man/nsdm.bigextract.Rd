@@ -11,7 +11,6 @@ nsdm.bigextract(
   cov_info,
   t_match = FALSE,
   tmatch_scheme = "npts",
-  ex_pint = TRUE,
   nzvt = 10,
   nsplits = ncores
 )
@@ -29,11 +28,9 @@ nsdm.bigextract(
 
 \item{tmatch_scheme}{A character string specifying the temporal matching scheme:
 \itemize{
-\item \code{"npts"}: nearest previous time slice
-\item \code{"nts"}: nearest time slice
+\item \code{"npts"}: nearest previous time
+\item \code{"nts"}: nearest time
 }}
-
-\item{ex_pint}{Logical; whether to treat period interval covariates as static (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{nzvt}{A numeric threshold specifying the minimum number of unique values required for a covariate to be retained in the candidate set.}
 

@@ -4,27 +4,21 @@
 \alias{nsdm.covinfo}
 \title{nsdm.covinfo}
 \usage{
-nsdm.covinfo(cov_path, save_path, time_cov, focal_cov)
+nsdm.covinfo(cov_path, save_path)
 }
 \arguments{
-\item{cov_path}{A character string specifying the root directory where covariates are stored.}
+\item{cov_path}{A character string specifying the directory where covariates are stored.}
 
-\item{save_path}{A character string specifying the destination path to save the \code{.xlsx} covariate information table.}
-
-\item{time_cov}{A character vector specifying the categories or datasets that include temporally dynamic covariates (with scenarios).}
-
-\item{focal_cat}{A character vector specifying the categories or datasets that include covariates with focal statistics.}
+\item{save_path}{A character string specifying the destination path to save the covariate information table.}
 }
 \value{
-An \code{.xlsx} file containing the covariate information table.
+A \code{.psv} file containing the covariate information table.
 }
 \description{
 Generate Covariate Information Table
 }
 \details{
-This function generates a covariate information table in \code{.xlsx} format based on the provided covariate paths and names.
-
-This function processes the covariate paths to identify dynamic and focal covariates, and saves the resulting information table in Excel format.
+This function generates a covariate information table based on the provided covariate paths and names.
 }
 \author{
 Antoine Adde (antoine.adde@eawag.ch)

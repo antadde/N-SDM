@@ -9,7 +9,6 @@ nsdm.disaggregate(
   rst,
   thindist = 0,
   thinyear = 0,
-  max_uncertain = 9999,
   min_occ = 0,
   ncores = 1
 )
@@ -20,7 +19,6 @@ nsdm.disaggregate(
 \item \code{species}: Taxon name.
 \item \code{X} and \code{Y}: Coordinates.
 \item \code{year}: Observation year.
-\item \code{uncertainty}: Coordinate uncertainty (in meters or another unit consistent with \code{max_uncertain}).
 }}
 
 \item{rst}{A reference \verb{Raster*} object used in subsequent analyses. Defines the spatial resolution and extent for the disaggregation.}
@@ -28,8 +26,6 @@ nsdm.disaggregate(
 \item{thindist}{A numeric value specifying the minimum spatial distance (in the units of \code{rst}) between two occurrences for spatial disaggregation.}
 
 \item{thinyear}{A numeric value specifying the minimum temporal separation (in years) between two occurrences at the same raster pixel.}
-
-\item{max_uncertain}{A numeric value specifying the maximum allowable coordinate uncertainty for an occurrence to be retained in the modeling dataset.}
 
 \item{min_occ}{A numeric value specifying the minimum number of occurrences required for a species to be included in the modeling dataset.}
 
@@ -42,9 +38,9 @@ A \code{sf} object containing the updated and disaggregated species occurrence d
 Spatiotemporal Disaggregation of Species Data
 }
 \details{
-This function performs spatiotemporal disaggregation of species occurrence data by ensuring a minimum distance between occurrences in space and time, removing records with high coordinate uncertainty, and filtering species with insufficient occurrences for modeling.
+This function performs spatiotemporal disaggregation of species occurrence data by ensuring a minimum distance between occurrences in space and time, and filtering species with insufficient occurrences for modeling.
 
-The function ensures that species occurrences meet the specified spatial and temporal separation criteria. It also removes occurrences with high coordinate uncertainty and filters out species that do not meet the minimum occurrence threshold. The function is optimized for parallel processing when \code{ncores} is greater than 1.
+The function ensures that species occurrences meet the specified spatial and temporal separation criteria. It also filters out species that do not meet the minimum occurrence threshold. The function is optimized for parallel processing when \code{ncores} is greater than 1.
 }
 \author{
 Antoine Adde (antoine.adde@eawag.ch)

@@ -23,7 +23,7 @@ Specifically, this function checks that:
 \item Covariate data follows the expected folder hierarchy.
 \item Covariate data follows the expected naming convention.
 \item For each level ('reg', 'glo'), a subset of raster files is sampled and checked for consistent extent, resolution, CRS, and grid alignment.
-\item The CRS and grid of the rasters are compared to a sample of species coordinates to ensure compatibility.
+\item The CRS and grid of the covariate and mask rasters are compared to a sample of species coordinates to ensure compatibility.
 }
 }
 \author{
