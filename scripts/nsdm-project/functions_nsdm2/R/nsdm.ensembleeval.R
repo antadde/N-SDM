@@ -352,7 +352,7 @@ for (z in seq_len(outerloop)) {
 }
 scores_ensemble[["GLO"]] <- scores
 scores <- simplify2array(scores)
-w_glo <- rowMeans(scores)[best_met]
+w_glo <- rowMeans(scores)[weight_metric]
 
 if(level == "reg"){
   # REG-level ensemble without nesting (only possible in multiply model)
@@ -371,7 +371,7 @@ if (any(c("multiply") %in% nesting_name)) {
     }
     scores_ensemble[["REG"]] <- scores
 	scores <- simplify2array(scores)
-    w_reg <- rowMeans(scores)[best_met]
+    w_reg <- rowMeans(scores)[weight_metric]
   }	
 
   # Covariate nested ensemble
