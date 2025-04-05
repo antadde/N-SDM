@@ -5,6 +5,7 @@
 #' @param n Integer. Number of background points to be generated.
 #' @param pres `sf` object. Spatial points dataset containing species occurrence data.
 #' @param taxon Character. Target species name.
+#' @param level Character. Target level (glo or reg).
 #' @param type Character. Specifies the type of species data:
 #'   - `"po"`: Presence-only data
 #'   - `"pa"`: Presence-absence data
@@ -20,6 +21,7 @@ nsdm.absences<-function(n=10000,
                        taxon=character(),
 					   type="po",
 					   rst_ref,
+					   level=character(),
 					   rst_background_weight=NULL,
                        set_max_npres_to_nabs=TRUE){
 
@@ -114,6 +116,7 @@ if (type == "po") {
   ### ------------------------
   ### Prepare output
   ### ------------------------
+  out@level<-rep(level, nrow(pres) + nrow(abs))
   out@pa<-c(rep(1,nrow(pres)),
             rep(0,nrow(abs)))
   out@years<-as.numeric(c(pres$year, rep(NA, nrow(abs))))
