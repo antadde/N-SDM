@@ -6,15 +6,11 @@
 #' @param pa A vector containing 0/1 presence/absence values
 #' @param env_vars A data.frame containing environmental predictors
 #' @param taxon  A character string of the taxon for which models are fitted
-#' @param replicatetype A charachter string indicating how should replicates be generated? may be 'none', 'splitsample',
-#' 'cv' 'block-cv'
-#' @param strata A numeric vector of the same length as observations with integers separating cross validation replicates (used when replicatetype='block-cv')
+#' @param replicatetype A charachter string indicating how should replicates be generated? may be 'none', 'splitsample'
 #' @param reps Numeric number of replicates
 #' @param mod_args List of class 'multi.input' containing information on models to be fitted
 #' @param timer Logical (TRUE or FALSE) indicating if model computation time is to be saved
 #' @param level A charachter string indicating the level evaluated (e.g. glo or reg)
-#' @param save  should the model be saved in a structured way? (not implemented yet)
-#' @param project character indicating the name of the project within which the models are run (later used to define saving directories)
 #' @param path where to save? (not implemented yet)
 #' @param ncores Number of cores to be used during parallel operations
 #' @param tmp_path Character indicating the path where to store temporary outputs
@@ -32,8 +28,6 @@ nsdm.flex3<-function(x=numeric(),
                    reps,
                    mod_args=list(),
 				   timer=FALSE,
-				   save=FALSE,
-                   project=NA,
                    path=NA,
 				   level,
 				   ncores,
@@ -52,6 +46,7 @@ nsdm.flex3<-function(x=numeric(),
     env_vars=x@env_vars
     taxon=x@meta$taxon
 	xy=data.frame(x@xy)
+	levels=x@level
   }
 
   # check and prepare data and output
