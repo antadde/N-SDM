@@ -77,7 +77,7 @@ for (i in seq_along(pred_list)) {
   # If both regional and global levels are available, ensure global variables exist in the regional set
   if (all(c("reg", "glo") %in% unique(pred_table$level))) {
   reg_cov <- pred_table[level == "reg"]
-  glo_cov <- pred_table[level == "glo" & attribute != "msk"]
+  glo_cov <- pred_table[level == "glo"]
   key_cols <- c("year", "variable", "attribute", "focal")
   missing <- fsetdiff(glo_cov[, ..key_cols], reg_cov[, ..key_cols])
   if (nrow(missing) > 0) {
@@ -91,7 +91,7 @@ for (i in seq_along(pred_list)) {
   if (all(c("reg", "glo") %in% pred_table$level)) {
     base_cov <- pred_table[level == "reg" & is.na(scenario)]
   } else if ("glo" %in% pred_table$level) {
-    base_cov <- pred_table[level == "glo" & is.na(scenario) & attribute != "msk"]
+    base_cov <- pred_table[level == "glo" & is.na(scenario)]
   }
   key_cols <- c("variable", "attribute", "focal")
   missing <- fsetdiff(scenario_cov[, ..key_cols], base_cov[, ..key_cols])

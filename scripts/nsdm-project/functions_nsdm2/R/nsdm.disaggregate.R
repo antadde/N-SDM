@@ -84,7 +84,8 @@ sps <- unique(pres$species)
 # Spatial thinning
 if (is.numeric(thindist) && thindist > 0) {
   pq <- mclapply(sps, function(i) {
-    # Subset presence data for the current species
+    
+	# Subset presence data for the current species
     pres_pq <- pres[pres$species == i, ]
     
     # Extract coordinates from sf object
@@ -92,13 +93,14 @@ if (is.numeric(thindist) && thindist > 0) {
     
     # Assign cell IDs based on the thinned raster
     pres_pq$cell <- terra::cellFromXY(rstthin, coords)
+	   
+	# Identify duplicates based on species × cell × year
+	dups_idx <- duplicated(sf::st_drop_geometry(pres_pq)[, c("species", "cell", "year")])
+
+	# Filter out the duplicates, keeping the geometry
+	pres_pq <- pres_pq[!dups_idx, ]
     
-    # Identify and remove duplicate occurrences (same species, cell, and year)
-    pres_dups <- data.frame(pres_pq[c("species", "cell", "year")])
-    if (any(duplicated(pres_dups))) {
-      pres_pq <- pres_pq[!duplicated(pres_dups), ]
-    }
-        return(pres_pq)
+    return(pres_pq)
   }, mc.cores = ncores)
   
   # Remove species with occurrences below the minimum threshold for modeling
@@ -151,6 +153,9 @@ if (is.numeric(thinyear) && thinyear > 0) {
     # Return thinned presence data for the species
     pres_pp[pres_pp$id %in% thin_id, ]
   }, mc.cores = ncores)
+  
+  # Clean id column
+  pres_pp$id<-NULL
   
   # Remove species with occurrences below the minimum threshold for modeling
   species_counts <- unlist(lapply(pp, nrow))  # Count occurrences per species

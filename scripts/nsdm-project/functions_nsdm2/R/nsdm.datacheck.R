@@ -14,7 +14,7 @@
 #' @param n_levels Integer. Number of spatial levels included (1 for 'reg' only, 2 for both 'reg' and 'glo').
 #'
 #' @return Invisibly returns a data.frame with consistency results for sampled rasters (extent, resolution, CRS, grid).
-#' If inconsistencies are found, the function stops and reports the problematic files or species mismatches.
+#' If inconsistencies are found, the function stops and reports the problematic files or mismatches.
 #'
 #' @author Antoine Adde (\email{antoine.adde@eawag.ch})
 #' @export
