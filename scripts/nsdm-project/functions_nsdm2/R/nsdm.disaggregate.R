@@ -54,7 +54,6 @@ if (length(bad_count) > 0) {
 # Update target species list after filtering
 sps <- unique(pres$species)
 
-
 # Remove presences with no environmental data coverage
 po <- mclapply(sps, function(i) {
   # Subset presences for the current species
@@ -155,7 +154,7 @@ if (is.numeric(thinyear) && thinyear > 0) {
   }, mc.cores = ncores)
   
   # Clean id column
-  pres_pp$id<-NULL
+  pp$id<-NULL
   
   # Remove species with occurrences below the minimum threshold for modeling
   species_counts <- unlist(lapply(pp, nrow))  # Count occurrences per species
