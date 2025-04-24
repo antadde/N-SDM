@@ -153,9 +153,6 @@ if (is.numeric(thinyear) && thinyear > 0) {
     pres_pp[pres_pp$id %in% thin_id, ]
   }, mc.cores = ncores)
   
-  # Clean id column
-  pp$id<-NULL
-  
   # Remove species with occurrences below the minimum threshold for modeling
   species_counts <- unlist(lapply(pp, nrow))  # Count occurrences per species
   bad_count <- which(species_counts < min_occ)  # Identify species with insufficient occurrences
@@ -165,6 +162,10 @@ if (is.numeric(thinyear) && thinyear > 0) {
   
   # Retain only valid rows in the presence data
   pres <- do.call(rbind, pp)
+  
+  # Clean columns
+  pres$id<-NULL
+  pres$cell<-NULL
 }
 
 return(pres)
