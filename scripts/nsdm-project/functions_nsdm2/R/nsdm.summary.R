@@ -3,24 +3,10 @@
 #' Summarize nsdm.evaluation objects
 #'
 #' @param object A nsdm.evaluation object to be summarized
-#' @author Philipp Brun (philipp.brun@wsl.ch)
+#' @author Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
 nsdm.summary=function(object){
-
-  #cat("\nMeta information: \n")
-  df=data.frame(object@meta[c("author","date")],object@meta$nsdm.fit[c("project","replicatetype","replicates")])
-
-  rownames(df)=""
-  #print(df)
-
-  #cat("\nThreshold: \n")
-  df=as.data.frame(object@meta[c("cutoff")])
-
-  rownames(df)=""
-  #print(df)
-
-  #cat("\nMean skill: \n")
 
   mats=list()
   for(k in 1:length(object@performance)){
@@ -33,5 +19,4 @@ nsdm.summary=function(object){
   colnames(mn)=names(object@performance)
 
   return(mn)
-
 }
