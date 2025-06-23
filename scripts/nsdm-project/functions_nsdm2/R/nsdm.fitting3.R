@@ -9,7 +9,6 @@
 #' @param replicatetype A charachter string indicating how should replicates be generated? may be 'none', 'splitsample'
 #' @param reps Numeric number of replicates
 #' @param mod_args List of class 'multi.input' containing information on models to be fitted
-#' @param timer Logical (TRUE or FALSE) indicating if model computation time is to be saved
 #' @param level A charachter string indicating the level evaluated (e.g. glo or reg)
 #' @param path where to save? (not implemented yet)
 #' @param ncores Number of cores to be used during parallel operations
@@ -27,7 +26,6 @@ nsdm.flex3<-function(x=numeric(),
                    replicatetype=character(),
                    reps,
                    mod_args=list(),
-				   timer=FALSE,
                    path=NA,
 				   level,
 				   ncores,
@@ -131,7 +129,5 @@ modis[[mod_args_j@tag]]<-modi
 # supply fitted objects
 lis$nsdm.i@fits=modis
 
-if(timer){ return(list(mod=lis$nsdm.i, time=time_res))
-} else {
-return(lis$nsdm.i)}
+return(lis$nsdm.i)
 }
