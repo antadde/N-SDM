@@ -59,7 +59,7 @@ for (model in model_names) {
     modinp_top_n <- modinp_top[n]
     
     # Retrieve test and training data
-    testa_GLO <- lapply(mod_m$m@tesdat, function(x) {
+    testa_GLO <- lapply(mod_m@tesdat, function(x) {
       if ("Presence" %in% colnames(x)) {
         x[, !colnames(x) %in% "Presence", drop = FALSE]
       } else {
@@ -68,7 +68,7 @@ for (model in model_names) {
       }
     })
     
-    papa_GLO <- lapply(mod_m$m@tesdat, function(x) {
+    papa_GLO <- lapply(mod_m@tesdat, function(x) {
       if ("Presence" %in% colnames(x)) {
         x[, "Presence"]
       } else {
@@ -78,26 +78,26 @@ for (model in model_names) {
     })
     
     # Predict
-    outerloop <- length(mod_m$m@tesdat)
+    outerloop <- length(mod_m@tesdat)
     tmp_path_gbm <- file.path(scr_path, "tmp", "gbm")
     pred <- list()
     
     for (k in seq_len(outerloop)) {
       model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_glo.rds"))
       
-      if (inherits(mod_m$m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
+      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
         if (file.exists(model_path)) {
-          mod_m$m@fits[[modinp_top_n]][[k]] <- lgb.load(model_path)
+          mod_m@fits[[modinp_top_n]][[k]] <- lgb.load(model_path)
         } else {
           warning("LightGBM model file not found: ", model_path)
         }
       }
       
-      if (inherits(mod_m$m@fits[[modinp_top_n]][[k]], "try-error")) {
+      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "try-error")) {
         warning("Model fit for ", modinp_top_n, " rep ", k, " is a try-error.")
         pred_i <- rep(NA, nrow(testa_GLO[[k]]))
       } else {
-		pred_i <- nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_GLO[[k]][, !(names(testa_GLO[[k]]) %in% c("X", "Y"))])
+		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_GLO[[k]][, !(names(testa_GLO[[k]]) %in% c("X", "Y","level"))])
       }
       
       pred[[k]] <- pred_i
@@ -159,7 +159,7 @@ for (model in mod_algo) {
     modinp_top_n <- modinp_top[n]
     
     # Retrieve test and training data
-    testa_REG_multiply <- lapply(mod_m$m@tesdat, function(x) {
+    testa_REG_multiply <- lapply(mod_m@tesdat, function(x) {
       if ("Presence" %in% colnames(x)) {
         x[, !colnames(x) %in% "Presence", drop = FALSE]
       } else {
@@ -168,7 +168,7 @@ for (model in mod_algo) {
       }
     })
     
-    papa_REG_multiply <- lapply(mod_m$m@tesdat, function(x) {
+    papa_REG_multiply <- lapply(mod_m@tesdat, function(x) {
       if ("Presence" %in% colnames(x)) {
         x[, "Presence"]
       } else {
@@ -178,7 +178,7 @@ for (model in mod_algo) {
     })
     
     # Predict
-    outerloop <- length(mod_m$m@tesdat)
+    outerloop <- length(mod_m@tesdat)
     tmp_path_gbm <- file.path(scr_path, "tmp", "gbm")
     pred <- list()
     glo_prob <- list()
@@ -188,24 +188,24 @@ for (model in mod_algo) {
     for (k in seq_len(outerloop)) {
 	  model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", nesting_name, ".rds"))
       
-      if (inherits(mod_m$m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
+      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
         if (file.exists(model_path)) {
-          mod_m$m@fits[[modinp_top_n]][[k]] <- lgb.load(model_path)
+          mod_m@fits[[modinp_top_n]][[k]] <- lgb.load(model_path)
         } else {
           warning("LightGBM model file not found: ", model_path)
         }
       }
       
-      if (inherits(mod_m$m@fits[[modinp_top_n]][[k]], "try-error")) {
+      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "try-error")) {
         warning("Model fit for ", modinp_top_n, " rep ", k, " is a try-error.")
         pred_i <- rep(NA, nrow(testa_REG_multiply[[k]]))
       } else {
-		pred_i <- nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_REG_multiply[[k]][, !(names(testa_REG_multiply[[k]]) %in% c("X", "Y"))])
+		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_REG_multiply[[k]][, !(names(testa_REG_multiply[[k]]) %in% c("X", "Y","level"))])
 
       }
       
       pred[[k]] <- pred_i
-      glo_prob[[k]] <- extract(glo_out, data.frame(mod_m$m@tesdat[[k]]$X, mod_m$m@tesdat[[k]]$Y)) / 100
+      glo_prob[[k]] <- extract(glo_out, data.frame(mod_m@tesdat[[k]]$X, mod_m@tesdat[[k]]$Y)) / 100
     }
     
     pop_n <- do.call(cbind, pred)
@@ -267,7 +267,7 @@ for (model in mod_algo) {
     modinp_top_n <- modinp_top[n]
     
     # Retrieve test and training data
-    testa_REG_covariate <- lapply(mod_m$m@tesdat, function(x) {
+    testa_REG_covariate <- lapply(mod_m@tesdat, function(x) {
       if ("Presence" %in% colnames(x)) {
         x[, !colnames(x) %in% "Presence", drop = FALSE]
       } else {
@@ -276,7 +276,7 @@ for (model in mod_algo) {
       }
     })
     
-    papa_REG_covariate <- lapply(mod_m$m@tesdat, function(x) {
+    papa_REG_covariate <- lapply(mod_m@tesdat, function(x) {
       if ("Presence" %in% colnames(x)) {
         x[, "Presence"]
       } else {
@@ -286,26 +286,26 @@ for (model in mod_algo) {
     })
     
     # Predict
-    outerloop <- length(mod_m$m@tesdat)
+    outerloop <- length(mod_m@tesdat)
     tmp_path_gbm <- file.path(scr_path, "tmp", "gbm")
     pred <- list()
     
     for (k in seq_len(outerloop)) {
       model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", nesting_name, ".rds"))
       
-      if (inherits(mod_m$m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
+      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
         if (file.exists(model_path)) {
-          mod_m$m@fits[[modinp_top_n]][[k]] <- lgb.load(model_path)
+          mod_m@fits[[modinp_top_n]][[k]] <- lgb.load(model_path)
         } else {
           warning("LightGBM model file not found: ", model_path)
         }
       }
       
-      if (inherits(mod_m$m@fits[[modinp_top_n]][[k]], "try-error")) {
+      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "try-error")) {
         warning("Model fit for ", modinp_top_n, " rep ", k, " is a try-error.")
         pred_i <- rep(NA, nrow(testa_REG_covariate[[k]]))
       } else {
-		pred_i <- nsdm.prd(mod_m$m@fits[[modinp_top_n]][[k]], testa_REG_covariate[[k]][, !(names(testa_REG_covariate[[k]]) %in% c("X", "Y"))])
+		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_REG_covariate[[k]][, !(names(testa_REG_covariate[[k]]) %in% c("X", "Y","level"))])
       }
       
       pred[[k]] <- pred_i
