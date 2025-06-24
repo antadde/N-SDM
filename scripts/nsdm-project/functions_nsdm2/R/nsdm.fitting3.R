@@ -3,10 +3,7 @@
 #' Model fitting (parallel version)
 #'
 #' @param x A nsdm.pseudoabsences object
-#' @param pa A vector containing 0/1 presence/absence values
-#' @param env_vars A data.frame containing environmental predictors
-#' @param taxon  A character string of the taxon for which models are fitted
-#' @param replicatetype A charachter string indicating how should replicates be generated? may be 'none', 'splitsample'
+#' @param replicatetype A charachter string indicating how should replicates be generated? may be 'none', 'splitsample', or 'clustered_splitsample'
 #' @param reps Numeric number of replicates
 #' @param mod_args List of class 'multi.input' containing information on models to be fitted
 #' @param level A charachter string indicating the level evaluated (e.g. glo or reg)
@@ -20,9 +17,6 @@
 
 
 nsdm.flex3<-function(x=numeric(),
-                   pa=numeric(),
-                   env_vars=data.frame(),
-                   taxon=character(),
                    replicatetype=character(),
                    reps,
                    mod_args=list(),
@@ -50,7 +44,6 @@ nsdm.flex3<-function(x=numeric(),
   # check and prepare data and output
   lis=preps(call=match.call())
   modis=list()
-  time_res=list()
 
   # loop over model types
 	
@@ -117,10 +110,6 @@ nsdm.flex3<-function(x=numeric(),
   
 # Rename replicates
 names(modi)=paste0("replicate_",sprintf("%02d",1:reps))
-
-# Retrieve computation time
-time<-c(proc.time() - ptm)
-time_res[[j]]<-time
 
 # Supply fitted replicates
 modis[[mod_args_j@tag]]<-modi
