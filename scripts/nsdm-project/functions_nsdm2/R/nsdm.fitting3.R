@@ -25,13 +25,6 @@ nsdm.flex3<-function(x=numeric(),
 				   ncores,
 				   tmp_path){
 
- # Check supplied model types
-  for(i in 1:length(mod_args)){
-    if(!(mod_args[[i]]@mod%in%c("glm","gam","gbm","maxnet","randomForest","mgcv_gam","mgcv_gam_fx","lgb.train","ranger"))){
-      warning(paste(mod_args[[i]]@mod,"not in focal model functions. You might run in to problems when evaluating/predicting..."))
-    }
-  }
-
   # Check if pseudo absence object is supplied
   if(class(x)=="nsdm.pseudoabsences"){
     pa=x@pa

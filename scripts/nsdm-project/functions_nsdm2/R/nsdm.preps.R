@@ -106,5 +106,4 @@ if (length(testing) > 0 && exists("out")) {
 }
 
 return(list(nsdm.i = out, train = obschoice))
-
 }
