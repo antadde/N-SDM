@@ -47,7 +47,7 @@ dat <- cbind(
 
 # Regional-only points for validation
 
-if (evaluationdomain == "regionalonly") {
+if (env$evaluationdomain == "regionalonly") {
 # 1. Tag points as regional or global
   rsts_ref_file <- file.path(w_path, "tmp", "settings", "ref_rasters.rds")
   rsts_ref <- readRDS(rsts_ref_file)
@@ -145,7 +145,7 @@ return(list(nsdm.i = out, train = obschoice))
 
 # All points for validation
 
-if (evaluationdomain == "all") {
+if (env$evaluationdomain == "all") {
 	
 obschoice <- list()
 testing <- list()
