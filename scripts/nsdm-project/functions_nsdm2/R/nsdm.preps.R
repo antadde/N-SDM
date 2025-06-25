@@ -42,7 +42,6 @@ dat <- cbind(
   data.frame(Presence = env$pa),
   env$env_vars,
   env$xy,
-  level = env$level
 )
 
 obschoice <- list()
@@ -59,7 +58,7 @@ if (env$replicatetype == "none") {
     dat$sid <- seq_len(nrow(dat))
 
       chc <- dat %>%
-      dplyr::group_by(Presence, level) %>%
+      dplyr::group_by(Presence) %>%
       dplyr::slice_sample(prop = 0.7)
 
     obschoice[[i]] <- dat %>% dplyr::filter(sid %in% chc$sid) %>% dplyr::select(-sid)
