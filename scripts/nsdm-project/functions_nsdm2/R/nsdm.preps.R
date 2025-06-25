@@ -20,7 +20,7 @@ preps=function(env=parent.frame(), call, evaluationdomain=character()){
   m.i <- list(
     author = Sys.info()[["user"]],
     date = Sys.time(),
-    replicatetype = env$replicatetype,
+    replicatetype = env$replicate_type,
     replicates = env$reps,
     taxon = env$taxon,
     env_vars = paste(colnames(env$env_vars), collapse = ", "),
@@ -66,10 +66,10 @@ obschoice <- list()
 testing <- list()
 
 # 4. Sampling logic
-if (env$replicatetype == "none") {
+if (env$replicate_type == "none") {
   obschoice[[1]] <- train_pool
 
-} else if (env$replicatetype == "splitsample") {
+} else if (env$replicate_type == "splitsample") {
   for (i in seq_len(env$reps)) {
     set.seed(i)
 
@@ -92,7 +92,7 @@ if (env$replicatetype == "none") {
     testing[[i]]   <- test_sample
   }
 
-} else if (env$replicatetype == "clustered_splitsample") {
+} else if (env$replicate_type == "clustered_splitsample") {
   for (i in seq_len(env$reps)) {
     set.seed(i)
 
@@ -149,11 +149,11 @@ if (evaluationdomain == "all") {
 obschoice <- list()
 testing <- list()
 
-if (env$replicatetype == "none") {
+if (env$replicate_type == "none") {
 
 obschoice[[1]] <- dat
 
-} else if (env$replicatetype == "splitsample") {
+} else if (env$replicate_type == "splitsample") {
 
 for (i in seq_len(env$reps)) {
 set.seed(i)
@@ -167,7 +167,7 @@ obschoice[[i]] <- dat %>% dplyr::filter(sid %in% chc$sid) %>% dplyr::select(-sid
 testing[[i]]   <- dat %>% dplyr::filter(!sid %in% chc$sid) %>% dplyr::select(-sid)
 }
 
-} else if (env$replicatetype == "clustered_splitsample") {
+} else if (env$replicate_type == "clustered_splitsample") {
 
 pres_points <- dat %>% dplyr::filter(Presence == 1)
 abs_points  <- dat %>% dplyr::filter(Presence == 0)
