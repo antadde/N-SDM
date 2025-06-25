@@ -145,7 +145,7 @@ return(list(nsdm.i = out, train = obschoice))
 
 # All points for validation
 
-if (env$evaluationdomain != "regionalonly") {
+if (env$evaluationdomain == "all") {
 	
 obschoice <- list()
 testing <- list()
