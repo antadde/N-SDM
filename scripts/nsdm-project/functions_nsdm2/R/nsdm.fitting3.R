@@ -51,8 +51,9 @@ nsdm.flex3<-function(x=numeric(),
   ## Weights
   if(mod_args_j@weight){
   wi=which(lis$train[[x]][,"Presence"]==1)
-  wt=rep(1,length(lis$train[[x]][,"Presence"]))
-  wt[wi]<-round((length(wt)-length(wi))/length(wi))}
+  wt=rep(1, nrow(lis$train[[x]]))
+  wt[wi]<-round((length(wt)-length(wi))/length(wi))
+  }
   
   ### MAX
   if(mod_args_j@mod=="maxnet"){

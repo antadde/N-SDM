@@ -89,8 +89,8 @@ if (env$replicatetype == "none") {
       dplyr::group_by(Presence) %>%
       dplyr::slice_sample(prop = 0.7)
 
-    obschoice[[i]] <- train_sample
-    testing[[i]]   <- test_sample
+    obschoice[[i]] <- train_sample %>% dplyr::select(-level, -X, -Y)
+    testing[[i]]   <- test_sample %>% dplyr::select(-level, -X, -Y)
   }
 
 } else if (env$replicatetype == "clustered_splitsample") {
@@ -129,8 +129,8 @@ if (env$replicatetype == "none") {
       dplyr::group_by(Presence) %>%
       dplyr::slice_sample(prop = 0.7)
 
-    obschoice[[i]] <- train_sample
-    testing[[i]]   <- test_sample
+    obschoice[[i]] <- train_sample %>% dplyr::select(-level, -X, -Y)
+    testing[[i]]   <- test_sample %>% dplyr::select(-level, -X, -Y)
   }
 }
 
@@ -164,8 +164,8 @@ chc <- dat %>%
 dplyr::group_by(Presence) %>%
 dplyr::slice_sample(prop = 0.7)
 
-obschoice[[i]] <- dat %>% dplyr::filter(sid %in% chc$sid) %>% dplyr::select(-sid)
-testing[[i]]   <- dat %>% dplyr::filter(!sid %in% chc$sid) %>% dplyr::select(-sid)
+obschoice[[i]] <- dat %>% dplyr::filter(sid %in% chc$sid) %>% dplyr::select(-sid, -X, -Y)
+testing[[i]]   <- dat %>% dplyr::filter(!sid %in% chc$sid) %>% dplyr::select(-sid, -X, -Y)
 }
 
 } else if (env$replicatetype == "clustered_splitsample") {
@@ -195,11 +195,11 @@ sampled_clusters <- sample(unique(dat_clustered$cluster_id),
 
 obschoice[[i]] <- dat_clustered %>%
 dplyr::filter(cluster_id %in% sampled_clusters) %>%
-dplyr::select(-sid, -cluster_id)
+dplyr::select(-sid, -cluster_id, -X, -Y)
 
 testing[[i]] <- dat_clustered %>%
 dplyr::filter(!cluster_id %in% sampled_clusters) %>%
-dplyr::select(-sid, -cluster_id)
+dplyr::select(-sid, -cluster_id, -X, -Y)
 }
 }
 
