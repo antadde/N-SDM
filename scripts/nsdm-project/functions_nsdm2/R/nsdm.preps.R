@@ -4,7 +4,7 @@
 #'
 #' @author Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (antoine.adde@eawag.ch)
 #' @export
-preps=function(env=parent.frame(),call){
+preps=function(env=parent.frame(), call, evaluationdomain=character()){
 
   env <- as.list(env)
 
@@ -21,7 +21,6 @@ preps=function(env=parent.frame(),call){
     author = Sys.info()[["user"]],
     date = Sys.time(),
     replicatetype = env$replicatetype,
-	evaluationdomain = env$evaluationdomain,
     replicates = env$reps,
     taxon = env$taxon,
     env_vars = paste(colnames(env$env_vars), collapse = ", "),
@@ -47,7 +46,7 @@ dat <- cbind(
 
 # Regional-only points for validation
 
-if (env$evaluationdomain == "regionalonly") {
+if (evaluationdomain == "regionalonly") {
 # 1. Tag points as regional or global
   rsts_ref_file <- file.path(w_path, "tmp", "settings", "ref_rasters.rds")
   rsts_ref <- readRDS(rsts_ref_file)
@@ -145,7 +144,7 @@ return(list(nsdm.i = out, train = obschoice))
 
 # All points for validation
 
-if (env$evaluationdomain == "all") {
+if (evaluationdomain == "all") {
 	
 obschoice <- list()
 testing <- list()

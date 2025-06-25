@@ -36,7 +36,7 @@ nsdm.flex3<-function(x=numeric(),
   }
 
   # check and prepare data and output
-  lis=preps(call=match.call())
+  lis=preps(call=match.call(), evaluationdomain=evaluationdomain)
   modis=list()
 
   # loop over model types
