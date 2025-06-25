@@ -3,7 +3,6 @@
 #' Parallel evaluation of nsdm.fit models with a suite of model assessment metrics (parallel version)
 #'
 #' @param x A nsdm.fit object
-#' @param tester Data.frame with testing data (only mandatory if replicatetype='none' was chosen when models were fitted)
 #' @param thres A character vector of the same length as number of models chosen with custom thresholds for model evaluation. for nsdm.flex outputs the thresholds have to be labelled with the same names provided to models
 #' @param crit A character string indicating which threshold criterion should be considered? Currently 'pp=op'(predicted prevalence = observed prevalence), 'maxTSS' (threshold yielding maximum TSS), and 'external' (thresholds manually supplied) are possible
 #' @param level A character string indicating the evaluated level (REG or GLO)
@@ -13,7 +12,7 @@
 #' @return An object of class 'nsdm.evaluation'
 #' @export
 
-nsdm.evaluate3<-function(x,tester=data.frame(),thres=numeric(),crit="pp=op", level, ncores=ncores, tmp_path=NULL){
+nsdm.evaluate3<-function(x,thres=numeric(),crit="pp=op", level, ncores=ncores, tmp_path=NULL){
 
   ### ------------------------
   ### check tresholds
@@ -42,7 +41,7 @@ nsdm.evaluate3<-function(x,tester=data.frame(),thres=numeric(),crit="pp=op", lev
 
   if(x@meta$replicatetype=="none" && nrow(tester)==0){
     stop("External testing data must be supplied for replicatetype 'none'")
-  } else if(x@meta$replicatetype%in%c("cv","block-cv","splitsample")) {
+  } else if(x@meta$replicatetype%in%c("cv","clustered_splitsample","splitsample")) {
 
     outerloop<-length(x@tesdat)
     testa<-lapply(x@tesdat,function(x){
@@ -87,7 +86,7 @@ nsdm.evaluate3<-function(x,tester=data.frame(),thres=numeric(),crit="pp=op", lev
   # Make predictions
    if("lgb.Booster" %in% class(fit_j[[g]])){
    fit_j[[g]]<-lgb.load(paste0(tmp_path_gbm, "/", taxon,"_rep",g,"_mod",j,"_",level,".rds"))
-   testa[[g]]<- testa[[g]][,-which(colnames(testa[[g]]) %in% c("X","Y","level"))]}
+   testa[[g]]<- testa[[g]][,-which(colnames(testa[[g]]) %in% c("X","Y"))]}
    
    pred=nsdm.prd(fit_j[[g]], testa[[g]])
    scores<-NULL

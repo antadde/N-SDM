@@ -43,9 +43,6 @@ nsdm.flex3<-function(x=numeric(),
    
   mod_args_j=mod_args[[j]]
   
-  # Retrieve computation time
-  ptm <- proc.time()
-  
   # parallelize over replicates
   modi<-mclapply(1:reps, function(x){
   
