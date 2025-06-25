@@ -4,6 +4,7 @@
 #'
 #' @param x A nsdm.pseudoabsences object
 #' @param replicatetype A charachter string indicating how should replicates be generated? may be 'none', 'splitsample', or 'clustered_splitsample'
+#' @param evaluationdomain A charachter string indicating the spatial domain for evaluation? may be 'regionalonly', or 'all'
 #' @param reps Numeric number of replicates
 #' @param mod_args List of class 'multi.input' containing information on models to be fitted
 #' @param level A charachter string indicating the level evaluated (e.g. glo or reg)
