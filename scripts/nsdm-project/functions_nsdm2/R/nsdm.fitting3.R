@@ -19,6 +19,7 @@
 
 nsdm.flex3<-function(x=numeric(),
                    replicatetype=character(),
+				   evaluationdomain=character(),
                    reps,
                    mod_args=list(),
                    path=NA,
