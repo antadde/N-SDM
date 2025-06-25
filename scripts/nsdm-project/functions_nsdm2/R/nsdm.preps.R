@@ -41,7 +41,7 @@ preps=function(env=parent.frame(),call){
 dat <- cbind(
   data.frame(Presence = env$pa),
   env$env_vars,
-  env$xy,
+  env$xy
 )
 
 obschoice <- list()
