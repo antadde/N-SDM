@@ -74,23 +74,28 @@ if (env$replicatetype == "none") {
   for (i in seq_len(env$reps)) {
     set.seed(i)
 
-    # Sample validation from regional pool
+ 
+    # 1. Sample validation set from regional points
     test_sample <- valid_pool %>%
+      dplyr::mutate(row_id = dplyr::row_number()) %>%
       dplyr::group_by(Presence) %>%
-      dplyr::slice_sample(prop = 0.3)
+      dplyr::slice_sample(prop = 0.3) %>%
+      dplyr::ungroup()
 
-    # Remove validation coordinates from training pool
-    val_coords <- test_sample %>% dplyr::select(X, Y)
-    training_pool <- train_pool %>%
-      dplyr::anti_join(val_coords, by = c("X", "Y"))
+    val_ids <- test_sample$row_id
 
-    # Sample training set from remaining pool
-    train_sample <- training_pool %>%
-      dplyr::group_by(Presence) %>%
-      dplyr::slice_sample(prop = 0.7)
+    # 2. Remove validation rows using row ID to avoid ambiguity
+    valid_ids_df <- valid_pool %>% dplyr::mutate(row_id = dplyr::row_number())
+    reg_left <- valid_ids_df %>% dplyr::filter(!row_id %in% val_ids)
+
+    # 3. Combine global data with remaining regional points
+    train_sample <- dplyr::bind_rows(
+      train_pool %>% dplyr::filter(level == "glo"),
+      reg_left %>% dplyr::select(-row_id)
+    )
 
     obschoice[[i]] <- train_sample %>% dplyr::select(-level, -X, -Y)
-    testing[[i]]   <- test_sample %>% dplyr::select(-level, -X, -Y)
+    testing[[i]]   <- test_sample %>% dplyr::select(-level, -X, -Y, -row_id)
   }
 
 } else if (env$replicatetype == "clustered_splitsample") {
