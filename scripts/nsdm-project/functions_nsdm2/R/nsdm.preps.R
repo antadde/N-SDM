@@ -94,8 +94,13 @@ if (env$replicatetype == "none") {
       reg_left %>% dplyr::select(-row_id)
     )
 
-    obschoice[[i]] <- train_sample %>% dplyr::select(-level, -X, -Y)
-    testing[[i]]   <- test_sample %>% dplyr::select(-level, -X, -Y, -row_id)
+obschoice[[i]] <- train_sample %>%
+  dplyr::select(-level, -X, -Y) %>%
+  as.data.frame()
+
+testing[[i]] <- test_sample %>%
+  dplyr::select(-level, -X, -Y, -row_id) %>%
+  as.data.frame()
   }
 
 } else if (env$replicatetype == "clustered_splitsample") {
