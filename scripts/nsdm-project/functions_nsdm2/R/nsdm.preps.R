@@ -89,10 +89,16 @@ if (env$replicatetype == "none") {
     reg_left <- valid_ids_df %>% dplyr::filter(!row_id %in% val_ids)
 
     # 3. Combine global data with remaining regional points
-    train_sample <- dplyr::bind_rows(
+    train_candidates <- dplyr::bind_rows(
       train_pool %>% dplyr::filter(level == "glo"),
       reg_left %>% dplyr::select(-row_id)
     )
+	
+	    # 4. Sample balanced training set
+    train_sample <- train_candidates %>%
+      dplyr::group_by(Presence) %>%
+      dplyr::slice_sample(prop = 0.7) %>%
+      dplyr::ungroup()
 
 obschoice[[i]] <- train_sample %>%
   dplyr::select(-level, -X, -Y) %>%
