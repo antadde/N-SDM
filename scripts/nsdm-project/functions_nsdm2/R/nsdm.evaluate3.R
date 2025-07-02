@@ -86,7 +86,7 @@ nsdm.evaluate3<-function(x,thres=numeric(),crit="pp=op", level, ncores=ncores, t
   # Make predictions
    if("lgb.Booster" %in% class(fit_j[[g]])){
    fit_j[[g]]<-lgb.load(paste0(tmp_path_gbm, "/", taxon,"_rep",g,"_mod",j,"_",level,".rds"))
-   testa[[g]]<- testa[[g]][,-which(colnames(testa[[g]]) %in% c("X","Y"))]}
+   testa[[g]]<- testa[[g]][,-which(colnames(testa[[g]]) %in% c("X","Y","sid"))]}
    
    pred=nsdm.prd(fit_j[[g]], testa[[g]])
    scores<-NULL
