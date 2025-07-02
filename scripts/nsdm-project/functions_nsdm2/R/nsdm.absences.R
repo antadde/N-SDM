@@ -119,6 +119,8 @@ if (type == "po") {
   out@years<-as.numeric(c(pres$year, rep(NA, nrow(abs))))
   out@env_vars=data.frame()
   out@xy=as.matrix(rbind(data.frame(X=st_coordinates(pres)[,1], Y=st_coordinates(pres)[,2]), data.frame(X=st_coordinates(abs)[,1], Y=st_coordinates(abs)[,2])))
+  out@sid=c(pres$sid,
+            paste("NA", "0", 1:nrow(abs), sep="_"))
   
   # return
   return(out)
