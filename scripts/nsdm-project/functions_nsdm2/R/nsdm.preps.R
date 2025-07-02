@@ -107,7 +107,7 @@ testing[[i]] <- test_sample %>%
     pres_reg <- valid_pool %>% dplyr::filter(Presence == 1)
     abs_reg  <- valid_pool %>% dplyr::filter(Presence == 0)
 
-    n_clusters_reg <- ceiling(sqrt(nrow(pres_reg)))
+    n_clusters_reg <- ceiling(sqrt(nrow(valid_pool))
 
     kmp_reg <- kmeans(pres_reg[, c("X", "Y")], centers = n_clusters_reg, nstart = 10)
     pres_reg$cluster_id <- kmp_reg$cluster
