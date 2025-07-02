@@ -8,5 +8,6 @@ nsdm.pseudoabsences<-setClass("nsdm.pseudoabsences",slots=c(meta="list", # Meta 
                                                             pa="numeric", # store presence/pseudoabsence information
 															years="numeric", # store year information
                                                             env_vars="data.frame", # store extracted env variables
-                                                            xy="matrix", # store coordiantes
+                                                            xy="matrix", # store coordinates
+															sid="character", # store point tag
                                                             call="call")) # conserve function call
