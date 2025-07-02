@@ -42,70 +42,60 @@ preps=function(env=parent.frame(), call, evaluationdomain=character()){
 dat <- cbind(
   data.frame(Presence = env$pa),
   env$env_vars,
-  env$xy
+  env$xy,
+  data.frame(sid = env$sid)
 )
 
 # Regional-only points for validation
 
 if (env$evaluationdomain == "regionalonly") {
-# 1. Tag points as regional or global
-  rsts_ref_file <- file.path(w_path, "tmp", "settings", "ref_rasters.rds")
-  rsts_ref <- readRDS(rsts_ref_file)
-  rst_reg_gloproj <- unwrap(rsts_ref$rst_reg_gloproj)
-
-  coords <- dat[, c("X", "Y")]
-  cells_reg <- cellFromXY(rst_reg_gloproj, coords)
-  in_reg <- !is.na(cells_reg)
-  dat$level <- ifelse(in_reg, "reg", "glo")
-
-# 2. Define pools
+# 1. Define pools
 train_pool <- dat
-valid_pool <- dat %>% dplyr::filter(level == "reg")
-
-# 3. Initialize output lists
+valid_pool <- dat %>%
+  dplyr::filter(
+    stringr::str_starts(sid, "reg") | stringr::str_starts(sid, "NA_")
+  )
+  
+# 2. Initialize output lists
 obschoice <- list()
 testing <- list()
 
-# 4. Sampling logic
+# 3. Sampling logic
 if (env$replicatetype == "none") {
   obschoice[[1]] <- train_pool
-
 } else if (env$replicatetype == "splitsample") {
   for (i in seq_len(env$reps)) {
     set.seed(i)
-
  
     # 1. Sample validation set from regional points
     test_sample <- valid_pool %>%
-      dplyr::mutate(row_id = dplyr::row_number()) %>%
       dplyr::group_by(Presence) %>%
       dplyr::slice_sample(prop = 0.3) %>%
       dplyr::ungroup()
 
-    val_ids <- test_sample$row_id
-
     # 2. Remove validation rows using row ID to avoid ambiguity
-    valid_ids_df <- valid_pool %>% dplyr::mutate(row_id = dplyr::row_number())
-    reg_left <- valid_ids_df %>% dplyr::filter(!row_id %in% val_ids)
+	val_ids <- test_sample$sid
+    valid_ids_df <- valid_pool
+    reg_left <- valid_ids_df %>% dplyr::filter(!sid %in% val_ids)
 
     # 3. Combine global data with remaining regional points
     train_candidates <- dplyr::bind_rows(
-      train_pool %>% dplyr::filter(level == "glo"),
-      reg_left %>% dplyr::select(-row_id)
+      train_pool %>% dplyr::filter(!sid %in% val_ids),
+      reg_left
     )
 	
-	    # 4. Sample balanced training set
+	# 4. Sample balanced training set
     train_sample <- train_candidates %>%
       dplyr::group_by(Presence) %>%
       dplyr::slice_sample(prop = 0.7) %>%
       dplyr::ungroup()
 
 obschoice[[i]] <- train_sample %>%
-  dplyr::select(-level, -X, -Y) %>%
+  dplyr::select(-X, -Y) %>%
   as.data.frame()
 
 testing[[i]] <- test_sample %>%
-  dplyr::select(-level, -X, -Y, -row_id) %>%
+  dplyr::select(-X, -Y) %>%
   as.data.frame()
   }
 
@@ -141,12 +131,12 @@ testing[[i]] <- test_sample %>%
     training_pool <- train_pool %>%
       dplyr::anti_join(val_coords, by = c("X", "Y"))
 
-    train_sample <- training_pool %>%
+    train_sample <- data.frame(training_pool %>%
       dplyr::group_by(Presence) %>%
-      dplyr::slice_sample(prop = 0.7)
+      dplyr::slice_sample(prop = 0.7))
 
-    obschoice[[i]] <- train_sample %>% dplyr::select(-level, -X, -Y)
-    testing[[i]]   <- test_sample %>% dplyr::select(-level, -X, -Y)
+    obschoice[[i]] <- train_sample %>% dplyr::select(-X, -Y)
+    testing[[i]]   <- test_sample %>% dplyr::select(-X, -Y)
   }
 }
 
@@ -158,6 +148,10 @@ if (length(testing) > 0 && exists("out")) {
 # 6. Return
 return(list(nsdm.i = out, train = obschoice))
 }
+
+
+
+
 
 # All points for validation
 
@@ -174,14 +168,13 @@ obschoice[[1]] <- dat
 
 for (i in seq_len(env$reps)) {
 set.seed(i)
-dat$sid <- seq_len(nrow(dat))
 
 chc <- dat %>%
 dplyr::group_by(Presence) %>%
 dplyr::slice_sample(prop = 0.7)
 
-obschoice[[i]] <- dat %>% dplyr::filter(sid %in% chc$sid) %>% dplyr::select(-sid, -X, -Y)
-testing[[i]]   <- dat %>% dplyr::filter(!sid %in% chc$sid) %>% dplyr::select(-sid, -X, -Y)
+obschoice[[i]] <- dat %>% dplyr::filter(sid %in% chc$sid) %>% dplyr::select(-X, -Y)
+testing[[i]]   <- dat %>% dplyr::filter(!sid %in% chc$sid) %>% dplyr::select(-X, -Y)
 }
 
 } else if (env$replicatetype == "clustered_splitsample") {
@@ -190,7 +183,6 @@ pres_points <- dat %>% dplyr::filter(Presence == 1)
 abs_points  <- dat %>% dplyr::filter(Presence == 0)
 
 n_clusters <- ceiling(sqrt(nrow(pres_points)))
-
 set.seed(42)
 kmp <- kmeans(pres_points[, c("X", "Y")], centers = n_clusters, nstart = 10)
 pres_points$cluster_id <- kmp$cluster
@@ -199,8 +191,7 @@ abs_points$cluster_id <- apply(abs_points[, c("X", "Y")], 1, function(xy) {
 which.min(colSums((t(kmp$centers) - xy)^2))
 })
 
-dat_clustered <- dplyr::bind_rows(pres_points, abs_points) %>%
-dplyr::mutate(sid = dplyr::row_number())
+dat_clustered <- dplyr::bind_rows(pres_points, abs_points)
 
 for (i in seq_len(env$reps)) {
 set.seed(i)
@@ -211,11 +202,11 @@ sampled_clusters <- sample(unique(dat_clustered$cluster_id),
 
 obschoice[[i]] <- dat_clustered %>%
 dplyr::filter(cluster_id %in% sampled_clusters) %>%
-dplyr::select(-sid, -cluster_id, -X, -Y)
+dplyr::select(-cluster_id, -X, -Y)
 
 testing[[i]] <- dat_clustered %>%
 dplyr::filter(!cluster_id %in% sampled_clusters) %>%
-dplyr::select(-sid, -cluster_id, -X, -Y)
+dplyr::select(-cluster_id, -X, -Y)
 }
 }
 

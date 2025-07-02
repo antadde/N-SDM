@@ -33,6 +33,7 @@ nsdm.flex3<-function(x=numeric(),
     env_vars=x@env_vars
     taxon=x@meta$taxon
 	xy=data.frame(x@xy)
+	sid=x@sid
   }
 
   # check and prepare data and output
@@ -57,7 +58,7 @@ nsdm.flex3<-function(x=numeric(),
   
   ### MAX
   if(mod_args_j@mod=="maxnet"){
-  mod_args_j@args$data<-lis$train[[x]][,-which(colnames(lis$train[[x]]) %in% c("Presence", "X", "Y"))]
+  mod_args_j@args$data<-lis$train[[x]][,-which(colnames(lis$train[[x]]) %in% c("Presence", "X", "Y", "sid"))]
   mod_args_j@args$p<-lis$train[[x]][,"Presence"]
   modi<-try(do.call(mod_args_j@mod, mod_args_j@args), TRUE)
   if("try-error" %in% class(modi)){
@@ -70,10 +71,10 @@ nsdm.flex3<-function(x=numeric(),
   tmp_path_gbm<-paste0(tmp_path, "/gbm")
   dir.create(tmp_path_gbm, recursive=TRUE)
   if(mod_args_j@weight){
-  mod_args_j@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])%in% c("Presence", "X", "Y"))]), 
+  mod_args_j@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])%in% c("Presence", "X", "Y", "sid"))]), 
                                        label = lis$train[[x]][,"Presence"], weight=wt)
   } else {
-  mod_args_j@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])%in% c("Presence", "X", "Y"))]), 
+  mod_args_j@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])%in% c("Presence", "X", "Y", "sid"))]), 
                                        label = lis$train[[x]][,"Presence"])}  
   modi<-do.call(mod_args_j@mod,mod_args_j@args)
   lgb.save(modi, paste0(tmp_path_gbm,"/",taxon,"_rep",x,"_mod",j,"_",level,".rds"))}
