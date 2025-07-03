@@ -22,7 +22,8 @@ nsdm.absences<-function(n=10000,
 					   rst_ref,
 					   rst_background_weight=NULL,
                        set_max_npres_to_nabs=TRUE,
-					   rst_reg_gloproj=NULL){
+					   rst_reg_gloproj=NULL,
+					   level){
 
   ### ------------------------
   ### generate nsdm.pseudoabsences object and add meta info
@@ -126,7 +127,7 @@ if (type == "po") {
 	### Tag points (assign sid)
 	### ------------------------
 	# Tag points
-	if (inherits(rst_reg_gloproj, "SpatRaster")) {
+if (inherits(rst_reg_gloproj, "SpatRaster") && level == "glo") {
 	  # Extract raster values at point locations
 	  vals <- terra::extract(rst_reg_gloproj, out@xy)
 
@@ -138,7 +139,7 @@ if (type == "po") {
 	  
 	} else {
 	  
-	  out@sid <- paste("glo", out@pa, seq_len(length(out@pa)), sep = "_")
+	  out@sid <- paste(level, out@pa, seq_len(length(out@pa)), sep = "_")
 	  
 	}
 
