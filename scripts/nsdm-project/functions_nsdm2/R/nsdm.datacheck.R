@@ -55,12 +55,7 @@ nsdm.datacheck <- function(data_dir, n_levels) {
 		if (length(files) == 0) {
 		  message("🚨 No .tif files found in ", full_path)
 		}
-	  } else if (subdir == "masks") {
-		mask_file <- file.path(full_path, basename(mask_reg))
-		if (!file.exists(mask_file)) {
-		  message("🚨 Missing expected mask file: ", mask_file)
-		}
-	  }
+	  } 
 	}
 
 	invisible(lapply(required_dirs, check_dir_has_data))
