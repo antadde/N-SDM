@@ -21,7 +21,8 @@ nsdm.absences<-function(n=10000,
 					   type="po",
 					   rst_ref,
 					   rst_background_weight=NULL,
-                       set_max_npres_to_nabs=TRUE){
+                       set_max_npres_to_nabs=TRUE,
+					   rst_reg_gloproj=NULL){
 
   ### ------------------------
   ### generate nsdm.pseudoabsences object and add meta info
@@ -111,6 +112,7 @@ if (type == "po") {
   }
 }
 
+
   ### ------------------------
   ### Prepare output
   ### ------------------------
@@ -119,9 +121,28 @@ if (type == "po") {
   out@years<-as.numeric(c(pres$year, rep(NA, nrow(abs))))
   out@env_vars=data.frame()
   out@xy=as.matrix(rbind(data.frame(X=st_coordinates(pres)[,1], Y=st_coordinates(pres)[,2]), data.frame(X=st_coordinates(abs)[,1], Y=st_coordinates(abs)[,2])))
-  out@sid=c(pres$sid,
-            paste("NA", "0", 1:nrow(abs), sep="_"))
   
+	### ------------------------
+	### Tag points (assign sid)
+	### ------------------------
+	# Tag points
+	if (inherits(rst_reg_gloproj, "SpatRaster")) {
+	  # Extract raster values at point locations
+	  vals <- terra::extract(rst_reg_gloproj, out@xy)
+
+	  # Identify if the point is inside or outside
+	  gloorreg <- ifelse(is.na(vals), "glo", "reg")
+
+	  # Build sid
+	  out@sid <- paste(gloorreg, out@pa, seq_len(length(out@pa)), sep = "_")
+	  
+	} else {
+	  
+	  out@sid <- paste("glo", out@pa, seq_len(length(out@pa)), sep = "_")
+	  
+	}
+
   # return
   return(out)
+
 }
