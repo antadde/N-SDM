@@ -39,6 +39,9 @@ preps=function(env=parent.frame(), call, evaluationdomain=character()){
 ### partition observations
 ### ----------------------
 
+#########
+##### Note ::: there is something wrong with the double 0.3 then 0.7 sampling. check.
+
 dat <- cbind(
   data.frame(Presence = env$pa),
   env$env_vars,

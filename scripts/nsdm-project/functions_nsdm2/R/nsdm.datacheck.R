@@ -167,23 +167,5 @@ check_covariate_consistency <- function(level = "reg", cov_dir, sp_dir) {
     stop("❌ Species coordinates are not compatible with raster grid (CRS or extent mismatch).")
   }
   
-# Mask data check
-if (level == "glo" && n_levels == 2) {
-   if (!file.exists(mask_reg)) {
-    stop("❌ Expected mask file not found: ", mask_reg)
-  }
-  m_r <- tryCatch(rast(mask_reg), error = function(e) stop("❌ Failed to load mask file: ", e$message))
-    if (!compareGeom(m_r, r, stopOnError = FALSE)) {
-    stop("❌ 'mask_reg.tif' geometry is not compatible with global raster grid (extent, resolution, or CRS mismatch).")
-  }
-
-rmin <- minmax(m_r)[1]
-rmax <- minmax(m_r)[2]
-
-if (!(rmin == 1 && rmax == 1)) {
-  stop("❌ 'mask_reg.tif' contains values other than 1 and NA. Found range: [", rmin, ", ", rmax, "]")
-}
-}
-  
   invisible(compare_df)
 }
