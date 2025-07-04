@@ -122,7 +122,7 @@ if (type == "po") {
   out@years<-as.numeric(c(pres$year, rep(NA, nrow(abs))))
   out@env_vars=data.frame()
   out@xy=as.matrix(rbind(data.frame(X=st_coordinates(pres)[,1], Y=st_coordinates(pres)[,2]), data.frame(X=st_coordinates(abs)[,1], Y=st_coordinates(abs)[,2])))
-  out@sid=c(pres$sid,
+  sid=c(pres$sid,
             paste("NA", 0, 1:nrow(abs), sep="_"))
 
   
@@ -138,11 +138,11 @@ if (inherits(rst_reg_gloproj, "SpatRaster") && level == "glo") {
 	  gloorreg <- ifelse(is.na(vals), "g", "r")
 
 	  # Build sid
-	  out@sid <- paste(out@sid, gloorreg, sep="_")
+	  out@sid <- paste(sid, gloorreg, sep="_")
 	                
 	} else {
 	  
-	  out@sid <- paste(out@sid, substr(level, 1, 1), sep="_")
+	  out@sid <- paste(sid, substr(level, 1, 1), sep="_")
 	  
 	}
 
