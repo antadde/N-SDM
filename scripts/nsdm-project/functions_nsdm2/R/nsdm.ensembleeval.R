@@ -97,7 +97,7 @@ for (model in model_names) {
         warning("Model fit for ", modinp_top_n, " rep ", k, " is a try-error.")
         pred_i <- rep(NA, nrow(testa_GLO[[k]]))
       } else {
-		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_GLO[[k]][, !(names(testa_GLO[[k]]) %in% c("X", "Y","level"))])
+		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_GLO[[k]][, !(names(testa_GLO[[k]]) %in% c("X","Y","sid"))])
       }
       
       pred[[k]] <- pred_i
@@ -200,7 +200,7 @@ for (model in mod_algo) {
         warning("Model fit for ", modinp_top_n, " rep ", k, " is a try-error.")
         pred_i <- rep(NA, nrow(testa_REG_multiply[[k]]))
       } else {
-		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_REG_multiply[[k]][, !(names(testa_REG_multiply[[k]]) %in% c("X", "Y","level"))])
+		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_REG_multiply[[k]][, !(names(testa_REG_multiply[[k]]) %in% c("X","Y","sid"))])
 
       }
       
@@ -305,7 +305,7 @@ for (model in mod_algo) {
         warning("Model fit for ", modinp_top_n, " rep ", k, " is a try-error.")
         pred_i <- rep(NA, nrow(testa_REG_covariate[[k]]))
       } else {
-		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_REG_covariate[[k]][, !(names(testa_REG_covariate[[k]]) %in% c("X", "Y","level"))])
+		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_REG_covariate[[k]][, !(names(testa_REG_covariate[[k]]) %in% c("X","Y","sid"))])
       }
       
       pred[[k]] <- pred_i
