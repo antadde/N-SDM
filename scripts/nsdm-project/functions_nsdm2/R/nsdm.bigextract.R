@@ -66,7 +66,7 @@ xt_pres <- do.call(cbind, xt_pres)
 
 # Only run temporal matching if years are available and t_match is TRUE and temporal covariates are available
 cov_info_fst_tempo <- cov_info_fst[!is.na(cov_info_fst$year), ]
-if (!all(is.na(years)) && isTRUE(t_match) && nrow(cov_info_fst_tempo)>0) {
+if (!all(is.na(years)) && isTRUE(t_match) && nrow(cov_info_fst_tempo) > 0) {
 
   # Get years corresponding to PA == 1
   y_sp <- years[pa == 1]
@@ -242,11 +242,8 @@ if (!is.null(cov_tif) && length(cov_tif) > 0) {
       # Load raster stack
       l <- rast(cov_tif)
       
-      # Convert raster to dataframe
-      r <- as.data.frame(l)
-      
-      # Extract values at identified cells
-      xt_glo <- r[cells, , drop = FALSE]  # Extract all bands, avoid dropping dimensions
+      # extract
+      xt_glo <- data.frame(extract(l, xy))
 
       # Ensure column names are correctly assigned
       colnames(xt_glo) <- names(l)
