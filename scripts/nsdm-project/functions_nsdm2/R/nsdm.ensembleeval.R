@@ -103,8 +103,10 @@ for (model in model_names) {
       pred[[k]] <- pred_i
     }
     
-    pop_n <- do.call(cbind, pred)
-    pop[[n]] <- pop_n
+    # pop_n <- do.call(cbind, pred)
+    # pop[[n]] <- pop_n
+	  pop[[n]] <- pred
+	
   }
   
   if (length(pop) > 1) {
@@ -119,7 +121,20 @@ for (model in model_names) {
 }
 
 if (length(pred_all) > 0) {
-  GLO_preds <- simplify2array(pred_all)
+ # GLO_preds <- simplify2array(pred_all)
+ # Rearrange pred_all so it's replicate → model → vector
+n_models <- length(pred_all)
+n_reps <- length(pred_all[[1]])
+
+# Make list for each replicate
+GLO_preds <- vector("list", n_reps)
+names(GLO_preds) <- paste0("rep", seq_len(n_reps))
+
+for (rep_idx in seq_len(n_reps)) {
+  GLO_preds[[rep_idx]] <- lapply(pred_all, `[[`, rep_idx)
+  names(GLO_preds[[rep_idx]]) <- names(pred_all)
+}
+ 
 } else {
   warning("No predictions were made.")
   GLO_preds <- NULL
@@ -344,7 +359,8 @@ scores_ensemble <- list()
 target <- GLO_preds
 scores <- list()
 for (z in seq_len(outerloop)) {
-  score <- nsdm.ceval(f = rowMeans(as.data.frame(target[, z, ]), na.rm = TRUE),
+  z_target <- target[[z]]
+  score <- nsdm.ceval(f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
                        pa = papa_GLO[[z]],
                        tesdat = testa_GLO[[z]],
                        crit = eval_crit)
