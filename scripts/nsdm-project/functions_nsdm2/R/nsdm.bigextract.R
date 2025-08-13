@@ -23,6 +23,7 @@ nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_sc
 xy <- data@xy
 pa <- data@pa
 years <- data@years
+sid <- data@sid
 
 # Isolate fst and tif covariates
 cov_tif <- cov[grep("\\.tif$", cov)]  # should only be mainGLO
@@ -280,6 +281,7 @@ if (length(na_ix) > 0) {
   xy <- xy[-na_ix, , drop = FALSE]
   pa <- pa[-na_ix]
   years <- years[-na_ix]
+  sid <- sid[-na_ix]
 }
 
 # Check if `data` is an S4 object and contains required slots
@@ -288,6 +290,7 @@ if (length(na_ix) > 0) {
   data@xy <- xy
   data@pa <- pa
   data@years <- years
+  data@sid <- sid
 
 return(list(data = data, filtered_out_layers = filtered_out_layers))
 }
