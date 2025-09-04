@@ -20,13 +20,7 @@ nsdm.fit<-function(x,
 				   ncores,
 				   tmp_path){
 
-  # Pseudo absence object supplied
-    pa=x@pa
-    env_vars=x@env_vars
-    taxon=x@meta$taxon
-	xy=data.frame(x@xy)
-	sid=x@sid
-  
+
   # Check sets
   reps = length(sets)
   
@@ -36,7 +30,8 @@ nsdm.fit<-function(x,
   mod_args_j=mod_args[[j]]
   
   # parallelize over replicates
-  modi<-mclapply(1:reps, function(rep_id){
+ modis=list()
+ modit <-mclapply(1:reps, function(rep_id){
   
   # Retrieve replicate values
 sub_sets  <- sets[[rep_id]][grep(level, names(sets[[rep_id]]))]
@@ -48,32 +43,30 @@ i_tr <- match(train_sid, x@sid); i_tr <- i_tr[!is.na(i_tr)]
 i_te <- match(test_sid,  x@sid); i_te <- i_te[!is.na(i_te)]
 
 train <- cbind(
-  data.frame(sid = x@sid[i_tr], split = "train", presence = x@pa[i_tr]),
+  data.frame(sid = x@sid[i_tr], split = "train", Presence = x@pa[i_tr]),
   x@env_vars[i_tr, , drop = FALSE]
 )
 test <- cbind(
-  data.frame(sid = x@sid[i_te], split = "test", presence = x@pa[i_te]),
+  data.frame(sid = x@sid[i_te], split = "test", Presence = x@pa[i_te]),
   x@env_vars[i_te, , drop = FALSE]
 )
 
-## unified data frame
-df <- rbind(train, test)
-
 ## only presence and env vars
-df_pres_env <- df[, c("presence", colnames(x@env_vars)), drop = FALSE]
+df_train <- train[, c("Presence", colnames(x@env_vars)), drop = FALSE]
+df_test <- test[, c("Presence", colnames(x@env_vars)), drop = FALSE]
 
 
   ## Weights
   if(mod_args_j@weight){
-  wi=which(sub_sets[[paste0(level, "_train")]]@pa==1)
-  wt=rep(1, length(sub_sets[[paste0(level, "_train")]]@pa))
+  wi=which(df_train$Presence==1)
+  wt=rep(1, nrow(df_train))
   wt[wi]<-round((length(wt)-length(wi))/length(wi))
   }
   
   ### MAX
   if(mod_args_j@mod=="maxnet"){
-  mod_args_j@args$data<-lis$train[[x]][,-which(colnames(lis$train[[x]]) %in% c("Presence", "X", "Y", "sid"))]
-  mod_args_j@args$p<-lis$train[[x]][,"Presence"]
+  mod_args_j@args$data<-train[, c(colnames(x@env_vars)), drop = FALSE]
+  mod_args_j@args$p<-df_train$Presence
   modi<-try(do.call(mod_args_j@mod, mod_args_j@args), TRUE)
   if("try-error" %in% class(modi)){
   mod_args_bis<-mod_args_j@args
@@ -85,45 +78,51 @@ df_pres_env <- df[, c("presence", colnames(x@env_vars)), drop = FALSE]
   tmp_path_gbm<-paste0(tmp_path, "/gbm")
   dir.create(tmp_path_gbm, recursive=TRUE)
   if(mod_args_j@weight){
-  mod_args_j@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])%in% c("Presence", "X", "Y", "sid"))]), 
-                                       label = lis$train[[x]][,"Presence"], weight=wt)
+  mod_args_j@args$data<-lgb.Dataset(as.matrix(df_train[, c(colnames(x@env_vars)), drop = FALSE]), 
+                                    label = df_train$Presence, weight=wt)
   } else {
-  mod_args_j@args$data<-lgb.Dataset(as.matrix(lis$train[[x]][,-which(colnames(lis$train[[x]])%in% c("Presence", "X", "Y", "sid"))]), 
-                                       label = lis$train[[x]][,"Presence"])}  
+  mod_args_j@args$data<-lgb.Dataset(as.matrix(df_train[, c(colnames(x@env_vars)), drop = FALSE]), 
+                                    label = df_train$Presence)}  
+									
   modi<-do.call(mod_args_j@mod,mod_args_j@args)
   lgb.save(modi, paste0(tmp_path_gbm,"/",taxon,"_rep",x,"_mod",j,"_",level,".rds"))}
   
   ### GLM or GAM
   if(mod_args_j@mod %in% c("glm", "mgcv_gam", "mgcv_fx", "esm")){
   if(mod_args_j@weight) mod_args_j@args$weights=wt
-  mod_args_j@args$data=lis$train[[x]]
-  modi=do.call(mod_args_j@mod,mod_args_j@args)}
+  mod_args_j@args$data=df_train
+  modi=do.call(mod_args_j@mod, mod_args_j@args)
+  }
   
   ### RF
   if(mod_args_j@mod=="randomForest"){
   if(mod_args_j@weight) mod_args_j@args$weights=wt
-   mod_args_j@args$data=lis$train[[x]]
-   mod_args_j@args$data$Presence=as.factor(mod_args_j@args$data$Presence)
+   mod_args_j@args$data=df_train[, c(colnames(x@env_vars)), drop = FALSE]
+   mod_args_j@args$data$Presence=as.factor(df_train$Presence)
    modi=do.call(mod_args_j@mod, mod_args_j@args)}
    
    ### RF with Ranger
   if(mod_args_j@mod=="ranger"){
   if(mod_args_j@weight) mod_args_j@args$case.weights=wt
-   mod_args_j@args$data=lis$train[[x]]
-   mod_args_j@args$data$Presence=as.factor(mod_args_j@args$data$Presence)
+   mod_args_j@args$data=df_train[, c(colnames(x@env_vars)), drop = FALSE]
+   mod_args_j@args$data$Presence=as.factor(df_train$Presence)
    modi=do.call(mod_args_j@mod, mod_args_j@args)}
    
+ 
   return(modi)}, mc.cores=ncores)
   
 # Rename replicates
-names(modi)=paste0("replicate_",sprintf("%02d",1:reps))
+names(modit)=paste0("replicate_",sprintf("%02d",1:reps))
 
 # Supply fitted replicates
-modis[[mod_args_j@tag]]<-modi
+modis[[mod_args_j@tag]]<-modit
 }
 
 # supply fitted objects
-lis$nsdm.i@fits=modis
+# Initiate out object
+  out <- nsdm.fit()
+  lis <- list(nsdm.i = out)
+  lis$nsdm.i@fits=modis
 
 return(lis$nsdm.i)
 }
