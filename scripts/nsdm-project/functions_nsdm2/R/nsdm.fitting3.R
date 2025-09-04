@@ -16,7 +16,6 @@
 #' @author Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
-
 nsdm.flex3<-function(x=numeric(),
                    replicatetype=character(),
 				   evaluationdomain=character(),

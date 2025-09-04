@@ -13,7 +13,7 @@ nsdm.datacheck(data_dir, n_levels)
 }
 \value{
 Invisibly returns a data.frame with consistency results for sampled rasters (extent, resolution, CRS, grid).
-If inconsistencies are found, the function stops and reports the problematic files or species mismatches.
+If inconsistencies are found, the function stops and reports the problematic files or mismatches.
 }
 \description{
 Validates the data for an NSDM-compliant run.

@@ -13,5 +13,5 @@ nsdm.summary(object)
 Summarize nsdm.evaluation objects
 }
 \author{
-Philipp Brun (philipp.brun@wsl.ch)
+Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (antoine.adde@eawag.ch)
 }

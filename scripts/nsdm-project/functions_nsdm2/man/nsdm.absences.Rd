@@ -11,7 +11,9 @@ nsdm.absences(
   type = "po",
   rst_ref,
   rst_background_weight = NULL,
-  set_max_npres_to_nabs = TRUE
+  set_max_npres_to_nabs = TRUE,
+  rst_reg_gloproj = NULL,
+  level
 )
 }
 \arguments{

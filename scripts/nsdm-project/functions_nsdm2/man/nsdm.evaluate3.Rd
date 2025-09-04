@@ -6,7 +6,6 @@
 \usage{
 nsdm.evaluate3(
   x,
-  tester = data.frame(),
   thres = numeric(),
   crit = "pp=op",
   level,
@@ -16,8 +15,6 @@ nsdm.evaluate3(
 }
 \arguments{
 \item{x}{A nsdm.fit object}
-
-\item{tester}{Data.frame with testing data (only mandatory if replicatetype='none' was chosen when models were fitted)}
 
 \item{thres}{A character vector of the same length as number of models chosen with custom thresholds for model evaluation. for nsdm.flex outputs the thresholds have to be labelled with the same names provided to models}
 

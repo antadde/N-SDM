@@ -6,15 +6,10 @@
 \usage{
 nsdm.flex3(
   x = numeric(),
-  pa = numeric(),
-  env_vars = data.frame(),
-  taxon = character(),
   replicatetype = character(),
+  evaluationdomain = character(),
   reps,
   mod_args = list(),
-  timer = FALSE,
-  save = FALSE,
-  project = NA,
   path = NA,
   level,
   ncores,
@@ -24,24 +19,13 @@ nsdm.flex3(
 \arguments{
 \item{x}{A nsdm.pseudoabsences object}
 
-\item{pa}{A vector containing 0/1 presence/absence values}
+\item{replicatetype}{A charachter string indicating how should replicates be generated? may be 'none', 'splitsample', or 'clustered_splitsample'}
 
-\item{env_vars}{A data.frame containing environmental predictors}
-
-\item{taxon}{A character string of the taxon for which models are fitted}
-
-\item{replicatetype}{A charachter string indicating how should replicates be generated? may be 'none', 'splitsample',
-'cv' 'block-cv'}
+\item{evaluationdomain}{A charachter string indicating the spatial domain for evaluation? may be 'regionalonly', or 'all'}
 
 \item{reps}{Numeric number of replicates}
 
 \item{mod_args}{List of class 'multi.input' containing information on models to be fitted}
-
-\item{timer}{Logical (TRUE or FALSE) indicating if model computation time is to be saved}
-
-\item{save}{should the model be saved in a structured way? (not implemented yet)}
-
-\item{project}{character indicating the name of the project within which the models are run (later used to define saving directories)}
 
 \item{path}{where to save? (not implemented yet)}
 
@@ -50,8 +34,6 @@ nsdm.flex3(
 \item{ncores}{Number of cores to be used during parallel operations}
 
 \item{tmp_path}{Character indicating the path where to store temporary outputs}
-
-\item{strata}{A numeric vector of the same length as observations with integers separating cross validation replicates (used when replicatetype='block-cv')}
 }
 \value{
 A nsdm.fit object including slots for meta info, testing data for evaluation, and model objects

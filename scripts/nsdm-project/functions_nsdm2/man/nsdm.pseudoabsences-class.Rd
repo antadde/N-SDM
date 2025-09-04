@@ -9,5 +9,5 @@
 Not to be called directly by the user
 }
 \author{
-Philipp Brun (philipp.brun@wsl.ch)
+Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (antoine.adde@eawag.ch)
 }
