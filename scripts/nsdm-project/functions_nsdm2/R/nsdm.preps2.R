@@ -179,6 +179,6 @@ nsdm.preps2 <- function(pseu_reg, pseu_glo,
   splits_idx <- .make_presence_indices(pseu_reg, pseu_glo, prop_test, n_reps, seed)
   splits_idx_bal <- .add_balanced_absences(splits_idx, pseu_reg, pseu_glo, ratio_abs, seed)
 
-  all_sets <- build_all_sets(pseu_reg, pseu_glo, splits_idx_bal)
+  all_sets <- .build_all_sets(pseu_reg, pseu_glo, splits_idx_bal)
   return(all_sets)
 }
