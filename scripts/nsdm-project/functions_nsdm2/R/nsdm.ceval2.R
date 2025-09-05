@@ -51,7 +51,7 @@ nsdm.ceval2 <- function(f, pa) {
 
   # Boyce
   boyce_s_pe=try(ecospat.boyce(fit=f, obs=f[pa==1], PEplot = FALSE, rm.duplicate = TRUE, method = 'spearman'), TRUE)
-  if(is.numeric(boyce_s_pe$cor)) { boyce_s_pe=boyce_s_pe$cor } else { boyce_s_pe=NA}
+  if(is.numeric(boyce_s_pe$cor)) {boyce_s_pe=boyce_s_pe$cor} else {boyce_s_pe=NA}
 
   ## AUC and RMSE
   prd  <- ROCR::prediction(f, pa)
@@ -62,11 +62,11 @@ nsdm.ceval2 <- function(f, pa) {
   aucS <- 2 * auc - 1
 
   ## simple consensus score
-  score_vec <- na.omit(c(aucS, cbi, tdep["maxTSS"]))
+  score_vec <- na.omit(c(aucS, boyce_s_pe, tdep["maxTSS"]))
   score <- if (length(score_vec)) mean(score_vec) else NA_real_
 
   ## return
-  weg <- c(auc, aucS, rmse, cbi, score, tre, tdep)
+  weg <- c(auc, aucS, rmse, boyce_s_pe, score, tre, tdep)
   names(weg)[1:6] <- c("AUC", "AUC_S", "RMSE", "CBI", "Score", "threshold")
   return(unlist(weg))
 }
