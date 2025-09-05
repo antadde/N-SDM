@@ -12,6 +12,7 @@
 #'   along the ranked predictions. Ties are broken by the maximum.
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
+
 nsdm.ceval2 <- function(f, pa) {
 
   ## basic hygiene
@@ -48,12 +49,9 @@ nsdm.ceval2 <- function(f, pa) {
               factor(pa,   levels = c("0", "1")))
   tdep <- unlist(nsdm.all.metrics(tb[2, 2], tb[2, 1], tb[1, 2], tb[1, 1]))
 
-  ## Boyce index
-  boy <- try(ecospat::ecospat.boyce(fit = f, obs = f[pa == 1],
-                                    PEplot = FALSE, rm.duplicate = TRUE,
-                                    method = "spearman"),
-             silent = TRUE)
-  cbi <- if (!inherits(boy, "try-error") && is.numeric(boy$cor)) boy$cor else NA_real_
+  # Boyce
+  boyce_s_pe=try(ecospat.boyce(fit=f, obs=f[pa==1], PEplot = FALSE, rm.duplicate = TRUE, method = 'spearman'), TRUE)
+  if(is.numeric(boyce_s_pe$cor)) { boyce_s_pe=boyce_s_pe$cor } else { boyce_s_pe=NA}
 
   ## AUC and RMSE
   prd  <- ROCR::prediction(f, pa)
