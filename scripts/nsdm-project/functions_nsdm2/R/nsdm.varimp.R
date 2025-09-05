@@ -1,13 +1,35 @@
 #' nsdm.varimp
 #'
-#' Covariate importance computation
+#' Covariate importance computation.
 #'
-#' @param models A nsdm.fit object containing fitted model(s)
+#' @md
+#' @param models An `nsdm.fit` object containing fitted model objects
 #'
-#' @return A list containing the values of the relative importance for each individual covariate and model
+#' @return A list with relative importance values for each covariate and model.
+#'   If `model_name` equals `"esm"` in the calling scope, the function returns
+#'   a list of data frames, one per sub model. Otherwise it returns a single
+#'   data frame for the first model.
+#'
+#' @details Supported model classes and the importance used
+#' 
+#' * `lgb.Booster`: `lightgbm::lgb.importance` Gain
+#' * `glm`: `caret::varImp` Overall, aggregated by base variable
+#' * `gam`: `summary(model)$s.table` Chi square for smooth terms
+#' * `randomForest`: `randomForest::importance`
+#' * `ranger`: `model$variable.importance`
+#' * `maxnet`: sum of absolute betas per original variable
+#'
+#' Importances are scaled by their maximum within each model, so the top
+#' covariate has importance equal to one. Output columns are `Covariate`
+#' and `Importance`, ordered by decreasing importance.
+#'
+#' @note This function reads a variable named `model_name` from the calling
+#'   environment to decide whether to return a list of importances for ESM
+#'   or a single table. No argument named `model_name` is present in the
+#'   function signature.
+#'
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
-
 nsdm.varimp <- function(models){
 
 imp_scaled_f<-list() # list where results will be stored
@@ -15,7 +37,7 @@ imp_scaled_f<-list() # list where results will be stored
 for(m in 1:length(models@fits)){ # Loop over models (1 in regular cases but much more in esm settings)
 
 # Retrieve model fit
-model<-models@fits[[m]][[1]]	  
+model<-models@fits[[m]]	  
   
 # In case of esm model uses its name its index for naming and subset Data
 if(model_name=="esm"){

@@ -7,13 +7,37 @@
 nsdm.varimp(models)
 }
 \arguments{
-\item{models}{A nsdm.fit object containing fitted model(s)}
+\item{models}{An \code{nsdm.fit} object containing fitted model objects}
 }
 \value{
-A list containing the values of the relative importance for each individual covariate and model
+A list with relative importance values for each covariate and model.
+If \code{model_name} equals \code{"esm"} in the calling scope, the function returns
+a list of data frames, one per sub model. Otherwise it returns a single
+data frame for the first model.
 }
 \description{
-Covariate importance computation
+Covariate importance computation.
+}
+\details{
+Supported model classes and the importance used
+\itemize{
+\item \code{lgb.Booster}: \code{lightgbm::lgb.importance} Gain
+\item \code{glm}: \code{caret::varImp} Overall, aggregated by base variable
+\item \code{gam}: \code{summary(model)$s.table} Chi square for smooth terms
+\item \code{randomForest}: \code{randomForest::importance}
+\item \code{ranger}: \code{model$variable.importance}
+\item \code{maxnet}: sum of absolute betas per original variable
+}
+
+Importances are scaled by their maximum within each model, so the top
+covariate has importance equal to one. Output columns are \code{Covariate}
+and \code{Importance}, ordered by decreasing importance.
+}
+\note{
+This function reads a variable named \code{model_name} from the calling
+environment to decide whether to return a list of importances for ESM
+or a single table. No argument named \code{model_name} is present in the
+function signature.
 }
 \author{
 Antoine Adde (antoine.adde@eawag.ch)
