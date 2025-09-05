@@ -317,7 +317,7 @@ nsdm.respcurve <- function(models, Data, scaleparam = NULL, factor = 1,
 
     for (m in 1:length(models@fits)) {
       Data2 <- Data
-      model <- models@fits[[m]][[1]]
+      model <- models@fits[[m]]
 
       if (model_name == "esm") {
         model_nameu <- names(models@fits)[m]
@@ -333,7 +333,8 @@ nsdm.respcurve <- function(models, Data, scaleparam = NULL, factor = 1,
 
       Xp <- as.data.frame(matrix(NA, ncol = NbVar, nrow = nrow(Data2),
                                  dimnames = list(NULL, colnames(Data2))))
-      for (i in 1:NbVar) Xp[, i] <- mean(Data2[, i])
+      
+	  for (i in 1:NbVar) Xp[, i] <- mean(Data2[, i])
 
       for (i in 1:NbVar) {
         xr  <- range(Data2[, i])
