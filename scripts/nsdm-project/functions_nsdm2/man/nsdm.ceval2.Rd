@@ -20,11 +20,7 @@ Model evaluation core function.
 }
 \details{
 The threshold is chosen as the prediction value that maximizes TSS
-along the ranked predictions. Ties are broken by the first maximum.
-}
-\seealso{
-\code{\link[ROCR:prediction]{ROCR::prediction()}}, \code{\link[ROCR:performance]{ROCR::performance()}}, \code{\link[ecospat:ecospat.boyce]{ecospat::ecospat.boyce()}},
-\code{nsdm.all.metrics()}, \code{tss()}
+along the ranked predictions. Ties are broken by the maximum.
 }
 \author{
 Antoine Adde (antoine.adde@eawag.ch)
