@@ -17,30 +17,30 @@ nsdm.respcurve(
 )
 }
 \arguments{
-\item{models}{A nsdm.fit object containing fitted model(s)}
+\item{models}{An \code{nsdm.fit} object containing fitted model objects}
 
-\item{Data}{A data.frame object containing covariate values used for model fitting}
+\item{Data}{A data frame with the covariates used during model fitting, one column per covariate}
 
-\item{scaleparam}{Attribute part of a scaled matrix containing the scaling parameters to be reapplied}
+\item{scaleparam}{Optional scaling attributes to reapply on the x axis, typically the \code{"scaled:center"} and \code{"scaled:scale"} named vectors from \code{attr(scale(X), "scaled:*")}}
 
-\item{factor}{When applicable, the value by which original covariates have been multiplied (e.g. by 10, 100, etc.) for storage purposes}
+\item{factor}{When applicable, the value used to store covariates at a different scale, divide the x axis by this value in the plots, default \code{1}}
 
-\item{model_name}{A character string indicating the name of the target modelling algorithm}
+\item{model_name}{Character string with the modelling engine name, for example \code{"glm"}, \code{"gam"}, \code{"maxnet"}, \code{"lgb.Booster"}, \code{"randomForest"}, \code{"ranger"}, or \code{"esm"}}
 
-\item{species_name}{A character string indicating the name of the target taxon}
+\item{species_name}{Character string with the taxon name, used in plot titles and filenames}
 
-\item{plotting}{Logical. Plot response curves?}
+\item{plotting}{Logical, create a PDF with response curves for each covariate, default \code{TRUE}}
 
-\item{save_path}{A character string indicating the path where the plots will be saved}
+\item{save_path}{Character path where plots are written when \code{plotting = TRUE}}
 
-\item{ncores}{Number of cores to be used during parallel operations}
+\item{ncores}{Integer, number of cores for \code{parallel::mclapply}, default \code{1}}
 }
 \value{
-A list containing the values of the response curves for each individual covariate and model
+A list with one element per model when \code{model_name == "esm"}, each element is a 3D array of size \verb{n_points x 2 x n_covariates} with dimnames \code{c("Var","Pred")} on the second dimension. For single model workflows it returns the first element only.
 }
 \description{
-Covariate response curves computation
+Covariate response curves computation.
 }
 \author{
-Antoine Adde (aadde@unil.ch)
+Antoine Adde (antoine.adde@eawag.ch)
 }
