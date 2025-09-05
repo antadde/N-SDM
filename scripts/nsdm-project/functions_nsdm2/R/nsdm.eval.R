@@ -1,4 +1,4 @@
-#' nsdm.evaluation
+#' nsdm.eval
 #'
 #' Parallel evaluation of fitted models with common SDM metrics.
 #'
@@ -13,8 +13,9 @@
 #' @return An object of class `nsdm.evaluation` with performance per model tag and replicate
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
-nsdm.evaluation <- function(x, models, sets, level,
-                            ncores = 1L, tmp_path) {
+
+nsdm.eval <- function(x, models, sets, level,
+                            ncores = 1L, tmp_path){
 
   tmp_path_gbm <- file.path(tmp_path, "gbm")
 
