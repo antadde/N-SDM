@@ -9,11 +9,7 @@
 #' @return Named numeric vector with `AUC`, `AUC_S`, `RMSE`, `CBI`, `Score`, `threshold`,
 #'   plus all elements returned by `nsdm.all.metrics`
 #' @details The threshold is chosen as the prediction value that maximizes TSS
-#'   along the ranked predictions. Ties are broken by the first maximum.
-#' @seealso [ROCR::prediction()], [ROCR::performance()], [ecospat::ecospat.boyce()],
-#'   `nsdm.all.metrics()`, `tss()`
-#' @importFrom ROCR prediction performance
-#' @importFrom ecospat ecospat.boyce
+#'   along the ranked predictions. Ties are broken by the maximum.
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 nsdm.ceval2 <- function(f, pa) {
