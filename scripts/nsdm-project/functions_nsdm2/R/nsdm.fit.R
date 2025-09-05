@@ -53,7 +53,7 @@ nsdm.fitting <- function(x,
       )
 
       df_train <- train[, c("Presence", colnames(x@env_vars)), drop = FALSE]
-      df_test  <- test[,  c("Presence", colnames(x@env_vars)), drop = FALSE]  # reserved if you later add evaluation
+      df_test  <- test[,  c("Presence", colnames(x@env_vars)), drop = FALSE]
 
       # weights for presence upweighting if requested
       wt <- NULL
