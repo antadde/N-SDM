@@ -4,10 +4,27 @@
 \alias{nsdm.ceval2}
 \title{nsdm.ceval2}
 \usage{
-nsdm.ceval2(f, pa, tesdat)
+nsdm.ceval2(f, pa)
+}
+\arguments{
+\item{f}{Numeric vector of predicted scores for the test data, higher means more suitable}
+
+\item{pa}{Integer or logical vector of presence–absence labels, must be 0 or 1, same length as \code{f}}
+}
+\value{
+Named numeric vector with \code{AUC}, \code{AUC_S}, \code{RMSE}, \code{CBI}, \code{Score}, \code{threshold},
+plus all elements returned by \code{nsdm.all.metrics}
 }
 \description{
-Model evaluation core function
+Model evaluation core function.
+}
+\details{
+The threshold is chosen as the prediction value that maximizes TSS
+along the ranked predictions. Ties are broken by the first maximum.
+}
+\seealso{
+\code{\link[ROCR:prediction]{ROCR::prediction()}}, \code{\link[ROCR:performance]{ROCR::performance()}}, \code{\link[ecospat:ecospat.boyce]{ecospat::ecospat.boyce()}},
+\code{nsdm.all.metrics()}, \code{tss()}
 }
 \author{
 Antoine Adde (antoine.adde@eawag.ch)

@@ -1,115 +1,94 @@
 #' nsdm.evaluation
 #'
-#' Parallel evaluation of nsdm.fit models with a suite of model assessment metrics
+#' Parallel evaluation of fitted models with common SDM metrics.
 #'
-#' @param x A nsdm.fit object
-#' @param level A character string indicating the evaluated level (REG or GLO)
-#' @param ncores Number of cores to be used during parallel operations
-#' @param tmp_path A character string indicating the path where to store gbm temporary outputs
+#' @md
+#' @param x An `nsdm.pseudoabsences` object that holds the master covariates, SIDs, and presence values
+#' @param models An `nsdm.fit` object produced by your fitting step, models are in `models@fits`
+#' @param sets A list of replicates, each replicate contains `reg_train`, `reg_test`, `glo_train`, `glo_test`
+#' @param level Character string, either `"glo"` or `"reg"`, selects which SIDs to use for testing
+#' @param ncores Integer, number of cores used by `parallel::mclapply`, default is `1`
+#' @param tmp_path Character path for LightGBM model files, default is `tempdir()`
 #'
-#' @return An object of class 'nsdm.evaluation'
+#' @return An object of class `nsdm.evaluation` with performance per model tag and replicate
+#' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
+nsdm.evaluation <- function(x, models, sets, level,
+                            ncores = 1L, tmp_path) {
 
-nsdm.evaluation<-function(x, models, sets, level, ncores=ncores, tmp_path=NULL){
+  tmp_path_gbm <- file.path(tmp_path, "gbm")
 
-  ### ------------------------
-  ### Check testing data and prepare for evaluation
-  ### ------------------------
+  ## ------------------------
+  ## Build testing covariates and presence vectors per replicate
+  ## ------------------------
+  cols <- colnames(x@env_vars)
+  rep_ids <- seq_along(sets)
 
-cols <- colnames(x@env_vars)
-rep_ids <- seq_along(sets)
+  testa <- vector("list", length(rep_ids))   # covariates only
+  papa  <- vector("list", length(rep_ids))   # presence vector
 
-testa <- vector("list", length(rep_ids))
-papa  <- vector("list", length(rep_ids))
+  for (k in rep_ids) {
+    sub_sets  <- sets[[k]][grep(level, names(sets[[k]]))]
+    test_sid  <- sub_sets[[paste0(level, "_test")]]@sid
 
-for (k in rep_ids) {
-  sub_sets  <- sets[[k]][grep(level, names(sets[[k]]))]
-  test_sid  <- sub_sets[[paste0(level, "_test")]]@sid
+    i_te <- match(test_sid, x@sid)
+    i_te <- i_te[!is.na(i_te)]
 
-  i_te <- match(test_sid, x@sid)
-  i_te <- i_te[!is.na(i_te)]
+    df_test <- cbind(
+      data.frame(Presence = x@pa[i_te]),
+      x@env_vars[i_te, , drop = FALSE]
+    )
 
-  df_test <- cbind(
-    data.frame(Presence = x@pa[i_te]),
-    x@env_vars[i_te, , drop = FALSE]
-  )
+    testa[[k]] <- df_test[, cols, drop = FALSE]
+    papa[[k]]  <- df_test$Presence
+  }
+  names(testa) <- names(papa) <- sprintf("replicate_%02d", rep_ids)
 
-  testa[[k]] <- df_test[, cols, drop = FALSE]  # covariates only
-  papa[[k]]  <- df_test$Presence                          # response
-}
+  ## ------------------------
+  ## Prepare evaluation container
+  ## ------------------------
+  out <- preva.meta(type = "evaluation")  # keep your constructor
 
-names(testa) <- names(papa) <- sprintf("replicate_%02d", rep_ids)
+  taxon <- tryCatch(x@meta$taxon, error = function(e) "unknown_taxon")
+  safe_taxon <- gsub("[^A-Za-z0-9_]+", "_", taxon)
 
-  ### ------------------------
-  ### generate nsdm.evaluation and add meta info
-  ### ------------------------
+  ## ------------------------
+  ## Evaluate each model family across replicates
+  ## ------------------------
+  lisa <- list()
 
-   out<-preva.meta(type="evaluation")
-  
-   # Unique identifiers for tmp gbm files
-   taxon<-species
-   tmp_path_gbm<-paste0(tmp_path, "/gbm")
-   
-   #### TO BE RESTART HERE
-   
-  ### -------------------------------------------
-  ### Evaluate models
-  ### -------------------------------------------
-  
-    lisa<-list()
+  for (j in seq_along(models@fits)) {
+    tag_j <- names(models@fits)[j]
+    fit_j <- models@fits[[j]]
 
-  # loop over model types
-  for(j in 1:length(x@fits)){
-  
-  fit_j<-x@fits[[j]]
- 
-  # parallelize over replicates
-  scores<-mclapply(1:length(fit_j), mc.preschedule = FALSE, function(g){
-  
-  # Make predictions
-   if("lgb.Booster" %in% class(fit_j[[g]])){
-   fit_j[[g]]<-lgb.load(paste0(tmp_path_gbm, "/", taxon,"_rep",g,"_mod",j,"_",level,".rds"))
-   testa[[g]]<- testa[[g]][,-which(colnames(testa[[g]]) %in% c("X","Y","sid"))]}
-   
-   pred=nsdm.prd(fit_j[[g]], testa[[g]])
-   scores<-NULL
-	  
-  # Evaluate (with external threshold if available)
-    if(length(thres)==0){
-       scores<-nsdm.ceval(f=pred,
-                          pa=papa[[g]],
-                          tesdat=testa[[g]],
-                          crit=crit)
- 
-      } else{
+    scores <- parallel::mclapply(seq_along(fit_j), function(g) {
+      fit <- fit_j[[g]]
 
-        scores<-nsdm.ceval(f=pred,
-                      pa=papa[[g]],
-                      tesdat=testa[[g]],
-                      tre=thres[which(names(thres)==names(fit_j[[g]])[j])],
-                      crit=crit)
+		# inside your mclapply over g
+		if ("lgb.Booster" %in% class(fit_j[[g]])) {
+		  fit_j[[g]] <- lightgbm::lgb.load(
+			paste0(tmp_path_gbm, "/", taxon, "_rep", g, "_mod", j, "_", level, ".rds")
+		  )
+		  # drop coords and sid if they exist
+		  testa[[g]] <- testa[[g]][, setdiff(colnames(testa[[g]]), c("X","Y","sid")), drop = FALSE]
+		}
 
-      }
+      ## predict and evaluate, guard with try
+      pr <- try(nsdm.prd(fit, testa[[g]]), silent = TRUE)
+      if (inherits(pr, "try-error")) return(pr)
 
-      if(scores["threshold"]==Inf){
-        scores["threshold"]=.5
-      }
-	  
-	
-    return(scores)}, mc.cores=ncores)
+      sc <- try(nsdm.ceval2(f = pr, pa = papa[[g]]), silent = TRUE)
+      return(sc)
+    }, mc.cores = ncores)
 
-# Remove replicate failures
-scores<-scores[grep("error",lapply(scores, attributes), invert=T)]
-  
-# Rename replicates
-names(scores)=paste0("replicate_",sprintf("%02d",1:length(scores)))
+    ## drop failures
+    ok <- !vapply(scores, inherits, logical(1), what = "try-error")
+    scores <- scores[ok]
+    names(scores) <- sprintf("replicate_%02d", seq_len(length(scores)))
 
-# Supply fitted replicates
-lisa[[names(x@fits[j])]]<-scores
+    lisa[[tag_j]] <- scores
+  }
 
-}
-
-out@performance<-lisa
-
-return(out)
+  out@performance <- lisa
+  return(out)
 }

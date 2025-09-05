@@ -6,22 +6,28 @@
 \alias{nsdm.evaluation}
 \title{nsdm.evaluation}
 \arguments{
-\item{x}{A nsdm.fit object}
+\item{x}{An \code{nsdm.pseudoabsences} object that holds the master covariates, SIDs, and presence values}
 
-\item{level}{A character string indicating the evaluated level (REG or GLO)}
+\item{models}{An \code{nsdm.fit} object produced by your fitting step, models are in \code{models@fits}}
 
-\item{ncores}{Number of cores to be used during parallel operations}
+\item{sets}{A list of replicates, each replicate contains \code{reg_train}, \code{reg_test}, \code{glo_train}, \code{glo_test}}
 
-\item{tmp_path}{A character string indicating the path where to store gbm temporary outputs}
+\item{level}{Character string, either \code{"glo"} or \code{"reg"}, selects which SIDs to use for testing}
+
+\item{ncores}{Integer, number of cores used by \code{parallel::mclapply}, default is \code{1}}
+
+\item{tmp_path}{Character path for LightGBM model files, default is \code{tempdir()}}
 }
 \value{
-An object of class 'nsdm.evaluation'
+An object of class \code{nsdm.evaluation} with performance per model tag and replicate
 }
 \description{
-Parallel evaluation of nsdm.fit models with a suite of model assessment metrics
+Parallel evaluation of fitted models with common SDM metrics.
 
 Not to be called directly by the user
 }
 \author{
+Antoine Adde (antoine.adde@eawag.ch)
+
 Philipp Brun (philipp.brun@wsl.ch)
 }
