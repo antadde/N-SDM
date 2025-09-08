@@ -4,7 +4,7 @@
 #'
 #' @md
 #' @param x An `nsdm.pseudoabsences` object used as the master table for feature values and SIDs
-#' @param sets A named list of replicates produced upstream, each replicate contains `reg_train`, `reg_test`, `glo_train`, `glo_test`
+#' @param sets A named list of replicates produced upstream, each replicate contains `reg_train`, `glo_train`
 #' @param mod_args A list of class `multi.input`, one element per model family, each with slots `@mod` a function name, `@args` a list of arguments, `@weight` logical, `@tag` a short label
 #' @param level Character string, `"glo"` or `"reg"`, selects which subset of `sets` to use for SIDs
 #' @param ncores Integer, number of cores for `mclapply`
@@ -33,27 +33,20 @@ nsdm.fitting <- function(x,
     # fit in parallel across replicates
     modit <- parallel::mclapply(seq_len(reps), function(rep_id) {
 
-      # fetch train and test SIDs for this level and replicate
+      # fetch train SIDs for this level and replicate
       sub_sets  <- sets[[rep_id]][grep(level, names(sets[[rep_id]]))]
       train_sid <- sub_sets[[paste0(level, "_train")]]@sid
-      test_sid  <- sub_sets[[paste0(level,  "_test")]]@sid
 
       # index rows in x
       i_tr <- match(train_sid, x@sid); i_tr <- i_tr[!is.na(i_tr)]
-      i_te <- match(test_sid,  x@sid); i_te <- i_te[!is.na(i_te)]
 
-      # build train and test frames
+      # build train frames
       train <- cbind(
         data.frame(sid = x@sid[i_tr], split = "train", Presence = x@pa[i_tr]),
         x@env_vars[i_tr, , drop = FALSE]
       )
-      test <- cbind(
-        data.frame(sid = x@sid[i_te], split = "test", Presence = x@pa[i_te]),
-        x@env_vars[i_te, , drop = FALSE]
-      )
 
       df_train <- train[, c("Presence", colnames(x@env_vars)), drop = FALSE]
-      df_test  <- test[,  c("Presence", colnames(x@env_vars)), drop = FALSE]
 
       # weights for presence upweighting if requested
       wt <- NULL

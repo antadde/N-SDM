@@ -48,7 +48,7 @@ nsdm.eval <- function(x, models, sets, level,
   ## ------------------------
   ## Prepare evaluation container
   ## ------------------------
-  out <- preva.meta(type = "evaluation")  # keep your constructor
+  out <- preva.meta(type = "evaluation") 
 
   taxon <- tryCatch(x@meta$taxon, error = function(e) "unknown_taxon")
   safe_taxon <- gsub("[^A-Za-z0-9_]+", "_", taxon)
@@ -63,18 +63,16 @@ nsdm.eval <- function(x, models, sets, level,
     fit_j <- models@fits[[j]]
 
     scores <- parallel::mclapply(seq_along(fit_j), function(g) {
-      fit <- fit_j[[g]]
-
-		# inside your mclapply over g
+      
+	   # inside your mclapply over g
 		if ("lgb.Booster" %in% class(fit_j[[g]])) {
 		  fit_j[[g]] <- lightgbm::lgb.load(
 			paste0(tmp_path_gbm, "/", taxon, "_rep", g, "_mod", j, "_", level, ".rds")
 		  )
-		  # drop coords and sid if they exist
-		  testa[[g]] <- testa[[g]][, setdiff(colnames(testa[[g]]), c("X","Y","sid")), drop = FALSE]
 		}
 
       ## predict and evaluate, guard with try
+	  fit <- fit_j[[g]]
       pr <- try(nsdm.prd(fit, testa[[g]]), silent = TRUE)
       if (inherits(pr, "try-error")) return(pr)
 
