@@ -20,7 +20,7 @@ splits_ix<-parallel::splitIndices(nrow(nwdata), nsplits)
 for(m in 1:length(models@fits)){ # Loop over models (1 in regular cases but much more in esm settings)
   
 # Retrieve model fit
-model<-models@fits[[m]][[1]]
+model<-models@fits[[m]]
 
 # Reorder covariates to match model order (needed for gbm booster ..)
 cov<-unlist(strsplit(models@meta$env_vars,", "))
