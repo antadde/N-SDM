@@ -98,6 +98,6 @@ nsdm.fitfull <- function(x,
   # wrap into nsdm.fit object
   out <- nsdm.fit()
   out@fits <- modis
-  out@meta$env_vars = paste(colnames(x$env_vars), collapse = ", ")
+  out@meta$env_vars = paste(colnames(x@env_vars), collapse = ", ")
   return(out)
 }
