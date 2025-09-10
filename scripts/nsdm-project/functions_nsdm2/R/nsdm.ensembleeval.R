@@ -2,36 +2,70 @@
 #'
 #' Evaluate ensemble predictions for a given species, level, and nesting strategy.
 #'
-#' This function loads the best model(s) for each algorithm, applies them to test data, 
-#' generates predictions, and evaluates ensemble performance using a specified criterion.
+#' This function loads the best model(s) for each algorithm, applies them to test data,
+#' and evaluates ensemble performance across replicates using specified ensemble criteria.
 #'
-#' @param level Character. Either `"glo"` or `"reg"`, indicating the spatial modeling level.
-#' @param model_names Character vector. The names of the modeling algorithms to ensemble (e.g., `c("glm", "rf", "esm")`).
-#' @param species_name Character. Name of the species/taxon being evaluated.
-#' @param nesting_name Character (default = NA). Name of the nesting strategy to evaluate, such as `"multiply"`, `"multiplyw"`, or `"covariate"`.
+#' @md
+#' @param x An `nsdm.pseudoabsences` object that holds the master covariates, SIDs, 
+#'   and presence values.
+#' @param sets A list of replicates; each replicate contains `reg_train`, `reg_test`, 
+#'   `glo_train`, and `glo_test`.
+#' @param level Character string, either `"glo"` or `"reg"`, selecting which SIDs to use 
+#'   for testing.
+#' @param model_names Character vector of modeling algorithms to ensemble 
+#'   (e.g. `c("glm", "rf", "esm")`).
+#' @param species_name Character string, the name of the species or taxon being evaluated.
+#' @param nesting_name Character string (default = `NA`), indicating the nesting strategy 
+#'   such as `"multiply"`, `"multiplyw"`, or `"covariate"`.
 #'
-#' @return A named list of ensemble evaluation scores (mean values across replicates), with one element per ensemble type (e.g., `"GLO"`, `"REG"`, `"MUL"`, `"COV"`).
+#' @return A named list of ensemble evaluation scores, averaged across replicates. 
+#' Elements correspond to ensemble types (e.g. `"GLO"`, `"REG"`, `"MUL"`, `"MULW"`, `"COV"`).
 #'
-#' @details This function assumes the model predictions and evaluation metrics have been previously computed and stored.
-#' Ensemble strategies include:
-#' - GLO: global-level ensemble.
-#' - REG: regional ensemble.
-#' - MUL: multiply nested ensemble.
-#' - MULW: multiplyw nested ensemble.
-#' - COV: covariate nested ensemble.
+#' @details Ensemble strategies include:
+#' - `GLO`: global-level ensemble  
+#' - `REG`: regional-level ensemble  
+#' - `MUL`: multiply nested ensemble  
+#' - `MULW`: multiply-weighted nested ensemble  
+#' - `COV`: covariate-nested ensemble
 #'
-#' Evaluation is performed using `nsdm.ceval()`, and results are returned as averaged scores over replicates.
+#' Evaluation is performed with [nsdm.ceval()], returning mean values over replicates.
 #'
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
-nsdm.ensembleeval <- function(level, model_names, species_name, nesting_name=NA){
-# Retrieve predictions
+nsdm.ensembleeval <- function(x, sets, level, model_names, species_name, nesting_name=NA){
+
+pred_all <- list()
+
 ### =========================================================================
 ### GLO
 ### =========================================================================
-## Loop on target algorithms
-pred_all <- list()
+  ## ------------------------
+  ## Build testing covariates and presence vectors per replicate
+  ## ------------------------
+  cols <- colnames(x@env_vars)
+  rep_ids <- seq_along(sets)
+
+  testa_glo <- vector("list", length(rep_ids))   # covariates only
+  papa_glo  <- vector("list", length(rep_ids))   # presence vector
+
+  for (k in rep_ids) {
+    sub_sets  <- sets[[k]][grep(level, names(sets[[k]]))]
+    test_sid  <- sub_sets[[paste0(level, "_test")]]@sid
+
+    i_te <- match(test_sid, x@sid)
+    i_te <- i_te[!is.na(i_te)]
+
+    df_test <- cbind(
+      data.frame(Presence = x@pa[i_te]),
+      x@env_vars[i_te, , drop = FALSE]
+    )
+
+    testa_glo[[k]] <- df_test[, cols, drop = FALSE]
+    papa_glo[[k]]  <- df_test$Presence
+  }
+names(testa_glo) <- names(papa_glo) <- sprintf("replicate_%02d", rep_ids)
+
 for (model in model_names) {
   # Retrieve evaluation table and identify best model
   eval_list <- nsdm.loadthis(model_name = model, species_name = species_name,
@@ -56,57 +90,37 @@ for (model in model_names) {
   # Loop over models (one in regular cases; more for ESMs)
   pop <- list()
   for (n in seq_along(modinp_top)) {
-    modinp_top_n <- modinp_top[n]
-    
-    # Retrieve test and training data
-    testa_GLO <- lapply(mod_m@tesdat, function(x) {
-      if ("Presence" %in% colnames(x)) {
-        x[, !colnames(x) %in% "Presence", drop = FALSE]
-      } else {
-        warning("Presence column not found in test dataset")
-        x
-      }
-    })
-    
-    papa_GLO <- lapply(mod_m@tesdat, function(x) {
-      if ("Presence" %in% colnames(x)) {
-        x[, "Presence"]
-      } else {
-        warning("Presence column not found in training dataset")
-        rep(NA, nrow(x))
-      }
-    })
-    
+  
+    modinp_top_n <- modinp_top[n]   
+ 
     # Predict
-    outerloop <- length(mod_m@tesdat)
+    outerloop <- length(testa_glo)
     tmp_path_gbm <- file.path(scr_path, "tmp", "gbm")
     pred <- list()
     
-    for (k in seq_len(outerloop)) {
-      model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_glo.rds"))
+    for (rep_id in seq_len(outerloop)) { 
+	  
+      model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", rep_id, "_mod", gsub(".*-", "", modinp_top_n), "_glo.rds"))
       
-      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
+      if (inherits(mod_m@fits[[modinp_top_n]][[rep_id]], "lgb.Booster")) {
         if (file.exists(model_path)) {
-          mod_m@fits[[modinp_top_n]][[k]] <- lgb.load(model_path)
+          mod_m@fits[[modinp_top_n]][[rep_id]] <- lgb.load(model_path)
         } else {
           warning("LightGBM model file not found: ", model_path)
         }
       }
       
-      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "try-error")) {
-        warning("Model fit for ", modinp_top_n, " rep ", k, " is a try-error.")
-        pred_i <- rep(NA, nrow(testa_GLO[[k]]))
+      if (inherits(mod_m@fits[[modinp_top_n]][[rep_id]], "try-error")) {
+        warning("Model fit for ", modinp_top_n, " rep ", rep_id, " is a try-error.")
+        pred_i <- rep(NA, nrow(testa_glo[[rep_id]]))
       } else {
-		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_GLO[[k]][, !(names(testa_GLO[[k]]) %in% c("X","Y","sid"))])
+		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[rep_id]], testa_glo[[rep_id]])
       }
       
-      pred[[k]] <- pred_i
+      pred[[rep_id]] <- pred_i
     }
     
-    # pop_n <- do.call(cbind, pred)
-    # pop[[n]] <- pop_n
 	  pop[[n]] <- pred
-	
   }
   
   if (length(pop) > 1) {
@@ -121,7 +135,6 @@ for (model in model_names) {
 }
 
 if (length(pred_all) > 0) {
- # GLO_preds <- simplify2array(pred_all)
  # Rearrange pred_all so it's replicate → model → vector
 n_models <- length(pred_all)
 n_reps <- length(pred_all[[1]])
@@ -361,8 +374,8 @@ scores <- list()
 for (z in seq_len(outerloop)) {
   z_target <- target[[z]]
   score <- nsdm.ceval(f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
-                       pa = papa_GLO[[z]],
-                       tesdat = testa_GLO[[z]],
+                       pa = papa[[z]],
+                       tesdat = testa[[z]],
                        crit = eval_crit)
   scores[[z]] <- score
 }

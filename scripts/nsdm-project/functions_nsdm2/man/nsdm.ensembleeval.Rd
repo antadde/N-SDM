@@ -4,38 +4,47 @@
 \alias{nsdm.ensembleeval}
 \title{nsdm.ensembleeval}
 \usage{
-nsdm.ensembleeval(level, model_names, species_name, nesting_name = NA)
+nsdm.ensembleeval(x, sets, level, model_names, species_name, nesting_name = NA)
 }
 \arguments{
-\item{level}{Character. Either \code{"glo"} or \code{"reg"}, indicating the spatial modeling level.}
+\item{x}{An \code{nsdm.pseudoabsences} object that holds the master covariates, SIDs,
+and presence values.}
 
-\item{model_names}{Character vector. The names of the modeling algorithms to ensemble (e.g., \code{c("glm", "rf", "esm")}).}
+\item{sets}{A list of replicates; each replicate contains \code{reg_train}, \code{reg_test},
+\code{glo_train}, and \code{glo_test}.}
 
-\item{species_name}{Character. Name of the species/taxon being evaluated.}
+\item{level}{Character string, either \code{"glo"} or \code{"reg"}, selecting which SIDs to use
+for testing.}
 
-\item{nesting_name}{Character (default = NA). Name of the nesting strategy to evaluate, such as \code{"multiply"}, \code{"multiplyw"}, or \code{"covariate"}.}
+\item{model_names}{Character vector of modeling algorithms to ensemble
+(e.g. \code{c("glm", "rf", "esm")}).}
+
+\item{species_name}{Character string, the name of the species or taxon being evaluated.}
+
+\item{nesting_name}{Character string (default = \code{NA}), indicating the nesting strategy
+such as \code{"multiply"}, \code{"multiplyw"}, or \code{"covariate"}.}
 }
 \value{
-A named list of ensemble evaluation scores (mean values across replicates), with one element per ensemble type (e.g., \code{"GLO"}, \code{"REG"}, \code{"MUL"}, \code{"COV"}).
+A named list of ensemble evaluation scores, averaged across replicates.
+Elements correspond to ensemble types (e.g. \code{"GLO"}, \code{"REG"}, \code{"MUL"}, \code{"MULW"}, \code{"COV"}).
 }
 \description{
 Evaluate ensemble predictions for a given species, level, and nesting strategy.
 }
 \details{
 This function loads the best model(s) for each algorithm, applies them to test data,
-generates predictions, and evaluates ensemble performance using a specified criterion.
+and evaluates ensemble performance across replicates using specified ensemble criteria.
 
-This function assumes the model predictions and evaluation metrics have been previously computed and stored.
 Ensemble strategies include:
 \itemize{
-\item GLO: global-level ensemble.
-\item REG: regional ensemble.
-\item MUL: multiply nested ensemble.
-\item MULW: multiplyw nested ensemble.
-\item COV: covariate nested ensemble.
+\item \code{GLO}: global-level ensemble
+\item \code{REG}: regional-level ensemble
+\item \code{MUL}: multiply nested ensemble
+\item \code{MULW}: multiply-weighted nested ensemble
+\item \code{COV}: covariate-nested ensemble
 }
 
-Evaluation is performed using \code{nsdm.ceval()}, and results are returned as averaged scores over replicates.
+Evaluation is performed with \code{\link[=nsdm.ceval]{nsdm.ceval()}}, returning mean values over replicates.
 }
 \author{
 Antoine Adde (antoine.adde@eawag.ch)
