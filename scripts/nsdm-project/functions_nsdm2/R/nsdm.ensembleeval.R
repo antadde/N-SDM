@@ -374,8 +374,8 @@ scores <- list()
 for (z in seq_len(outerloop)) {
   z_target <- target[[z]]
   score <- nsdm.ceval(f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
-                       pa = papa[[z]],
-                       tesdat = testa[[z]],
+                       pa = papa_glo[[z]],
+                       tesdat = testa_glo[[z]],
                        crit = eval_crit)
   scores[[z]] <- score
 }
