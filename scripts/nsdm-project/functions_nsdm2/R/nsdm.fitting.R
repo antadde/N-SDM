@@ -33,9 +33,10 @@ nsdm.fitting <- function(x,
     # fit in parallel across replicates
     modit <- parallel::mclapply(seq_len(reps), function(rep_id) {
 
-      # fetch train SIDs for this level and replicate
-      sub_sets  <- sets[[rep_id]][grep(level, names(sets[[rep_id]]))]
-      train_sid <- sub_sets[[paste0(level, "_train")]]@sid
+      # fetch train SIDs for this lev and replicate
+	  lev=substr(level,1,3)
+      sub_sets  <- sets[[rep_id]][grep(lev, names(sets[[rep_id]]))]
+      train_sid <- sub_sets[[paste0(lev, "_train")]]@sid
 
       # index rows in x
       i_tr <- match(train_sid, x@sid); i_tr <- i_tr[!is.na(i_tr)]
