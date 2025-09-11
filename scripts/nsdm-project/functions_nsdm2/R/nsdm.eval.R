@@ -6,7 +6,7 @@
 #' @param x An `nsdm.pseudoabsences` object that holds the master covariates, SIDs, and presence values
 #' @param models An `nsdm.fit` object produced by your fitting step, models are in `models@fits`
 #' @param sets A list of replicates, each replicate contains `reg_train`, `reg_test`, `glo_train`, `glo_test`
-#' @param level Character string, either `"glo"` or `"reg"`, selects which SIDs to use for testing
+#' @param level Character string, selects which SIDs to use for testing
 #' @param ncores Integer, number of cores used by `parallel::mclapply`, default is `1`
 #' @param tmp_path Character path for LightGBM model files, default is `tempdir()`
 #'
@@ -27,10 +27,12 @@ nsdm.eval <- function(x, models, sets, level,
 
   testa <- vector("list", length(rep_ids))   # covariates only
   papa  <- vector("list", length(rep_ids))   # presence vector
+  
+  lev=substr(level,1,3)
 
   for (k in rep_ids) {
-    sub_sets  <- sets[[k]][grep(level, names(sets[[k]]))]
-    test_sid  <- sub_sets[[paste0(level, "_test")]]@sid
+    sub_sets  <- sets[[k]][grep(lev, names(sets[[k]]))]
+    test_sid  <- sub_sets[[paste0(lev, "_test")]]@sid
 
     i_te <- match(test_sid, x@sid)
     i_te <- i_te[!is.na(i_te)]
