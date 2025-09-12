@@ -33,7 +33,7 @@
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
-nsdm.ensembleeval <- function(x, sets, level, model_names, species_name, nesting_name=NA){
+nsdm.ensembleeval <- function(sets, level, model_names, species_name, nesting_name=NA, scratch_path){
 
 pred_all <- list()
 
@@ -43,6 +43,8 @@ pred_all <- list()
   ## ------------------------
   ## Build testing covariates and presence vectors per replicate
   ## ------------------------
+  x=readRDS(file.path(scratch_path, "outputs", "d1_covsels", "glo", species_name, paste0(species_name, ".rds")))$pseu.abs_i
+  
   cols <- colnames(x@env_vars)
   rep_ids <- seq_along(sets)
 
@@ -50,8 +52,8 @@ pred_all <- list()
   papa_glo  <- vector("list", length(rep_ids))   # presence vector
 
   for (k in rep_ids) {
-    sub_sets  <- sets[[k]][grep(level, names(sets[[k]]))]
-    test_sid  <- sub_sets[[paste0(level, "_test")]]@sid
+    sub_sets  <- sets[[k]][grep("glo", names(sets[[k]]))]
+    test_sid  <- sub_sets[[paste0("glo", "_test")]]@sid
 
     i_te <- match(test_sid, x@sid)
     i_te <- i_te[!is.na(i_te)]
@@ -154,13 +156,46 @@ for (rep_idx in seq_len(n_reps)) {
 }
 
 if(level == "reg"){
+
+  ## ------------------------
+  ## Build testing covariates and presence vectors per replicate
+  ## ------------------------
+  x=readRDS(file.path(scratch_path, "outputs", "d1_covsels", "reg", species_name, paste0(species_name, ".rds")))
+  
+  cols <- colnames(x$env_vars)
+  rep_ids <- seq_along(sets)
+
+  testa_reg <- vector("list", length(rep_ids))   # covariates only
+  papa_reg  <- vector("list", length(rep_ids))   # presence vector
+  coord_reg <- vector("list", length(rep_ids))   # coordinates vector
+
+  for (k in rep_ids) {
+    sub_sets  <- sets[[k]][grep("reg", names(sets[[k]]))]
+    test_sid  <- sub_sets[[paste0("reg", "_test")]]@sid
+
+    i_te <- match(test_sid, x$pseu.abs_i@sid)
+    i_te <- i_te[!is.na(i_te)]
+
+    df_test <- cbind(
+      data.frame(Presence = x$pseu.abs_i@pa[i_te]),
+      x$env_vars[i_te, , drop = FALSE],
+	  x$pseu.abs_i@xy[i_te, , drop = FALSE]
+    )
+
+    testa_reg[[k]] <- df_test[, cols, drop = FALSE]
+    papa_reg[[k]]  <- df_test$Presence
+	coord_reg[[k]] <- df_test[, c("X","Y"), drop = FALSE]
+  }
+  
+names(testa_reg) <- names(coord_reg) <- names(papa_reg) <- sprintf("replicate_%02d", rep_ids)
+
 ### =========================================================================
 ### REG MULTIPLY
 ### =========================================================================
 if (any(c("multiply") %in% nesting_name)) {
 ## Loop on target algorithms
 pred_all <- list()
-for (model in mod_algo) {
+for (model in model_names) {
   # Retrieve evaluation table and identify best model
   eval_list <- nsdm.loadthis(model_name = model, species_name = ispi_name,
                              read_path = file.path(scr_path, "outputs", "d3_evals", "reg", nesting_name))
@@ -186,61 +221,37 @@ for (model in mod_algo) {
   for (n in seq_along(modinp_top)) {
     modinp_top_n <- modinp_top[n]
     
-    # Retrieve test and training data
-    testa_REG_multiply <- lapply(mod_m@tesdat, function(x) {
-      if ("Presence" %in% colnames(x)) {
-        x[, !colnames(x) %in% "Presence", drop = FALSE]
-      } else {
-        warning("Presence column not found in test dataset")
-        x
-      }
-    })
-    
-    papa_REG_multiply <- lapply(mod_m@tesdat, function(x) {
-      if ("Presence" %in% colnames(x)) {
-        x[, "Presence"]
-      } else {
-        warning("Presence column not found in training dataset")
-        rep(NA, nrow(x))
-      }
-    })
-    
     # Predict
-    outerloop <- length(mod_m@tesdat)
+    outerloop <- length(testa_reg)
     tmp_path_gbm <- file.path(scr_path, "tmp", "gbm")
     pred <- list()
-    glo_prob <- list()
-    glo_out <- rast(list.files(file.path(scr_path, "outputs", "d8_ensembles", "glo", ispi_name), 
-                                  pattern = ".tif", full.names = TRUE))
-    
-    for (k in seq_len(outerloop)) {
-	  model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", nesting_name, ".rds"))
-      
-      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
+	   
+   for (rep_id in seq_len(outerloop)) { 
+	  
+    model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", rep_id, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", nesting_name, ".rds"))
+
+      if (inherits(mod_m@fits[[modinp_top_n]][[rep_id]], "lgb.Booster")) {
         if (file.exists(model_path)) {
-          mod_m@fits[[modinp_top_n]][[k]] <- lgb.load(model_path)
+          mod_m@fits[[modinp_top_n]][[rep_id]] <- lgb.load(model_path)
         } else {
           warning("LightGBM model file not found: ", model_path)
         }
       }
       
-      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "try-error")) {
-        warning("Model fit for ", modinp_top_n, " rep ", k, " is a try-error.")
-        pred_i <- rep(NA, nrow(testa_REG_multiply[[k]]))
+      if (inherits(mod_m@fits[[modinp_top_n]][[rep_id]], "try-error")) {
+        warning("Model fit for ", modinp_top_n, " rep ", rep_id, " is a try-error.")
+        pred_i <- rep(NA, nrow(testa_reg[[rep_id]]))
       } else {
-		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_REG_multiply[[k]][, !(names(testa_REG_multiply[[k]]) %in% c("X","Y","sid"))])
-
+	    vars_list <- strsplit(mod_m@meta$env_vars, ", ")[[1]]
+		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[rep_id]], testa_reg[[rep_id]][, c(vars_list), drop = FALSE])
       }
-      
-      pred[[k]] <- pred_i
-      glo_prob[[k]] <- extract(glo_out, data.frame(mod_m@tesdat[[k]]$X, mod_m@tesdat[[k]]$Y)) / 100
+      pred[[rep_id]] <- pred_i
     }
     
-    pop_n <- do.call(cbind, pred)
-    pop[[n]] <- pop_n
+    pop[[n]] <- pred
   }
   
-  if (length(pop) > 1) {
+    if (length(pop) > 1) {
     pop <- simplify2array(pop)
     pop <- apply(pop, c(1, 2), mean)
   } else {
@@ -252,7 +263,19 @@ for (model in mod_algo) {
 }
 
 if (length(pred_all) > 0) {
-  REG_multiply_preds <- simplify2array(pred_all)
+ # Rearrange pred_all so it's replicate → model → vector
+n_models <- length(pred_all)
+n_reps <- length(pred_all[[1]])
+
+# Make list for each replicate
+REG_multiply_preds <- vector("list", n_reps)
+names(REG_multiply_preds) <- paste0("rep", seq_len(n_reps))
+
+for (rep_idx in seq_len(n_reps)) {
+  REG_multiply_preds[[rep_idx]] <- lapply(pred_all, `[[`, rep_idx)
+  names(REG_multiply_preds[[rep_idx]]) <- names(pred_all)
+}
+ 
 } else {
   warning("No predictions were made.")
   REG_multiply_preds <- NULL
@@ -263,12 +286,9 @@ if (length(pred_all) > 0) {
 ### REG COVARIATE
 ### =========================================================================
 if (any(c("covariate") %in% nesting_name)) {
-# Load covariate matrix to rescale GLO predictions
-mat <- nsdm.loadthis(species_name = ispi_name, read_path = file.path(scr_path, "outputs", "d1_covsels", "reg"))$env_vars
-
 ## Loop on target algorithms
 pred_all <- list()
-for (model in mod_algo) {
+for (model in model_names) {
   # Retrieve evaluation table and identify best model
   eval_list <- nsdm.loadthis(model_name = model, species_name = ispi_name,
                              read_path = file.path(scr_path, "outputs", "d3_evals", "reg", nesting_name))
@@ -289,61 +309,44 @@ for (model in mod_algo) {
                           tag = paste0(model, "_tune"),
                           read_path = file.path(scr_path, "outputs", "d2_models", "reg", nesting_name))$model
   
-  # Loop over models (one in regular cases; more for ESMs)
+# Loop over models (one in regular cases; more for ESMs)
   pop <- list()
   for (n in seq_along(modinp_top)) {
-    modinp_top_n <- modinp_top[n]
-    
-    # Retrieve test and training data
-    testa_REG_covariate <- lapply(mod_m@tesdat, function(x) {
-      if ("Presence" %in% colnames(x)) {
-        x[, !colnames(x) %in% "Presence", drop = FALSE]
-      } else {
-        warning("Presence column not found in test dataset")
-        x
-      }
-    })
-    
-    papa_REG_covariate <- lapply(mod_m@tesdat, function(x) {
-      if ("Presence" %in% colnames(x)) {
-        x[, "Presence"]
-      } else {
-        warning("Presence column not found in training dataset")
-        rep(NA, nrow(x))
-      }
-    })
-    
+      modinp_top_n <- modinp_top[n]   
+ 
     # Predict
-    outerloop <- length(mod_m@tesdat)
+    outerloop <- length(testa_reg)
     tmp_path_gbm <- file.path(scr_path, "tmp", "gbm")
     pred <- list()
     
-    for (k in seq_len(outerloop)) {
-      model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", k, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", nesting_name, ".rds"))
+    for (rep_id in seq_len(outerloop)) { 
+	  
+    model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", rep_id, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", nesting_name, ".rds"))
+
       
-      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "lgb.Booster")) {
+      if (inherits(mod_m@fits[[modinp_top_n]][[rep_id]], "lgb.Booster")) {
         if (file.exists(model_path)) {
-          mod_m@fits[[modinp_top_n]][[k]] <- lgb.load(model_path)
+          mod_m@fits[[modinp_top_n]][[rep_id]] <- lgb.load(model_path)
         } else {
           warning("LightGBM model file not found: ", model_path)
         }
       }
       
-      if (inherits(mod_m@fits[[modinp_top_n]][[k]], "try-error")) {
-        warning("Model fit for ", modinp_top_n, " rep ", k, " is a try-error.")
-        pred_i <- rep(NA, nrow(testa_REG_covariate[[k]]))
+      if (inherits(mod_m@fits[[modinp_top_n]][[rep_id]], "try-error")) {
+        warning("Model fit for ", modinp_top_n, " rep ", rep_id, " is a try-error.")
+        pred_i <- rep(NA, nrow(testa_reg[[rep_id]]))
       } else {
-		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[k]], testa_REG_covariate[[k]][, !(names(testa_REG_covariate[[k]]) %in% c("X","Y","sid"))])
+	    vars_list <- strsplit(mod_m@meta$env_vars, ", ")[[1]]
+		pred_i <- nsdm.prd(mod_m@fits[[modinp_top_n]][[rep_id]], testa_reg[[rep_id]][, c(vars_list), drop = FALSE])
       }
       
-      pred[[k]] <- pred_i
+      pred[[rep_id]] <- pred_i
     }
     
-    pop_n <- do.call(cbind, pred)
-    pop[[n]] <- pop_n
+	  pop[[n]] <- pred
   }
   
-  if (length(pop) > 1) {
+    if (length(pop) > 1) {
     pop <- simplify2array(pop)
     pop <- apply(pop, c(1, 2), mean)
   } else {
@@ -355,7 +358,19 @@ for (model in mod_algo) {
 }
 
 if (length(pred_all) > 0) {
-  REG_covariate_preds <- simplify2array(pred_all)
+ # Rearrange pred_all so it's replicate → model → vector
+n_models <- length(pred_all)
+n_reps <- length(pred_all[[1]])
+
+# Make list for each replicate
+REG_covariate_preds <- vector("list", n_reps)
+names(REG_covariate_preds) <- paste0("rep", seq_len(n_reps))
+
+for (rep_idx in seq_len(n_reps)) {
+  REG_covariate_preds[[rep_idx]] <- lapply(pred_all, `[[`, rep_idx)
+  names(REG_covariate_preds[[rep_idx]]) <- names(pred_all)
+}
+ 
 } else {
   warning("No predictions were made.")
   REG_covariate_preds <- NULL
@@ -384,16 +399,17 @@ scores <- simplify2array(scores)
 w_glo <- rowMeans(scores)[weight_metric]
 
 if(level == "reg"){
-  # REG-level ensemble without nesting (only possible in multiply model)
+  # REG-level ensemble without nesting
 if (any(c("multiply") %in% nesting_name)) {
     target <- REG_multiply_preds
     scores <- list()
     
     for (z in seq_len(outerloop)) {
+	  z_target <- target[[z]]
       score <- nsdm.ceval(
-        f = rowMeans(as.data.frame(target[, z, ]), na.rm = TRUE),
-        pa = papa_REG_multiply[[z]],
-        tesdat = testa_REG_multiply[[z]],
+        f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
+        pa = papa_reg[[z]],
+        tesdat = testa_reg[[z]],
         crit = eval_crit
       )
       scores[[z]] <- score
@@ -409,10 +425,11 @@ if (any(c("multiply") %in% nesting_name)) {
     scores <- list()
     
     for (z in seq_len(outerloop)) {
+	  z_target <- target[[z]]
       score <- nsdm.ceval(
-        f = rowMeans(as.data.frame(target[, z, ]), na.rm = TRUE),
-        pa = papa_REG_covariate[[z]],
-        tesdat = testa_REG_covariate[[z]],
+        f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
+        pa = papa_reg[[z]],
+        tesdat = testa_reg[[z]],
         crit = eval_crit
       )
       scores[[z]] <- score
@@ -423,75 +440,61 @@ if (any(c("multiply") %in% nesting_name)) {
 
   # Multiply nested ensemble
   if ("multiply" %in% nesting_name) {
-    target <- REG_multiply_preds
+    
+	target <- REG_multiply_preds
  
    # Preprocess GLO probabilities
-    glo_prob2 <- lapply(glo_prob, function(eux) {
+   	glo_out <- rast(list.files(file.path(scr_path, "outputs", "d8_ensembles", "glo", ispi_name), pattern = ".tif", full.names = TRUE))
+	glo_prob <- list()
+	for (rep_id in seq_len(outerloop)) {
+    glo_prob[[rep_id]] <- terra::extract(glo_out, coord_reg[[rep_id]], ID=FALSE) / 100
+	}
+    
+	glo_prob2 <- lapply(glo_prob, function(eux) {
       eux[eux < 0] <- 0
-      return(eux[, 2])
+      return(eux)
     })
 	
+	# define weight sums
+	w_sum <- w_reg + w_glo
+	
+	# Evaluate
     scores <- list()
+	scores_w <- list()
+
     
     for (z in seq_len(outerloop)) {
-      good_ix <- which(!is.na(glo_prob2[[z]]))
-      target_z <- target[good_ix, z, ]
-      glo_prob2_z <- glo_prob2[[z]][good_ix]
-      papa_REG_multiply_z <- papa_REG_multiply[[z]][good_ix]
-      testa_REG_multiply_z <- testa_REG_multiply[[z]][good_ix, ]
+    good_ix <- which(!is.na(glo_prob2[[z]]))
+	z_target <- target[[z]]
+	z_target <- lapply(z_target, function(g){g[good_ix]})
+	papa_reg_c <- lapply(papa_reg, function(g){g[good_ix]})
+	testa_reg_c <- lapply(testa_reg, function(g){g[good_ix,]})
+	z_glo_prob2 <- glo_prob2[[z]]
 	  
+	  # normal multiply
       score <- nsdm.ceval(
-        f = sqrt(rowMeans(as.data.frame(target_z), na.rm = TRUE) * glo_prob2_z),
-        pa = papa_REG_multiply_z,
-        tesdat = testa_REG_multiply_z,
+        f = sqrt(rowMeans(as.data.frame(z_target), na.rm = TRUE) * z_glo_prob2)[[1]],
+        pa = papa_reg[[z]],
+        tesdat = testa_reg[[z]],
         crit = eval_crit
       )
+	  
+	  # multiply weigthed
+	    score_w <- nsdm.ceval(
+        f =(((rowMeans(as.data.frame(z_target), na.rm = TRUE) ^ w_reg) *
+         (z_glo_prob2[[1]] ^ w_glo)) ^ (1 / w_sum)),
+        pa = papa_reg[[z]],
+        tesdat = testa_reg[[z]],
+        crit = eval_crit
+      )
+	  
       scores[[z]] <- score
+	  scores_w[[z]] <- score_w
     }
     
     scores_ensemble[["MUL"]] <- scores
-  
-  # Multiply weighted nested ensemble
-if (multiply_weighted == TRUE) {
-  target <- REG_multiply_preds
-  
-  # Preprocess GLO probabilities
-  glo_prob2 <- lapply(glo_prob, function(eux) {
-    eux[eux < 0] <- 0
-    return(eux[, 2])
-  })
-  
-  scores <- list()
-  
-  # Define weights
-  w_sum <- w_reg + w_glo
-  
-  for (z in seq_len(outerloop)) {
-    good_ix <- which(!is.na(glo_prob2[[z]]))
-    target_z <- target[good_ix, z, ]
-    glo_prob2_z <- glo_prob2[[z]][good_ix]
-    papa_REG_multiply_z <- papa_REG_multiply[[z]][good_ix]
-    testa_REG_multiply_z <- testa_REG_multiply[[z]][good_ix, ]
-    
-    # Compute normalized weighted geometric mean
-    target_mean <- rowMeans(as.data.frame(target_z), na.rm = TRUE)
-    weighted_gmean <- (target_mean ^ w_reg) * (glo_prob2_z ^ w_glo)
-    weighted_gmean <- weighted_gmean ^ (1 / w_sum)
-    
-    # Evaluate
-    score <- nsdm.ceval(
-      f = weighted_gmean,
-      pa = papa_REG_multiply_z,
-      tesdat = testa_REG_multiply_z,
-      crit = eval_crit
-    )
-    
-    scores[[z]] <- score
-  }
-  
-  scores_ensemble[["MULW"]] <- scores
+	scores_ensemble[["MULW"]] <- scores_w
 }
-  }
 }
 
 #### Return
