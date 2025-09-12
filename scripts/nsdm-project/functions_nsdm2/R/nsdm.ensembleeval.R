@@ -198,7 +198,7 @@ pred_all <- list()
 for (model in model_names) {
   # Retrieve evaluation table and identify best model
   eval_list <- nsdm.loadthis(model_name = model, species_name = ispi_name,
-                             read_path = file.path(scr_path, "outputs", "d3_evals", "reg", nesting_name))
+                             read_path = file.path(scr_path, "outputs", "d3_evals", "reg", "multiply"))
   
   if (!is.null(eval_list) && best_met %in% rownames(eval_list)) {
    modinp_top <- colnames(eval_list)[which.max(eval_list[best_met, ])]
@@ -214,7 +214,7 @@ for (model in model_names) {
   # Load best model
   mod_m <- nsdm.loadthis(species_name = ispi_name, model_name = model,
                           tag = paste0(model, "_tune"),
-                          read_path = file.path(scr_path, "outputs", "d2_models", "reg", nesting_name))$model
+                          read_path = file.path(scr_path, "outputs", "d2_models", "reg", "multiply"))$model
   
   # Loop over models (one in regular cases; more for ESMs)
   pop <- list()
@@ -228,7 +228,7 @@ for (model in model_names) {
 	   
    for (rep_id in seq_len(outerloop)) { 
 	  
-    model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", rep_id, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", nesting_name, ".rds"))
+    model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", rep_id, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", "multiply", ".rds"))
 
       if (inherits(mod_m@fits[[modinp_top_n]][[rep_id]], "lgb.Booster")) {
         if (file.exists(model_path)) {
@@ -291,7 +291,7 @@ pred_all <- list()
 for (model in model_names) {
   # Retrieve evaluation table and identify best model
   eval_list <- nsdm.loadthis(model_name = model, species_name = ispi_name,
-                             read_path = file.path(scr_path, "outputs", "d3_evals", "reg", nesting_name))
+                             read_path = file.path(scr_path, "outputs", "d3_evals", "reg", "covariate"))
   
   if (!is.null(eval_list) && best_met %in% rownames(eval_list)) {
    modinp_top <- colnames(eval_list)[which.max(eval_list[best_met, ])]
@@ -307,7 +307,7 @@ for (model in model_names) {
   # Load best model
   mod_m <- nsdm.loadthis(species_name = ispi_name, model_name = model,
                           tag = paste0(model, "_tune"),
-                          read_path = file.path(scr_path, "outputs", "d2_models", "reg", nesting_name))$model
+                          read_path = file.path(scr_path, "outputs", "d2_models", "reg", "covariate"))$model
   
 # Loop over models (one in regular cases; more for ESMs)
   pop <- list()
@@ -321,7 +321,7 @@ for (model in model_names) {
     
     for (rep_id in seq_len(outerloop)) { 
 	  
-    model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", rep_id, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", nesting_name, ".rds"))
+    model_path <- file.path(tmp_path_gbm, paste0(ispi_name, "_rep", rep_id, "_mod", gsub(".*-", "", modinp_top_n), "_", level, "_", "covariate", ".rds"))
 
       
       if (inherits(mod_m@fits[[modinp_top_n]][[rep_id]], "lgb.Booster")) {
