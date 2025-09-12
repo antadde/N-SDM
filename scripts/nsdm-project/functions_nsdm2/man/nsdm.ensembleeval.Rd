@@ -4,12 +4,16 @@
 \alias{nsdm.ensembleeval}
 \title{nsdm.ensembleeval}
 \usage{
-nsdm.ensembleeval(x, sets, level, model_names, species_name, nesting_name = NA)
+nsdm.ensembleeval(
+  sets,
+  level,
+  model_names,
+  species_name,
+  nesting_name = NA,
+  scratch_path
+)
 }
 \arguments{
-\item{x}{An \code{nsdm.pseudoabsences} object that holds the master covariates, SIDs,
-and presence values.}
-
 \item{sets}{A list of replicates; each replicate contains \code{reg_train}, \code{reg_test},
 \code{glo_train}, and \code{glo_test}.}
 
@@ -23,6 +27,9 @@ for testing.}
 
 \item{nesting_name}{Character string (default = \code{NA}), indicating the nesting strategy
 such as \code{"multiply"}, \code{"multiplyw"}, or \code{"covariate"}.}
+
+\item{x}{An \code{nsdm.pseudoabsences} object that holds the master covariates, SIDs,
+and presence values.}
 }
 \value{
 A named list of ensemble evaluation scores, averaged across replicates.

@@ -13,7 +13,7 @@ nsdm.eval(x, models, sets, level, ncores = 1L, tmp_path)
 
 \item{sets}{A list of replicates, each replicate contains \code{reg_train}, \code{reg_test}, \code{glo_train}, \code{glo_test}}
 
-\item{level}{Character string, either \code{"glo"} or \code{"reg"}, selects which SIDs to use for testing}
+\item{level}{Character string, selects which SIDs to use for testing}
 
 \item{ncores}{Integer, number of cores used by \code{parallel::mclapply}, default is \code{1}}
 
