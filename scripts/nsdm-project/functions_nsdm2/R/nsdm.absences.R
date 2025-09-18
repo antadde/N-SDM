@@ -25,6 +25,9 @@ nsdm.absences<-function(n=10000,
 					   rst_reg_gloproj=NULL,
 					   level){
 
+  
+  set.seed(111)
+  
   ### ------------------------
   ### generate nsdm.pseudoabsences object and add meta info
   ### ------------------------
@@ -96,7 +99,6 @@ if (type == "po") {
     abs <- abs[sample(1:nrow(abs), n + 200),]
   }
 }
-
 
   ### ------------------------
   ### Prepare output
