@@ -41,7 +41,7 @@ if (type == "pa") {
   
   if (!"pa" %in% colnames(pres)) stop("Error: 'pa' column not found in pres dataset.")
  
- set_max_npres_to_nabs=FALSE
+  set_max_npres_to_nabs=FALSE
 
   abs <- pres[pres$pa == 0, ]
   pres <- pres[pres$pa == 1, ]
@@ -49,24 +49,8 @@ if (type == "pa") {
 	
 # Set max_npres_to_nabs if requested
 if (set_max_npres_to_nabs && nrow(pres) > n) {
-
-  ## Prepare data for stratified sampling
-  d <- data.frame(
-    id = 1:nrow(pres),
-    X = st_coordinates(pres)[, 1],
-    Y = st_coordinates(pres)[, 2]
-  )
-
-  ## Generate grouping variable
-  if (max(d$X, na.rm = TRUE) > 10000) {
-    d$group <- round(d$X / 10000 * d$Y / 10000)  # Large-scale grouping
-  } else {
-    d$group <- round(d$X + d$Y)  # More stable grouping for small-scale data
-  }
-
-  ## Perform stratified sampling
-  outs <- nsdm.stratified(d, "group", (n + 100) / nrow(d))
-  pres <- pres[outs$id, ]
+target_n <- n + 100
+pres <- pres[sample(seq_len(nrow(pres)), target_n), ]
 }
 
 ### ------------------------
@@ -148,5 +132,4 @@ if (inherits(rst_reg_gloproj, "SpatRaster") && level == "glo") {
 
   # return
   return(out)
-
 }
