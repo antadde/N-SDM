@@ -25,7 +25,7 @@ nsdm.datacheck <- function(data_dir, n_levels) {
   sp_dir  <- file.path(data_dir, "species")
   tif_paths <- list.files(cov_dir, pattern = "\\.tif$", recursive = TRUE, full.names = TRUE)
   dirs_with_data <- unique(dirname(tif_paths))
-  valid_levels <- if (n_levels > 1) c("reg", "glo") else "reg"
+  valid_levels <- if (n_levels > 1) c("reg", "glo") else "glo"
 
   # Step 1: Check required subfolders
 	required_dirs <- if (n_levels > 1) {
@@ -85,7 +85,10 @@ nsdm.datacheck <- function(data_dir, n_levels) {
   }
 
   # Step 2b: Check for special characters in folder names
-  spec_char <- dirs_with_data[grepl("_|[^a-zA-Z0-9/\\.]", dirs_with_data)]
+  spec_char <- dirs_with_data |>
+  sub(".*?/data/covariates/", "", x = _) |>                # keep only relative path after ./data/covariates
+  (\(rel_paths) rel_paths[grepl("_|[^a-zA-Z0-9/\\.]", rel_paths)])()
+  
   if (length(spec_char) > 0) {
     message("🚨 Suspicious use of special characters in folder names:\n", paste(spec_char, collapse = "\n"))
   }
