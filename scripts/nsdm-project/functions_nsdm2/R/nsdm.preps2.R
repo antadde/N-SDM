@@ -19,11 +19,11 @@
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
-nsdm.preps2 <- function(pseu_reg, pseu_glo,
-                           prop_test = 0.3,
-                           n_reps = 10,
-                           seed = 42,
-                           ratio_abs = 1) {
+nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
+                        prop_test = 0.3,
+                        n_reps = 10,
+                        seed = 42,
+                        ratio_abs = 1) {
 
   ## ----- helpers -----
 
@@ -48,6 +48,8 @@ nsdm.preps2 <- function(pseu_reg, pseu_glo,
   }
 
   ## ----- 1. split presences only, mirror REG to GLO when tagged -----
+  
+  if (!is.null(pseu_reg)) {
 
   .make_presence_indices <- function(pseu_reg, pseu_glo, prop_test, n_reps, seed) {
     reg_sid <- pseu_reg@sid
@@ -180,5 +182,102 @@ nsdm.preps2 <- function(pseu_reg, pseu_glo,
   splits_idx_bal <- .add_balanced_absences(splits_idx, pseu_reg, pseu_glo, ratio_abs, seed)
 
   all_sets <- .build_all_sets(pseu_reg, pseu_glo, splits_idx_bal)
+  
+ ## ----- handle glo-only situations -----
+ 
+ } else {
+
+  .make_presence_indices_glo <- function(pseu_glo, prop_test, n_reps, seed) {
+    glo_sid <- pseu_glo@sid
+    glo_pa  <- pseu_glo@pa
+    i_glo_pres <- which(glo_pa == 1)
+
+    reps <- lapply(seq_len(n_reps), function(i) {
+      set.seed(seed + i)
+
+      # split presences at global level only
+      glo_core_pres <- .to_core(glo_sid[i_glo_pres])
+      u_glo_core <- unique(glo_core_pres)
+      glo_core_test <- runif(length(u_glo_core)) < prop_test
+      glo_map <- data.frame(core = u_glo_core, test = glo_core_test, stringsAsFactors = FALSE)
+
+      glo_is_test <- glo_map$test[match(glo_core_pres, glo_map$core)]
+      glo_test_idx  <- i_glo_pres[glo_is_test]
+      glo_train_idx <- i_glo_pres[!glo_is_test]
+
+      list(
+        reg_train_idx = integer(0),
+        reg_test_idx  = integer(0),
+        glo_train_idx = glo_train_idx,
+        glo_test_idx  = glo_test_idx
+      )
+    })
+
+    names(reps) <- paste0("rep_", seq_len(n_reps))
+    reps
+  }
+
+  .add_balanced_absences_glo <- function(splits_idx, pseu_glo, ratio, seed) {
+    out <- splits_idx
+    reps <- names(splits_idx)
+
+    glo_abs_pool_all <- which(pseu_glo@pa == 0)
+
+    for (j in seq_along(reps)) {
+      i <- splits_idx[[reps[j]]]
+
+      need_glo_train <- round(ratio * length(i$glo_train_idx))
+      need_glo_test  <- round(ratio * length(i$glo_test_idx))
+
+      set.seed(seed + j + 3000)
+      glo_abs_pool <- glo_abs_pool_all
+      glo_train_abs_idx <- if (need_glo_train > 0) {
+        sample(glo_abs_pool, size = min(need_glo_train, length(glo_abs_pool)))
+      } else integer(0)
+      glo_abs_pool <- setdiff(glo_abs_pool, glo_train_abs_idx)
+
+      set.seed(seed + j + 4000)
+      glo_test_abs_idx <- if (need_glo_test > 0) {
+        sample(glo_abs_pool, size = min(need_glo_test, length(glo_abs_pool)))
+      } else integer(0)
+
+      out[[reps[j]]]$reg_train_abs_idx <- integer(0)
+      out[[reps[j]]]$reg_test_abs_idx  <- integer(0)
+      out[[reps[j]]]$glo_train_abs_idx <- glo_train_abs_idx
+      out[[reps[j]]]$glo_test_abs_idx  <- glo_test_abs_idx
+    }
+
+    out
+  }
+
+  .make_sets_with_absences_glo <- function(pseu_glo, splits_idx_with_abs, rep_id) {
+    i <- splits_idx_with_abs[[rep_id]]
+    glo_train_rows <- c(i$glo_train_idx, i$glo_train_abs_idx)
+    glo_test_rows  <- c(i$glo_test_idx,  i$glo_test_abs_idx)
+    list(
+      reg_train = NULL,
+      reg_test  = NULL,
+      glo_train = if (length(glo_train_rows)) .subset_nsdm_by_idx(pseu_glo, glo_train_rows) else NULL,
+      glo_test  = if (length(glo_test_rows))  .subset_nsdm_by_idx(pseu_glo, glo_test_rows)  else NULL
+    )
+  }
+
+  .build_all_sets_glo <- function(pseu_glo, splits_idx_with_abs) {
+    setNames(
+      lapply(names(splits_idx_with_abs), function(rep_id) {
+        .make_sets_with_absences_glo(pseu_glo, splits_idx_with_abs, rep_id)
+      }),
+      names(splits_idx_with_abs)
+    )
+  }
+
+  ## ----- pipeline -----
+
+  splits_idx <- .make_presence_indices_glo(pseu_glo, prop_test, n_reps, seed)
+  splits_idx_bal <- .add_balanced_absences_glo(splits_idx, pseu_glo, ratio_abs, seed)
+
+  all_sets <- .build_all_sets_glo(pseu_glo, splits_idx_bal)
+ 
+  }
   return(all_sets)
-}
+  }
