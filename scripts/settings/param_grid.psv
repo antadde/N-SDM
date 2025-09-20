@@ -1,0 +1,13 @@
+Algorithm|Parameter|Option_1|Option_2|Option_3|Option_4|Option_5|Option_6|Option_7|Option_8|Option_9|Option_10
+glm|poly.lev|2|||||||||
+gam.auto|reg.spline|cr|||||||||
+gam.auto|method|REML|||||||||
+gam.fx|df|3|4||||||||
+max|classes|lqhp|||||||||
+max|regmult|1|2|3|||||||
+rf|num.trees|100|500||||||||
+rf|min.node.size|1|||||||||
+gbm|min_data_in_leaf|1|100||||||||
+gbm|max_depth|3|6|12|||||||
+gbm|learning_rate|0,05|||||||||
+gbm|num_iterations|100|200||||||||

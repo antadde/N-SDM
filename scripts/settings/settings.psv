@@ -1,0 +1,108 @@
+Parameter|Value|Group|Details
+new_sess|TRUE|General Settings|Is this a new N-SDM session? (If FALSE, previously completed steps are skipped.)
+exit_any|FALSE|General Settings| Exiting N-SDM on any error?
+w_path|/cluster/work/eawag/p01001/nsdm|General Settings|Path to the working directory.
+scr_path|/cluster/scratch/anadde/nsdmv2|General Settings|Path to the scratch directory for temporary storage.
+svp_path|/cluster/project/eawag/p01001/nsdm_save|General Settings|Path to the directory where final outputs are saved.
+lib_path|/cluster/home/anadde/Rpackages|General Settings|Path to the R libraries directory.
+clear_sop|TRUE|General Settings|Clear the scratch directory before starting a new run? (TRUE/FALSE)
+clear_fst|TRUE|General Settings|Delete previously converted fst files?
+n_levels|2|General Settings|Number of nested levels (1 = Global only, 2 = Global + Regional).
+glo_gloreg|TRUE|Species Data|Regional species data are also used in the global model?
+n_spe|1|Species Data|Total number of species evaluated.
+n_mx_spe|100|Species Data|Maximum number of species evaluated simultaneously in a single N-SDM run (to prevent scratch saturation).
+forced_species|forced.psv|Species Data|(Optional) Name of the .psv file in /scripts/settings listing species to model (one per row).
+pa_po_reg|po|Species Data|Presence-only (po) or presence-absence (pa) data for regional-level species.
+pa_po_glo|po|Species Data|Presence-only (po) or presence-absence (pa) data for global-level species.
+min_occ_reg|50|Species Data|Minimum number of occurrences required for modelling a species at the regional level.
+min_occ_glo|50|Species Data|Minimum number of occurrences required for modelling a species at the global level.
+disag_reg|TRUE|Species Data|Apply spatial and/or temporal disaggregation to regional species data? (TRUE/FALSE)
+disag_glo|TRUE|Species Data|Apply spatial and/or temporal disaggregation to global species data? (TRUE/FALSE)
+thin_dist_reg|200|Species Data|(Optional) Distance threshold for spatial thinning of regional species occurrences (in regional raster projection system units).
+thin_time_reg|5|Species Data|Time interval for temporal thinning of regional species occurrences (in years).
+thin_dist_glo|0.008333333|Species Data|(Optional) Distance threshold for spatial thinning of global species occurrences (in global raster projection system units).
+thin_time_glo|NULL|Species Data|Time interval for temporal thinning of global species occurrences (in years).
+back_strat|random|Species Data|If pa_po_reg or pa_po_glo is po, specifies the pseudoabsence generation strategy. Currently,  "random" or "random_w" are available. If using "random_w", a bias raster file must be in /data/background/bias, named [group]_reg.tif (for regional models) or [group]_glo.tif (for global models), where group comes from the species data. For example, a species in the "mammals" group requires mammals_reg.tif and/or mammals_glo.tif
+n_back|10000|Species Data|If pa_po_reg or pa_po_glo is po, number of background pseudoabsences to generate.
+cov_observ|c('reg_transport_tlm3d_dist2road', 'reg_transport_sonbase_noise', 'reg_popdensity_statpop13_populationdensity','reg_lulc_geostat8_present_20132018_cl3')|Covariate Data|(Optional) List of observational covariates, which are set to a constant value during predictions.
+cov_observ_val|median|Covariate Data|If cov_observ exists, specifies how observational covariates are handled ("median", "zero", or "max").
+expert_table|expert_table.psv|Covariate Data|(Optional) Pre-filtering table (.psv format) in /scripts/settings, listing candidate covariates for each species class.
+tmatch_glo|FALSE|Covariate Data|Apply temporal matching in global analyses? (TRUE/FALSE)
+tmatch_reg|TRUE|Covariate Data|Apply temporal matching in regional analyses? (TRUE/FALSE)
+tmatch_scheme_glo|npts|Covariate Data|If tmatch_glo=TRUE, specifies the temporal matching scheme ("npts" = nearest previous time slice, "nts" = nearest time slice).
+tmatch_scheme_reg|nts|Covariate Data|If tmatch_reg=TRUE, specifies the temporal matching scheme ("npts" or "nts").
+sel_met|GLM|Covariate Selection|Method for univariate collinearity filtering. Currently, only "GLM" has been validated. See nsdm.covfilter.R for details.
+cor_cut|0.7|Covariate Selection|Pearson correlation threshold for collinearity filtering.
+max_thre|12|Covariate Selection|Maximum number of covariates allowed in a single model.
+param_grid|param_grid.psv|Modelling Configuration|Name of the .psv file in /scripts/settings containing hyperparameter tuning grid.
+mod_algo|c('glm', 'gam', 'max', 'rf', 'gbm')|Modelling Configuration|List of modeling algorithms ("glm", "gam", "max", "rf", "gbm") or ensemble of small models ("esm", which must be run individually).
+ncov_esm|5|ESM-Specific Modelling|If "esm" is included in mod_algo, total number of covariates evaluated in the ESM framework.
+comb_esm|2|ESM-Specific Modelling|If "esm" is included in mod_algo, number of covariates combined in each ESM model.
+best_thre_esm|0.5|ESM-Specific Modelling|If "esm" is included in mod_algo, threshold for "best_met", below which a model is discarded.
+replicate_type|clustered_splitsample|Model Evaluation|Cross-validation strategy. "splitsample" and "clustered_splitsample" (geographical clustering) are available.
+reps|5|Model Evaluation|Number of cross-validation replicates.
+eval_crit|maxTSS|Model Evaluation|Evaluation metric for threshold-dependent assessment (only "maxTSS" is available).
+best_met|Score|Model Evaluation|Metric used for selecting best models ("AUC", "Boyce", "maxTSS", etc.).
+do_weighting|FALSE|Ensembling & Nesting|Weight algorithms based on weight_metric in ensembling? (TRUE/FALSE).
+weight_metric|Score|Ensembling & Nesting|Metric used for weighting and discarding models in ensembling.
+disc_thre|0.4|Ensembling & Nesting|Threshold for weight_metric, below which models are discarded in ensembling.
+nesting_methods|c('covariate','multiply')|Ensembling & Nesting|Strategy for integrating global and regional models. Options: "covariate" or "multiply".
+multiply_weighted|TRUE|Ensembling & Nesting|Also compute a weighted version of the multiply nested ensemble (using weight_metric).
+mask_pred|lakes_mask.tif|Ensembling & Nesting|(Optional) Binary (0-1) .tif raster mask stored in /data/mask, used to mask prediction outputs (pixels with 0 are excluded).
+do_proj|TRUE|Scenario Projections|Perform scenario projections? (TRUE/FALSE)
+proj_scenarios|c('rcp45', 'rcp85')|Scenario Projections|Names of scenario/alternative climate scenarios for projections. Must match covariate folder names.
+proj_periods|c('2085')|Scenario Projections|Time periods for scenario/alternative projections. Must match covariate folder names.
+rsync_exclude|d1_covsels,d2_models,d6_preds,d13_preds-sce,d14_maps-sce,d17_nested-ensembles-sce,d18_nested-ensembles-cv-sce|Rsync|Output folders to exclude when transferring scratch files to the save directory. Default settings ensure all essential material is preserved. (See https://doi.org/10.1111/ecog.06540 Appendix S1: Text S5 for output folder details.)
+sess_own|aadde|HPC & Cluster Settings|HPC session owner.
+account|aguisan_valpar|HPC & Cluster Settings|HPC account name.
+partition|cpu|HPC & Cluster Settings|HPC partition for job execution.
+pre_A_m|75G|HPC & Cluster Settings|Requested memory for pre_A step.
+pre_A_t|00-00:15|HPC & Cluster Settings|Requested runtime for pre_A step.
+pre_A_c|10|HPC & Cluster Settings|Requested CPU cores for pre_A step.
+pre_B_m|5G|HPC & Cluster Settings|Requested memory for pre_B step.
+pre_B_t|00-00:15|HPC & Cluster Settings|Requested runtime for pre_B step.
+pre_B_c|1|HPC & Cluster Settings|Requested CPU cores for pre_B step.
+glo_A_m|25G|HPC & Cluster Settings|Requested memory for global analysis (glo_A).
+glo_A_t|00-00:15|HPC & Cluster Settings|Requested runtime for global analysis (glo_A).
+glo_A_c|10|HPC & Cluster Settings|Requested CPU cores for global analysis (glo_A).
+glo_B_m|80G|HPC & Cluster Settings|Requested memory for global analysis (glo_B).
+glo_B_t|00-00:15|HPC & Cluster Settings|Requested runtime for global analysis (glo_B).
+glo_B_c|10|HPC & Cluster Settings|Requested CPU cores for global analysis (glo_B).
+glo_C_m|25G|HPC & Cluster Settings|Requested memory for global analysis (glo_C).
+glo_C_t|00-00:15|HPC & Cluster Settings|Requested runtime for global analysis (glo_C).
+glo_C_c|1|HPC & Cluster Settings|Requested CPU cores for global analysis (glo_C).
+reg_A_m|25G|HPC & Cluster Settings|Requested memory for regional analysis (reg_A).
+reg_A_t|00-00:15|HPC & Cluster Settings|Requested runtime for regional analysis (reg_A).
+reg_A_c|10|HPC & Cluster Settings|Requested CPU cores for regional analysis (reg_A).
+reg_B_m|80G|HPC & Cluster Settings|Requested memory for regional analysis (reg_B).
+reg_B_t|00-00:15|HPC & Cluster Settings|Requested runtime for regional analysis (reg_B).
+reg_B_c|10|HPC & Cluster Settings|Requested CPU cores for regional analysis (reg_B).
+reg_C_m|25G|HPC & Cluster Settings|Requested memory for regional analysis (reg_C).
+reg_C_t|00-00:15|HPC & Cluster Settings|Requested runtime for regional analysis (reg_C).
+reg_C_c|1|HPC & Cluster Settings|Requested CPU cores for regional analysis (reg_C).
+sce_A_m|80G|HPC & Cluster Settings|Requested memory for scenario projections (sce_A).
+sce_A_t|00-00:15|HPC & Cluster Settings|Requested runtime for scenario projections (sce_A).
+sce_A_c|10|HPC & Cluster Settings|Requested CPU cores for scenario projections (sce_A).
+sce_B_m|25G|HPC & Cluster Settings|Requested memory for scenario projections (sce_B).
+sce_B_t|00-00:15|HPC & Cluster Settings|Requested runtime for scenario projections (sce_B).
+sce_B_c|1|HPC & Cluster Settings|Requested CPU cores for scenario projections (sce_B).
+sce_C_m|80G|HPC & Cluster Settings|Requested memory for scenario projections (sce_C).
+sce_C_t|00-00:15|HPC & Cluster Settings|Requested runtime for scenario projections (sce_C).
+sce_C_c|10|HPC & Cluster Settings|Requested CPU cores for scenario projections (sce_C).
+sce_D_m|25G|HPC & Cluster Settings|Requested memory for scenario projections (sce_D).
+sce_D_t|00-00:15|HPC & Cluster Settings|Requested runtime for scenario projections (sce_D).
+sce_D_c|1|HPC & Cluster Settings|Requested CPU cores for scenario projections (sce_D).
+end_A_m|25G|HPC & Cluster Settings|Requested memory for final processing (end_A).
+end_A_t|00-00:15|HPC & Cluster Settings|Requested runtime for final processing (end_A).
+end_A_c|1|HPC & Cluster Settings|Requested CPU cores for final processing (end_A).
+args|commandArgs(trailingOnly = TRUE)|HPC & Cluster Settings|Command arguments, not meant to be modified.
+arrayID|as.numeric(args[[1]])|HPC & Cluster Settings|Array job identifier, not meant to be modified.
+module_gcc|gcc/8.5.0 r/4.3.2|HPC & Cluster Settings|Name and version of the GCC module.
+module_r|r/4.3.2|HPC & Cluster Settings|Name and version of the R module.
+module_proj|proj|HPC & Cluster Settings|Name and version of the PROJ module.
+module_perl|perl/5.38.0-4lrahtt|HPC & Cluster Settings|Name and version of the Perl module.
+module_curl|curl/8.4.0-s6dtj75|HPC & Cluster Settings|Name and version of the cURL module.
+module_geos|geos|HPC & Cluster Settings|Name and version of the GEOS module.
+module_gdal|gdal|HPC & Cluster Settings|Name and version of the GDAL module.
+module_sqlite|sqlite/3.43.2|HPC & Cluster Settings|Name and version of the SQLite module.
+module_udunits|udunits/2.2.28|HPC & Cluster Settings|Name and version of the UDUNITS module.
