@@ -1,8 +1,9 @@
 #' Evaluation function (define some confusion matrix indices)
 #'
-#' @author Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (aadde@unil.ch)
-
-# define some confusion matrix indices
+#' Not to be called directly by the user
+#'
+#' @author Philipp Brun (philipp.brun@wsl.ch) and Antoine Adde (antoine.adde@eawag.ch)
+#' @export
 
 # Sensitivity
 sens=function(a,c){a/(a+c)}
