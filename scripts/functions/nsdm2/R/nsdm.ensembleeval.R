@@ -388,10 +388,8 @@ target <- GLO_preds
 scores <- list()
 for (z in seq_len(outerloop)) {
   z_target <- target[[z]]
-  score <- nsdm.ceval(f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
-                       pa = papa_glo[[z]],
-                       tesdat = testa_glo[[z]],
-                       crit = eval_crit)
+  score <- nsdm.ceval2(f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
+                       pa = papa_glo[[z]])
   scores[[z]] <- score
 }
 scores_ensemble[["GLO"]] <- scores
@@ -406,12 +404,9 @@ if (any(c("multiply") %in% nesting_name)) {
     
     for (z in seq_len(outerloop)) {
 	  z_target <- target[[z]]
-      score <- nsdm.ceval(
+      score <- nsdm.ceval2(
         f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
-        pa = papa_reg[[z]],
-        tesdat = testa_reg[[z]],
-        crit = eval_crit
-      )
+        pa = papa_reg[[z]])
       scores[[z]] <- score
     }
     scores_ensemble[["REG"]] <- scores
@@ -426,12 +421,9 @@ if (any(c("multiply") %in% nesting_name)) {
     
     for (z in seq_len(outerloop)) {
 	  z_target <- target[[z]]
-      score <- nsdm.ceval(
+      score <- nsdm.ceval2(
         f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
-        pa = papa_reg[[z]],
-        tesdat = testa_reg[[z]],
-        crit = eval_crit
-      )
+        pa = papa_reg[[z]])
       scores[[z]] <- score
     }
     
@@ -472,21 +464,15 @@ if (any(c("multiply") %in% nesting_name)) {
 	z_glo_prob2 <- glo_prob2[[z]]
 	  
 	  # normal multiply
-      score <- nsdm.ceval(
+      score <- nsdm.ceval2(
         f = sqrt(rowMeans(as.data.frame(z_target), na.rm = TRUE) * z_glo_prob2)[[1]],
-        pa = papa_reg[[z]],
-        tesdat = testa_reg[[z]],
-        crit = eval_crit
-      )
+        pa = papa_reg[[z]])
 	  
 	  # multiply weigthed
-	    score_w <- nsdm.ceval(
+	    score_w <- nsdm.ceval2(
         f =(((rowMeans(as.data.frame(z_target), na.rm = TRUE) ^ w_reg) *
          (z_glo_prob2[[1]] ^ w_glo)) ^ (1 / w_sum)),
-        pa = papa_reg[[z]],
-        tesdat = testa_reg[[z]],
-        crit = eval_crit
-      )
+        pa = papa_reg[[z]])
 	  
       scores[[z]] <- score
 	  scores_w[[z]] <- score_w

@@ -5,7 +5,7 @@
 \title{nsdm.preps2}
 \usage{
 nsdm.preps2(
-  pseu_reg,
+  pseu_reg = NULL,
   pseu_glo,
   prop_test = 0.3,
   n_reps = 10,
