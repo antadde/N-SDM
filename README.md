@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/488654433.svg)](https://zenodo.org/badge/latestdoi/488654433)
+[![DOI](https://img.shields.io/badge/DOI-10.1111%2Fgcb.12345-blue)](https://doi.org/10.1111/ecog.06540)
 
 <img src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" align="right" width="50%"/>
 
