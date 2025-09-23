@@ -2,7 +2,7 @@
 
 <img src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" align="right" width="40%"/>
 
-<h3>📢 Upcoming Release</h3>
+<h3>📢 Upcoming Release – September/October 2025</h3>
 
 A new version of N-SDM is coming soon with updated features and improved workflows. Details will be announced here.
 
