@@ -71,7 +71,7 @@ job_status=$(sacct -j "$job_id" --format=State --noheader | awk '{$1=$1};1')
 failed_status=$(echo "$job_status" | grep -E 'FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|OUT_OF_ME|NODE_FAIL' || true)
 
 # Print the full job status
-echo "Job $job_name ended."
+echo "Job $job_name completed."
 
 # If any failure is detected, return non-zero to caller
 if [[ -n "$failed_status" ]]; then
@@ -172,7 +172,12 @@ fi
 check_exit() {
     local job_name=$1
     local exit_code=$2
-    if [ $exit_code -ne 0 ]; then
+    local i=$3
+    local ssl_id=$4
+
+    if [ $exit_code -eq 0 ]; then
+        create_checkpoint "$job_name" "$i" "$ssl_id"
+    else
         echo "Job $job_name failed."
         if [ "$exit_on_error" = "TRUE" ]; then
             echo "Exiting due to exit_any=TRUE"

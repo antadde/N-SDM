@@ -32,13 +32,9 @@ trap cleanup EXIT
 module load "$(get_value "software_stack")"
 
 # Load required modules
+module load "$(get_value "module_gcc")"
 module load "$(get_value "module_r")"
-module load "$(get_value "module_proj")"
-module load "$(get_value "module_perl")"
-module load "$(get_value "module_curl")"
-module load "$(get_value "module_geos")"
 module load "$(get_value "module_gdal")"
-module load "$(get_value "module_sqlite")"
 module load "$(get_value "module_udunits")"
 
 # Retrieve main paths from settings.psv
@@ -128,7 +124,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$PRE_A_m" "$PRE_A_t" "$PRE_A_c" 1 "$job_command" "" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 pre_A_job
 
@@ -225,7 +221,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$PRE_B_m" "$PRE_B_t" "$PRE_B_c" 1 "$job_command" "" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 cd "$wp/scripts/0_mainPRE"
 pre_B_job
@@ -265,7 +261,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$GLO_A_m" "$GLO_A_t" "$GLO_A_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -293,7 +289,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$GLO_B_m" "$GLO_B_t" "$GLO_B_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -321,7 +317,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$GLO_C_m" "$GLO_C_t" "$GLO_C_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -369,7 +365,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$REG_A_m" "$REG_A_t" "$REG_A_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -397,7 +393,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$REG_B_m" "$REG_B_t" "$REG_B_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -425,7 +421,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$REG_C_m" "$REG_C_t" "$REG_C_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -474,7 +470,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$SCE_A_m" "$SCE_A_t" "$SCE_A_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -502,7 +498,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$SCE_B_m" "$SCE_B_t" "$SCE_B_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -540,7 +536,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$SCE_C_m" "$SCE_C_t" "$SCE_C_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -568,7 +564,7 @@ mkdir -p "$log_dir"
 
 # Submit the job
 submit_and_monitor_job "$job_name" "$SCE_D_m" "$SCE_D_t" "$SCE_D_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $?
+check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
