@@ -12,34 +12,23 @@ Prerequisites for running N-SDM include:
 
 1. **Linux HPC cluster** equipped with the **Slurm Workload Manager**.
    
-2. Availability of the following **modules** (with the versions used during N-SDM development):
-   - `gcc (9.3.0)`
-   - `r (4.0.5)`
-   - `proj (5.2.0)`
-   - `perl (5.32.1)`
-   - `curl (7.76.1)`
-   - `geos (3.8.1)`
-   - `gdal (2.4.4)`
+2. Availability of the following **modules** (below are the versions used during N-SDM development):
+   - `gcc (12.2.0)`
+   - `r (4.6.3)`
+   - `gdal (3.4.4)`
+   - `udunits (2.2.28)`
 
 3. A **clone of the N-SDM GitHub repository** in the working directory:
    ```bash
-   git clone https://github.com/N-SDM/N-SDM.git .
+   git clone https://github.com/antadde/N-SDM.git .
    ```
 
-4. An installation of the **nsdm R package**:
+4. An installation of the **nsdm2 R package**:
    ```r
-   remotes::install_github("N-SDM/N-SDM/scripts/nsdm-project/functions", upgrade=FALSE)
+   remotes::install_github("antadde/N-SDM/Rpkg", upgrade=FALSE)
    ```
 
-5. [Optional for running the N-SDM example] Download the 6GB zip file containing example species and covariate data into the `./data` folder:
-   ```bash
-   wget -O ./data/nsdm-project.zip https://unils-my.sharepoint.com/:u:/g/personal/antoine_adde_unil_ch/EQ-B2q08HQ5MuVrav33MnMQBp61DzUF9Eoi3nP_qe1FrOQ?download=1
-   ```
-
-6. [Optional for running the N-SDM example] Unzip `nsdm-project.zip` in the `data` folder:
-   ```bash
-   unzip ./data/nsdm-project.zip -d ./data/nsdm-project/
-   ```
+5. [Optional for running the N-SDM example] Download and unzip the example dataset available at https://zenodo.org/records/17177174 in the `./data` directory
 
 # Example N-SDM run
 
@@ -65,9 +54,9 @@ N-SDM settings must be adapted to your computing environment (e.g., paths, HPC a
 
 ## Running N-SDM
 
-Position yourself at `cd ./scripts/nsdm-project/main`, where the main N-SDM bash file (`nsdm.sh`) is stored. 
+Position yourself in the `./scripts` directory, where the main N-SDM bash file (nsdm.sh) is stored.
 
-We encourage running N-SDM in a background "no hangup" mode to prevent the command from being aborted if you log out or exit the shell. You can do this with the following command:
+It is recommended to run N-SDM in the background using no hangup mode, so the process continues even if you log out or close the shell. Use the following command:
 
 ```bash
 nohup bash nsdm.sh > nsdm.out &
@@ -77,8 +66,7 @@ You can monitor the execution of N-SDM by checking the `nsdm.out` file.
 
 # Contributing
 
-If you have a suggestion that would make N-SDM better, please fork the repository and create a pull request. You can also simply open an issue with the tag "enhancement".
-Thanks!
+If you have suggestions to improve N-SDM, please fork the repository and submit a pull request.
 
 # Citation
 
@@ -90,15 +78,6 @@ Adde, A. et al. 2023. N-SDM: a high-performance computing pipeline for Nested Sp
 
 antoine.adde@eawag.ch
 
-Project Link: [https://github.com/N-SDM/N-SDM](https://https://github.com/N-SDM/N-SDM)
-
 # Acknowledgments
 
-N-SDM development was conducted within the [Ecospat lab](https://www.unil.ch/ecospat/en/home.html).
-
-We gratefully acknowledge financial support from the Federal Office for the Environment (FOEN) through the Action Plan of the Swiss Biodiversity Strategy, which funded the Valpar.ch and SwissCatchment projects.
-
-The Swiss Species Information Center, [InfoSpecies](https://www.infospecies.ch), provided Swiss-level species occurrence data and expertise on species ecology, and we appreciate their support regarding the database.
-
-This research was also made possible, in part, by the support provided by the [Scientific Computing and Research Unit](https://www.unil.ch/ci/dcsr) of the University of Lausanne.
-
+N-SDM development was conducted within the [Guisan](https://www.unil.ch/ecospat/en/home.html) and [Altermatt](https://www.altermattlab.ch/) labs. This work was supported by the Action Plan of the Swiss Biodiversity Strategy, with funding from the Swiss Federal Office for the Environment to the [ValPar.CH project](https://www.valpar.ch/index_en.php?page=home_en). It was later integrated into the [SPEED2ZERO project](https://speed2zero.ethz.ch/en/), supported by the ETH-Board through the Joint Initiatives scheme.
