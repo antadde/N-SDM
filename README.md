@@ -2,6 +2,11 @@
 
 <img src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" align="right" width="50%"/>
 
+## 📢 Upcoming Release
+
+A new version of N-SDM is coming soon with updated features and improved workflows.  
+Details will be announced here.
+
 # About N-SDM
 
 N-SDM is a high-performance computing pipeline for Nested-Species Distribution Modeling, addressing spatial niche truncation by combining global, coarse-grain models with regional, fine-grain models. This approach preserves the full niche while keeping local resolution and precision, improving biodiversity projections under global change. The pipeline integrates automated covariate selection, multiple modeling algorithms, ensemble methods, and scalable parallel processing for efficient reproducible assessments across species and scenarios.
