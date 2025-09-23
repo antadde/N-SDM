@@ -9,6 +9,9 @@
 ### A- Main N-SDM Settings
 ### =========================================================================
 
+# global reproducibility seed
+set.seed(123)
+
 # Set permissions for new files
 Sys.umask(mode = "000")
 

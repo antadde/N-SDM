@@ -11,7 +11,6 @@
 #' @param pseu_glo An `nsdm.pseudoabsences` object for the global level
 #' @param prop_test Numeric in (0, 1), fraction of presences assigned to test
 #' @param n_reps Integer, number of replicates
-#' @param seed Integer, base seed
 #' @param ratio_abs Numeric, absences per presence, set to `0` to skip absences
 #'
 #' @return A named list of length `n_reps`. Each element has `reg_train`, `reg_test`,
@@ -22,7 +21,6 @@
 nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
                         prop_test = 0.3,
                         n_reps = 10,
-                        seed = 42,
                         ratio_abs = 1) {
 
   ## ----- helpers -----
@@ -51,7 +49,7 @@ nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
   
   if (!is.null(pseu_reg)) {
 
-  .make_presence_indices <- function(pseu_reg, pseu_glo, prop_test, n_reps, seed) {
+  .make_presence_indices <- function(pseu_reg, pseu_glo, prop_test, n_reps) {
     reg_sid <- pseu_reg@sid
     glo_sid <- pseu_glo@sid
     reg_pa  <- pseu_reg@pa
@@ -64,8 +62,6 @@ nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
     has_reg_tag <- !is.na(glo_reg_tag)
 
     reps <- lapply(seq_len(n_reps), function(i) {
-      set.seed(seed + i)
-
       reg_core_pres <- .to_core(reg_sid[i_reg_pres])
       u_reg_core <- unique(reg_core_pres)
       reg_core_test <- runif(length(u_reg_core)) < prop_test
@@ -84,7 +80,6 @@ nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
       glo_train_idx_from_copy <- i_glo_pres_with_tag[ matched & !copied_flag]
 
       i_glo_pres_remaining <- setdiff(i_glo_pres, c(glo_test_idx_from_copy, glo_train_idx_from_copy))
-      set.seed(seed + i + 1000000L)
       need_test <- runif(length(i_glo_pres_remaining)) < prop_test
       glo_test_idx_indep  <- i_glo_pres_remaining[need_test]
       glo_train_idx_indep <- i_glo_pres_remaining[!need_test]
@@ -103,7 +98,7 @@ nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
 
   ## ----- 2. add absences to balance each set -----
 
-  .add_balanced_absences <- function(splits_idx, pseu_reg, pseu_glo, ratio, seed) {
+  .add_balanced_absences <- function(splits_idx, pseu_reg, pseu_glo, ratio) {
     out <- splits_idx
     reps <- names(splits_idx)
 
@@ -118,26 +113,22 @@ nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
       need_glo_train <- round(ratio * length(i$glo_train_idx))
       need_glo_test  <- round(ratio * length(i$glo_test_idx))
 
-      set.seed(seed + j + 1000)
       reg_abs_pool <- reg_abs_pool_all
       reg_train_abs_idx <- if (need_reg_train > 0) {
         sample(reg_abs_pool, size = min(need_reg_train, length(reg_abs_pool)))
       } else integer(0)
       reg_abs_pool <- setdiff(reg_abs_pool, reg_train_abs_idx)
 
-      set.seed(seed + j + 2000)
       reg_test_abs_idx <- if (need_reg_test > 0) {
         sample(reg_abs_pool, size = min(need_reg_test, length(reg_abs_pool)))
       } else integer(0)
 
-      set.seed(seed + j + 3000)
       glo_abs_pool <- glo_abs_pool_all
       glo_train_abs_idx <- if (need_glo_train > 0) {
         sample(glo_abs_pool, size = min(need_glo_train, length(glo_abs_pool)))
       } else integer(0)
       glo_abs_pool <- setdiff(glo_abs_pool, glo_train_abs_idx)
 
-      set.seed(seed + j + 4000)
       glo_test_abs_idx <- if (need_glo_test > 0) {
         sample(glo_abs_pool, size = min(need_glo_test, length(glo_abs_pool)))
       } else integer(0)
@@ -178,8 +169,8 @@ nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
 
   ## ----- pipeline -----
 
-  splits_idx <- .make_presence_indices(pseu_reg, pseu_glo, prop_test, n_reps, seed)
-  splits_idx_bal <- .add_balanced_absences(splits_idx, pseu_reg, pseu_glo, ratio_abs, seed)
+  splits_idx <- .make_presence_indices(pseu_reg, pseu_glo, prop_test, n_reps)
+  splits_idx_bal <- .add_balanced_absences(splits_idx, pseu_reg, pseu_glo, ratio_abs)
 
   all_sets <- .build_all_sets(pseu_reg, pseu_glo, splits_idx_bal)
   
@@ -187,13 +178,12 @@ nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
  
  } else {
 
-  .make_presence_indices_glo <- function(pseu_glo, prop_test, n_reps, seed) {
+  .make_presence_indices_glo <- function(pseu_glo, prop_test, n_reps) {
     glo_sid <- pseu_glo@sid
     glo_pa  <- pseu_glo@pa
     i_glo_pres <- which(glo_pa == 1)
 
     reps <- lapply(seq_len(n_reps), function(i) {
-      set.seed(seed + i)
 
       # split presences at global level only
       glo_core_pres <- .to_core(glo_sid[i_glo_pres])
@@ -217,7 +207,7 @@ nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
     reps
   }
 
-  .add_balanced_absences_glo <- function(splits_idx, pseu_glo, ratio, seed) {
+  .add_balanced_absences_glo <- function(splits_idx, pseu_glo, ratio) {
     out <- splits_idx
     reps <- names(splits_idx)
 
@@ -229,14 +219,12 @@ nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
       need_glo_train <- round(ratio * length(i$glo_train_idx))
       need_glo_test  <- round(ratio * length(i$glo_test_idx))
 
-      set.seed(seed + j + 3000)
       glo_abs_pool <- glo_abs_pool_all
       glo_train_abs_idx <- if (need_glo_train > 0) {
         sample(glo_abs_pool, size = min(need_glo_train, length(glo_abs_pool)))
       } else integer(0)
       glo_abs_pool <- setdiff(glo_abs_pool, glo_train_abs_idx)
 
-      set.seed(seed + j + 4000)
       glo_test_abs_idx <- if (need_glo_test > 0) {
         sample(glo_abs_pool, size = min(need_glo_test, length(glo_abs_pool)))
       } else integer(0)
@@ -273,8 +261,8 @@ nsdm.preps2 <- function(pseu_reg = NULL, pseu_glo,
 
   ## ----- pipeline -----
 
-  splits_idx <- .make_presence_indices_glo(pseu_glo, prop_test, n_reps, seed)
-  splits_idx_bal <- .add_balanced_absences_glo(splits_idx, pseu_glo, ratio_abs, seed)
+  splits_idx <- .make_presence_indices_glo(pseu_glo, prop_test, n_reps)
+  splits_idx_bal <- .add_balanced_absences_glo(splits_idx, pseu_glo, ratio_abs)
 
   all_sets <- .build_all_sets_glo(pseu_glo, splits_idx_bal)
  

@@ -11,20 +11,16 @@
 #' @param subsample Fraction of random lines in pred.data to be used in prediction
 #' @param which.class Which class if objective is "multi:softprob" (value from 0 to num_class - 1)
 #' @param xlab, ylab, main, type, ... Parameters passed to \code{plot}
-#' @param seed Random seed used if \code{subsample < 1}
 
 #' @return List of prepared objects
 
 nsdm.partialPlot.gbm <- function(obj, pred.data, xname, n.pt = 19, discrete.x = FALSE, 
                         subsample = pmin(1, n.pt * 100 / nrow(pred.data)), which.class = NULL,
                         xlab = deparse(substitute(xname)), ylab = "", type = if (discrete.x) "p" else "b",
-                        main = "", rug = TRUE, seed = NULL, ...) {
+                        main = "", rug = TRUE, ...) {
   stopifnot(dim(pred.data) >= 1)
   
   if (subsample < 1) {
-    if (!is.null(seed)) {
-      set.seed(seed)
-    } 
     n <- nrow(pred.data)
     picked <- sample(n, trunc(subsample * n))
     pred.data <- pred.data[picked, , drop = FALSE]

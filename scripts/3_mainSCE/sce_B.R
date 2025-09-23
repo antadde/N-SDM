@@ -8,6 +8,10 @@
 ### =========================================================================
 ### A- Preparation
 ### =========================================================================
+
+# global reproducibility seed
+set.seed(123)
+
 # Load N-SDM settings
 load(file.path(gsub("scripts", "tmp", gsub("/3_mainSCE", "", getwd())), "settings", "tmp_nsdm_settings.RData"))
 

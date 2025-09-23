@@ -9,6 +9,9 @@
 ### A. Initialization
 ### =========================================================================
 
+# global reproducibility seed
+set.seed(123)
+
 # Load N-SDM settings
 load(file.path(gsub("scripts", "tmp", getwd()), "settings", "ref_nsdm_settings.RData"))
 
