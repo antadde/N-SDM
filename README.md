@@ -4,13 +4,13 @@
 
 # About N-SDM
 
-Uniting species distribution modeling (SDM) techniques into a high-performance computing (HPC) pipeline, we developed N-SDM, a platform designed to deliver reproducible outputs for standard biodiversity assessments. N-SDM is built around a spatially nested framework, aimed at facilitating the combined use of species occurrence data from multiple sources and across various spatial scales. N-SDM enables the combination of two models, fitted with species and covariate data retrieved from global to regional scales, which helps address the issue of spatial niche truncation. The set of state-of-the-art SDM features in N-SDM includes a newly devised covariate selection procedure, five modeling algorithms, an algorithm-specific hyperparameter grid search, and the ensemble of small-models approach. N-SDM is designed for HPC environments, enabling the parallel processing of thousands of species simultaneously.
+N-SDM is a high-performance computing pipeline for Nested-Species Distribution Modeling, addressing spatial niche truncation by combining global, coarse-grain models with regional, fine-grain models. This approach preserves the full niche while keeping local resolution and precision, improving biodiversity projections under global change. The pipeline integrates automated covariate selection, multiple modeling algorithms, ensemble methods, and scalable parallel processing for efficient reproducible assessments across species and scenarios.
 
 # Prerequisites
 
 Prerequisites for running N-SDM include:
 
-1. **Linux cluster computer** equipped with the **Slurm workload manager**.
+1. **Linux HPC cluster** equipped with the **Slurm Workload Manager**.
    
 2. Availability of the following **modules** (with the versions used during N-SDM development):
    - `gcc (9.3.0)`
