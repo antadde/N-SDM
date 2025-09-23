@@ -71,12 +71,12 @@ job_status=$(sacct -j "$job_id" --format=State --noheader | awk '{$1=$1};1')
 failed_status=$(echo "$job_status" | grep -E 'FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|OUT_OF_ME|NODE_FAIL' || true)
 
 # Print the full job status
-echo "Job $job_name finished."
+echo "Job $job_name ended."
 
-# If any failure is detected, exit after printing
+# If any failure is detected, return non-zero to caller
 if [[ -n "$failed_status" ]]; then
-    echo "Error: Detected a failure in job $job_name. Exiting."
-    exit 1
+    echo "Error: Detected a failure in job $job_name"
+    return 1
 fi
 
     # Check if the log file already exists and is not empty
@@ -102,7 +102,7 @@ sacct_summary() {
     job_id="$1"
 
     sacct -j "$job_id" --format=JobID,JobName,State,Elapsed,TotalCPU,ReqCPUS,Timelimit,MaxRSS,NNodes,NTasks,ReqMem --parsable2 | awk -F '|' '
-    NR==1 { print "JobID|JobName|State|Elapsed|Recommended_Time|Timelimit|TotalCPU|ReqCPUS|UsedCPUS|MaxRSS|NNodes|NTasks|Recommended_Mem|ReqMem"; next }
+    NR==1 { print "JobID|JobName|State|Elapsed|Timelimit|TotalCPU|ReqCPUS|UsedCPUS|MaxRSS|NNodes|NTasks|ReqMem"; next }
     $2 !~ /batch|extern/ { jobname=$2; reqmem=$11; timelimit=$7; reqcpus=$6 }  # Store main job info
     $2 == "batch" {
         sub(/\.batch/, "", $1)
@@ -138,7 +138,7 @@ sacct_summary() {
         rec_ss = rec_sec % 60
         recommended_time = sprintf("%02d:%02d:%02d", rec_hh, rec_mm, rec_ss)
 
-        printf "%s|%s|%s|%s|%s|%s|%s|%s|%.1f|%s|%s|%s|%.2fG|%s\n", $1, jobname, $3, $4, recommended_time, timelimit, $5, reqcpus, used_cpus, $8, $9, $10, mem_rec, reqmem
+        printf "%s|%s|%s|%s|%s|%s|%s|%.1f|%s|%s|%s|%s\n", $1, jobname, $3, $4, timelimit, $5, reqcpus, used_cpus, $8, $9, $10, reqmem
     }'
 }
 
@@ -168,10 +168,26 @@ else
   echo "[INFO] Exiting on any error is DISABLED (exit_any=$exit_on_error)"
 fi
 
+# Check exiting status
+check_exit() {
+    local job_name=$1
+    local exit_code=$2
+    if [ $exit_code -ne 0 ]; then
+        echo "Job $job_name failed."
+        if [ "$exit_on_error" = "TRUE" ]; then
+            echo "Exiting due to exit_any=TRUE"
+            exit $exit_code
+        fi
+    fi
+}
+
 # Clean up on script exit
 cleanup() {
-  local exit_code=$?
-  if [ $exit_code -ne 0 ]; then
-    echo "An error occurred. Cleaning up and exiting (code $exit_code)."
-  fi
+    local exit_code=$?
+    # Always do cleanup actions here (e.g. remove temp files)
+
+    if [ "$exit_on_error" = "TRUE" ] && [ $exit_code -ne 0 ]; then
+        echo "An error occurred. Cleaning up and exiting."
+    fi
 }
+

@@ -318,10 +318,10 @@ if (n_levels > 1) {
 }
 
 # Subset global species data
-	spe_glo_pts <- spe_glo_fst[spe_glo_fst$species %in% species, ]
-	spe_glo_pts$sid <- paste("glo", 1, 1:nrow(spe_glo_pts), sep="_")
+spe_glo_pts <- spe_glo_fst[spe_glo_fst$species %in% species, ]
+spe_glo_pts$sid <- paste("glo", 1, 1:nrow(spe_glo_pts), sep="_")
 	
-	cat(paste0("Ready for spatiotemporal disaggregation of global data for ", length(species), " species...\n"))
+cat(paste0("Ready for spatiotemporal disaggregation of global data for ", length(species), " species...\n"))
 
 # Disaggregate global species data
   if (!as.logical(tmatch_glo)) {
@@ -342,7 +342,7 @@ if (disag_glo) {
 }
 
 # Use both reg and glo or glo-only species data in the global model if requested
-if (n_levels > 1 & glo_gloreg == TRUE) {
+if (n_levels > 1 & glo_use_reg == TRUE) {
 cat(paste0("Combined use of global and regional species data in the global model requested...\n"))
   # Reproject regional dataset to match global CRS
   spe_reg_dis_reproj <- st_transform(spe_reg_dis, crs = st_crs(spe_glo_dis))
@@ -373,7 +373,7 @@ cat(paste0("Combined use of global and regional species data in the global model
 }
 
 # Save species data settings
-l3 <- if (n_levels > 1 & glo_gloreg == TRUE) {
+l3 <- if (n_levels > 1 & glo_use_reg == TRUE) {
   list(spe_reg_dis = spe_reg_dis, spe_glo_dis = sp_combined)  # Include both regional and global data
 } else if (n_levels > 1) {
 	list(spe_reg_dis = spe_reg_dis, spe_glo_dis = spe_glo_dis)  # Use separate global and regional data
