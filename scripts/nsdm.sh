@@ -47,11 +47,6 @@ sop=$(get_value "scr_path")  # Scratch output path
 svp=$(get_value "svp_path")  # Saving output path
 rlibs=$(get_value "lib_path")  # Saving output path
 
-# General definitions from settings.psv
-own=$(get_value "sess_own")  # Session account
-acc=$(get_value "account")   # HPC account
-part=$(get_value "partition") # HPC partition
-
 # ssl_id directory
 ssl_dir="$wp/tmp/ssl_id"
 ssl_id_file="$wp/tmp/ssl_id/ssl_id.txt"

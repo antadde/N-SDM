@@ -126,12 +126,10 @@ for (model in model_names) {
   }
   
   if (length(pop) > 1) {
-    pop <- simplify2array(pop)
-    pop <- apply(pop, c(1, 2), mean)
+   pop <- lapply(1:outerloop, function(i) rowMeans(do.call(cbind, lapply(pop, `[[`, i)), na.rm=TRUE))
   } else {
     pop <- pop[[1]]
-  }
-  
+  }  
   # List results
   pred_all[[model]] <- pop
 }
@@ -251,13 +249,11 @@ for (model in model_names) {
     pop[[n]] <- pred
   }
   
-    if (length(pop) > 1) {
-    pop <- simplify2array(pop)
-    pop <- apply(pop, c(1, 2), mean)
+  if (length(pop) > 1) {
+   pop <- lapply(1:outerloop, function(i) rowMeans(do.call(cbind, lapply(pop, `[[`, i)), na.rm=TRUE))
   } else {
     pop <- pop[[1]]
   }
-  
   # List results
   pred_all[[model]] <- pop
 }
@@ -346,13 +342,11 @@ for (model in model_names) {
 	  pop[[n]] <- pred
   }
   
-    if (length(pop) > 1) {
-    pop <- simplify2array(pop)
-    pop <- apply(pop, c(1, 2), mean)
+  if (length(pop) > 1) {
+   pop <- lapply(1:outerloop, function(i) rowMeans(do.call(cbind, lapply(pop, `[[`, i)), na.rm=TRUE))
   } else {
     pop <- pop[[1]]
   }
-  
   # List results
   pred_all[[model]] <- pop
 }
