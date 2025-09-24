@@ -24,7 +24,7 @@ Prerequisites for running N-SDM include:
 
 3. A **clone of the N-SDM GitHub repository** in the working directory:
    ```bash
-   git clone https://github.com/antadde/N-SDM.git .
+   git clone https://github.com/antadde/N-SDM.git nsdm
    ```
 
 4. An installation of the **nsdm2 R package**:
