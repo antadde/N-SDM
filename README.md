@@ -18,7 +18,7 @@ Prerequisites for running N-SDM include:
    
 2. Availability of the following **modules** (below are the versions used during N-SDM development):
    - `gcc (12.2.0)`
-   - `r (4.6.3)`
+   - `r (4.3.2)`
    - `gdal (3.4.4)`
    - `udunits (2.2.28)`
 
