@@ -32,11 +32,11 @@ Prerequisites for running N-SDM include:
    remotes::install_github("antadde/N-SDM/Rpkg", upgrade=FALSE)
    ```
 
-5. [Optional for running the N-SDM example] Download and unzip the example dataset available at https://zenodo.org/records/17177174 in the `./data` directory
+5. [Optional for running the N-SDM example] Download and unzip the example dataset available at https://zenodo.org/records/17177174 in the `./data` directory. Follow the instructions provided on Zenodo.
 
 # Example N-SDM run
 
-We will run an applied example to illustrate the main operations and performance of N-SDM by modeling the habitat suitability of three species—Larix decidua, Capra ibex, and Cantharellus cibarius—at 100-meter resolution across Switzerland, for both the current period (1980–2021) and the future period (2070–2100).
+We will run an applied example to demonstrate the main operations and outputs of N-SDM by modeling the habitat suitability of three species (Larix decidua, Capra ibex, and Cantharellus cibarius) at 100-meter resolution across Switzerland, for the current period (1980–2021) and a future period (2070–2100).
 
 ## Study area
 
@@ -46,15 +46,21 @@ Following the spatially nested framework (see Figure 1 and the section 'Highligh
 
 ### Species data
 
-Global-level species occurrence records were obtained from GBIF (https://www.gbif.org/), while regional-level records were sourced from the Swiss Species Information Center, InfoSpecies (www.infospecies.ch). To minimize spatial clustering effects, occurrence records will be disaggregated, ensuring that no two points are closer than 1 km at the global level and 200 m at the regional level. For each species and level, 10,000 background absence points will be randomly generated across the target areas to contrast with the occurrence records.
+Global-level species occurrence records were obtained from GBIF, and regional-level records from the Swiss Species Information Center. To reduce spatial clustering, records were disaggregated so that no two points were closer than 1 km at the global level and 200 m at the regional level. For each species and level, 10,000 background absence points were randomly generated across the target areas to contrast with the occurrence records.
 
 ### Covariate data
 
-We will use a suite of 453 candidate covariates derived from 42 individual parameters, categorized into six main groups: bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation. Once the .zip data file is unzipped, detailed information about the covariates can be found in ./data/nsdm-project/covariates/covariates.xlsx. Only bioclimatic covariates were used to fit the global-level model, while all other categories were used for the regional model (see Figure 1 in the companion Software Note for details). To capture environmental conditions beyond the immediate occurrence points, covariates from the 'land use and cover' category were extracted using 13 moving radii, ranging from 25 m to 5 km. All covariates were standardized to have a mean of zero and a unit variance.
+We used suite of 374 candidate covariates dcategorized into six main categories: bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation. Only bioclimatic covariates were used to fit the global-level model, while all other categories were used for the regional model. To capture environmental conditions beyond the immediate occurrence points, covariates from the 'land use and cover' category were extracted using 13 moving radii, ranging from 25 m to 5 km. All covariates were standardized to have a mean of zero and a unit variance.
 
 ## N-SDM settings
 
-N-SDM settings must be adapted to your computing environment (e.g., paths, HPC account, partition, etc.) by editing the settings.psv file located in ./scripts/nsdm-project/main/settings with a text editor (to preserve the "|" delimiter). You can also customize the data and modeling settings (e.g., covariate selection, modeling algorithm, ensembling strategy, etc.). In the same ./scripts/nsdm-project/main/settings directory, you will find the param-grid.xlsx file, which allows you to specify the grid for hyperparameter tuning. A pre-filled example expert-table.xlsx is also included, allowing for expert-based prefiltering of candidate covariates. Additional details on N-SDM settings, hyperparameter tuning, and expert pre-filtering can be found in the N-SDM Software Note.
+N-SDM settings must be adapted to your computing environment (e.g., paths and module versions) by editing the `settings.psv` file in `./scripts/settings` with an editor that preserves the `"|"` delimiter. You can also customize data and modeling options such as covariate selection, modeling algorithms, and ensembling strategies.  
+
+In the same directory:  
+- `param_grid.psv` defines the grid for hyperparameter tuning  
+- `expert_table.psv` (pre-filled) allows expert-based prefiltering of candidate covariates  
+
+Further details on settings, hyperparameter tuning, and expert prefiltering are available in the [**N-SDM Software Note**](https://onlinelibrary.wiley.com/doi/10.1111/ecog.06540).  
 
 ## Running N-SDM
 
