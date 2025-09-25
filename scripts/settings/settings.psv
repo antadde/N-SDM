@@ -2,7 +2,7 @@ Parameter|Value|Group|Details
 new_sess|TRUE|General Settings|Is this a new N-SDM session? (If FALSE, previously completed steps are skipped.)
 exit_any|TRUE|General Settings| Exiting N-SDM on any error?
 w_path|/cluster/work/eawag/p01001/nsdm|General Settings|Path to the working directory.
-scr_path|/cluster/scratch/anadde/nsdmv2|General Settings|Path to the scratch directory for temporary storage.
+scr_path|/cluster/scratch/anadde/nsdm|General Settings|Path to the scratch directory for temporary storage.
 svp_path|/cluster/project/eawag/p01001/nsdm_save|General Settings|Path to the directory where final outputs are saved.
 lib_path|/cluster/home/anadde/Rpackages|General Settings|Path to the R libraries directory.
 clear_sop|TRUE|General Settings|Clear the scratch directory before starting a new run? (TRUE/FALSE)
@@ -22,7 +22,7 @@ thin_dist_reg|200|Species Data|(Optional) Distance threshold for spatial thinnin
 thin_time_reg|5|Species Data|Time interval for temporal thinning of regional species occurrences (in years).
 thin_dist_glo|0.008333333|Species Data|(Optional) Distance threshold for spatial thinning of global species occurrences (in global raster projection system units).
 thin_time_glo|NULL|Species Data|Time interval for temporal thinning of global species occurrences (in years).
-back_strat|random_w|Species Data|If pa_po_reg or pa_po_glo is po, specifies the pseudoabsence generation strategy. Currently,  "random" or "random_w" are available. If using "random_w", a bias raster file must be in /data/background/bias, named [group]_reg.tif (for regional models) or [group]_glo.tif (for global models), where group comes from the species data. For example, a species in the "mammals" group requires mammals_reg.tif and/or mammals_glo.tif
+back_strat|random|Species Data|If pa_po_reg or pa_po_glo is po, specifies the pseudoabsence generation strategy. Currently,  "random" or "random_w" are available. If using "random_w", a bias raster file must be in /data/background/bias, named [group]_reg.tif (for regional models) or [group]_glo.tif (for global models), where group comes from the species data. For example, a species in the "mammals" group requires mammals_reg.tif and/or mammals_glo.tif
 n_back|10000|Species Data|If pa_po_reg or pa_po_glo is po, number of background pseudoabsences to generate.
 cov_observ|c('reg_transport_tlm3d_dist2road', 'reg_transport_sonbase_noise', 'reg_popdensity_statpop13_populationdensity','reg_lulc_geostat8_present_20132018_cl3')|Covariate Data|(Optional) List of observational covariates, which are set to a constant value during predictions.
 cov_observ_val|median|Covariate Data|If cov_observ exists, specifies how observational covariates are handled ("median", "zero", or "max").

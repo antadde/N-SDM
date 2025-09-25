@@ -71,7 +71,7 @@ job_status=$(sacct -j "$job_id" --format=State --noheader | awk '{$1=$1};1')
 failed_status=$(echo "$job_status" | grep -E 'FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|OUT_OF_ME|NODE_FAIL' || true)
 
 # Print the full job status
-echo "Job $job_name completed."
+echo "Job $job_name finished."
 
 # If any failure is detected, return non-zero to caller
 if [[ -n "$failed_status" ]]; then
