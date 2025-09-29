@@ -25,7 +25,7 @@ nsdm.respcurve(
 
 \item{factor}{When applicable, the value used to store covariates at a different scale, divide the x axis by this value in the plots, default \code{1}}
 
-\item{model_name}{Character string with the modelling engine name, for example \code{"glm"}, \code{"gam"}, \code{"maxnet"}, \code{"lgb.Booster"}, \code{"randomForest"}, \code{"ranger"}, or \code{"esm"}}
+\item{model_name}{Character string with the modelling engine name, for example \code{"glm"}, \code{"gam"}, \code{"maxnet"}, \code{"lgb.Booster"}, \code{"randomForest"}, or \code{"esm"}}
 
 \item{species_name}{Character string with the taxon name, used in plot titles and filenames}
 

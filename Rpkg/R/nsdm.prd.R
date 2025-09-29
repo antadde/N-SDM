@@ -29,13 +29,7 @@ nsdm.prd <- function(mod, tst) {
     pred <- predict(mod,
                     newdata = tst,
                     type = "prob")[, 2]  # Probability for class 1
-    
-  } else if ("ranger" %in% class(mod)) {
-    
-    pred <- predict(mod,
-                    data = tst,
-                    type = "response")$predictions[, 2]  # Probability for class 1
-    
+      
   }
 
   pred <- round(as.numeric(pred), 2)

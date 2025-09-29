@@ -1,6 +1,6 @@
 #' nsdm.partialPlot.gbm
 #'
-#' Partial dependency plot for xgboost, lightgbm, or ranger object
+#' Partial dependency plot for xgboost, lightgbm, object
 #'
 #' @author Michael Mayer, \email{mayer@consultag.ch}
 #' @param obj model object

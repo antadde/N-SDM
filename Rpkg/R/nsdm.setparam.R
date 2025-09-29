@@ -154,40 +154,6 @@ modinp<-append(modinp, multi_rf)
 }
 }
 
-## RF with ranger
-# if(model_name == "rf") {
-  # if(nrow(subdataframes[["rf"]]) > 1){
-    # params_rf <- na.omit(expand.grid(data.frame(subdataframes[["rf"]])))
-  # } else {
-    # params_rf <- na.omit(data.frame(subdataframes[["rf"]]))
-  # }
-
-  # for(p in 1:nrow(params_rf)) {
-    # param_rf <- params_rf[p, ]
-    # form_rf <- as.formula(paste("Presence ~", paste(covariate_names, collapse = " + ")))
-
-    # multi_rf <- nsdm.multi(
-      # "ranger",
-      # list(
-        # formula = form_rf,
-        # num.trees = as.numeric(param_rf$num.trees),
-        # mtry = floor(sqrt(length(covariate_names))),
-        # min.node.size = as.numeric(param_rf$min.node.size),
-        # probability = TRUE,
-        # num.threads = nthreads,
-		# verbose = FALSE,
-		# importance= "impurity",
-        # case.weights = weighting
-      # ),
-      # tag = paste0("rf-", p),
-      # weight = weighting
-    # )
-
-    # modinp <- append(modinp, multi_rf)
-  # }
-# }
-
-
 ## (light)GBM
 if(model_name=="gbm"){
 if(nrow(subdataframes[["gbm"]])>1){

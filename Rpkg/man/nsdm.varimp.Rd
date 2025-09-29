@@ -25,7 +25,6 @@ Supported model classes and the importance used
 \item \code{glm}: \code{caret::varImp} Overall, aggregated by base variable
 \item \code{gam}: \code{summary(model)$s.table} Chi square for smooth terms
 \item \code{randomForest}: \code{randomForest::importance}
-\item \code{ranger}: \code{model$variable.importance}
 \item \code{maxnet}: sum of absolute betas per original variable
 }
 

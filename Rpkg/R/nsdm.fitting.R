@@ -109,13 +109,6 @@ nsdm.fitting <- function(x,
         mod_args_j@args$data$Presence <- as.factor(df_train$Presence)
         fit <- do.call(mod_args_j@mod, mod_args_j@args)
 
-      } else if (identical(mod_args_j@mod, "ranger")) {
-        # ranger
-        if (!is.null(wt)) mod_args_j@args$case.weights <- wt
-        mod_args_j@args$data <- df_train[, colnames(x@env_vars), drop = FALSE]
-        mod_args_j@args$data$Presence <- as.factor(df_train$Presence)
-        fit <- do.call(mod_args_j@mod, mod_args_j@args)
-
       } else {
         stop(sprintf("Unknown model engine: %s", mod_args_j@mod))
       }

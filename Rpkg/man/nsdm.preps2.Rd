@@ -9,7 +9,6 @@ nsdm.preps2(
   pseu_glo,
   prop_test = 0.3,
   n_reps = 10,
-  seed = 42,
   ratio_abs = 1
 )
 }
@@ -21,8 +20,6 @@ nsdm.preps2(
 \item{prop_test}{Numeric in (0, 1), fraction of presences assigned to test}
 
 \item{n_reps}{Integer, number of replicates}
-
-\item{seed}{Integer, base seed}
 
 \item{ratio_abs}{Numeric, absences per presence, set to \code{0} to skip absences}
 }

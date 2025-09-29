@@ -1,6 +1,6 @@
 Parameter|Value|Group|Details
 new_sess|TRUE|General Settings|Is this a new N-SDM session? (If FALSE, previously completed steps are skipped.)
-exit_any|TRUE|General Settings| Exiting N-SDM on any error?
+exit_any|FALSE|General Settings| Exiting N-SDM on any error?
 w_path|/cluster/work/eawag/p01001/nsdm|General Settings|Path to the working directory.
 scr_path|/cluster/scratch/anadde/nsdm|General Settings|Path to the scratch directory for temporary storage.
 svp_path|/cluster/project/eawag/p01001/nsdm_save|General Settings|Path to the directory where final outputs are saved.

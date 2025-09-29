@@ -16,7 +16,6 @@
 #' * `glm`: `caret::varImp` Overall, aggregated by base variable
 #' * `gam`: `summary(model)$s.table` Chi square for smooth terms
 #' * `randomForest`: `randomForest::importance`
-#' * `ranger`: `model$variable.importance`
 #' * `maxnet`: sum of absolute betas per original variable
 #'
 #' Importances are scaled by their maximum within each model, so the top
@@ -67,14 +66,6 @@ imp_scaled$Variable<-gsub("[\\(\\)]", "", regmatches(imp_scaled$Variable, gregex
 if(c("randomForest") %in% class(model)){
 imp<-randomForest::importance(model)
 imp_scaled <- data.frame(Variable=rownames(imp), Importance=scale(imp,FALSE,max(imp)))
-}
-
-if(c("ranger") %in% class(model)){
-  imp <- model$variable.importance
-  imp_scaled <- data.frame(
-    Variable = names(imp),
-    Importance = scale(imp, center = FALSE, scale = max(imp))
-  )
 }
 
 if(c("maxnet") %in% class(model)){

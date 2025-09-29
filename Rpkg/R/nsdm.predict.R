@@ -56,23 +56,6 @@ ndata<-parallel::mclapply(splits_ix, function(x){data.frame(fit=predict(model, n
 ndata_bck<-rbind.fill(ndata)
 }
 
-## RF with ranger
-if ("ranger" %in% class(model)) {
-  ndata <- parallel::mclapply(
-    splits_ix,
-    function(x) {
-      preds <- predict(model, data = nwdata[x, ], type = "response", verbose = FALSE)$predictions
-      if (is.matrix(preds)) {
-        data.frame(fit = preds[, 2])  # probability of class 1
-      } else {
-        data.frame(fit = preds)  # if only 2-class case returns vector
-      }
-    },
-    mc.cores = nsplits
-  )
-  ndata_bck <- plyr::rbind.fill(ndata)
-}
-
 ## GBM
 if(c("lgb.Booster") %in% class(model)){
 ndata_bck<-data.frame(fit=predict(model, as.matrix(nwdata), num_threads=nsplits)) # already makes use of all available cores

@@ -17,7 +17,6 @@ nsdm.partialPlot.gbm(
   type = if (discrete.x) "p" else "b",
   main = "",
   rug = TRUE,
-  seed = NULL,
   ...
 )
 }
@@ -36,15 +35,13 @@ nsdm.partialPlot.gbm(
 
 \item{xlab, }{ylab, main, type, ... Parameters passed to \code{plot}}
 
-\item{seed}{Random seed used if \code{subsample < 1}}
-
 \item{x.discrete}{If TRUE, the evaluation grid is set to the unique values of x}
 }
 \value{
 List of prepared objects
 }
 \description{
-Partial dependency plot for xgboost, lightgbm, or ranger object
+Partial dependency plot for xgboost, lightgbm, object
 }
 \author{
 Michael Mayer, \email{mayer@consultag.ch}
