@@ -17,11 +17,8 @@ Prerequisites for running N-SDM include:
 1. **Linux HPC cluster** equipped with the **Slurm Workload Manager**.
    
 2. Availability of the following **modules** (below are the versions used during N-SDM development):
-   - `gcc (12.2.0)`
-   - `r (4.3.2)`
-   - `gdal (3.4.4)`
-   - `udunits (2.2.28)`
-
+   - ...
+     
 3. A **clone of the N-SDM GitHub repository** in the working directory:
    ```bash
    git clone https://github.com/antadde/N-SDM.git nsdm
