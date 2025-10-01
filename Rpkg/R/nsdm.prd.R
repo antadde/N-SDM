@@ -22,7 +22,7 @@ nsdm.prd <- function(mod, tst) {
   } else if ("lgb.Booster" %in% class(mod)) {
     
     pred <- predict(mod,
-                    data = as.matrix(tst))
+                    newdata = as.matrix(tst))
     
   } else if ("randomForest" %in% class(mod)) {
     
