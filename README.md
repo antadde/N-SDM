@@ -49,6 +49,8 @@ Global-level species occurrence records were obtained from GBIF, and regional-le
 
 We used suite of 374 candidate covariates dcategorized into six main categories: bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation. Only bioclimatic covariates were used to fit the global-level model, while all other categories were used for the regional model. To capture environmental conditions beyond the immediate occurrence points, covariates from the 'land use and cover' category were extracted using 13 moving radii, ranging from 25 m to 5 km. All covariates were standardized to have a mean of zero and a unit variance.
 
+Further details on covariate and species data preparation are available in the `./documentation/preparation` directory (N-SDM_dataprep.odt files)
+
 ## N-SDM settings
 
 N-SDM settings must be adapted to your computing environment (e.g., paths and module versions) by editing the `settings.psv` file in `./scripts/settings` with an editor that preserves the `"|"` delimiter. You can also customize data and modeling options such as covariate selection, modeling algorithms, and ensembling strategies.  
@@ -57,7 +59,7 @@ In the same directory:
 - `param_grid.psv` defines the grid for hyperparameter tuning  
 - `expert_table.psv` (pre-filled) allows expert-based prefiltering of candidate covariates  
 
-Further details on settings, hyperparameter tuning, and expert prefiltering are available in the [**N-SDM Software Note**](https://onlinelibrary.wiley.com/doi/10.1111/ecog.06540).  
+Further details on settings and hyperparameter tuning options are available in the `./documentation/preparation` directory (N-SDM_settings and _algoparameters.odt files)
 
 ## Running N-SDM
 
