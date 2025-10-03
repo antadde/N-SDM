@@ -13,7 +13,7 @@
 set.seed(123)
 
 # Load N-SDM settings
-load(file.path(gsub("scripts", "tmp", gsub("/1_mainGLO", "", getwd())), "settings", "tmp_nsdm_settings.RData"))
+load(file.path(gsub("scripts", "tmp", getwd()), "settings", "tmp_nsdm_settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode = "000")

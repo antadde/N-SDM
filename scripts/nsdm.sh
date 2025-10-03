@@ -28,15 +28,6 @@ source "./helpers/functions.sh"
 
 trap cleanup EXIT
 
-# Load the software stack if needed
-module load "$(get_value "software_stack")"
-
-# Load required modules
-module load "$(get_value "module_gcc")"
-module load "$(get_value "module_r")"
-module load "$(get_value "module_gdal")"
-module load "$(get_value "module_udunits")"
-
 # Retrieve main paths from settings.psv
 wp=$(get_value "w_path")    # Working path
 sop=$(get_value "scr_path")  # Scratch output path
@@ -97,8 +88,7 @@ chmod -R 777 "$wp/scripts" 2>/dev/null || true
 chmod -R 777 "$wp/tmp" 2>/dev/null || true
 
 # Clean up old log files from the mainPRE script if they exist
-rm "$wp/scripts/0_mainPRE/logs/"*.err 2>/dev/null || true
-rm "$wp/scripts/0_mainPRE/logs/"*.out 2>/dev/null || true
+rm "$wp/scripts/0_mainPRE/logs/"* 2>/dev/null || true
 fi
 
 ##############################################
@@ -111,7 +101,7 @@ PRE_A_c=$(get_value "pre_A_c")  # Cores
 pre_A_job() {
 local job_name="pre_A_${ssl_id}"
 local log_dir="./0_mainPRE/logs"
-local job_command="export OMP_NUM_THREADS=1; Rscript ./0_mainPRE/pre_A.R"
+local job_command="Rscript ./0_mainPRE/pre_A.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -146,7 +136,7 @@ echo "Run $i started at $dt"
 
 # Update N-SDM settings using the R script
 cd "$wp/scripts/"
-Rscript ./0_mainPRE/nsdm_update.R >/dev/null 2>&1 || true
+module load "$(get_value module_r)" && Rscript ./0_mainPRE/nsdm_update.R >/dev/null 2>&1 || true
 
 # Retrieve the number of species to model in this run
 output_list="$wp/tmp/settings/tmp_species_list.txt"
@@ -168,7 +158,7 @@ periods=$(get_value "proj_periods")      # Projection periods evaluated
 n_periods=$(count_items "$periods")      # Number of projection periods
 
 # Define file patterns to clean
-file_patterns=("*.err" "*.out")
+file_patterns=("*.err" "*.out" "*.sbatch")
 
 # Define log_dirs
 log_dirs=(
@@ -185,7 +175,7 @@ done
 done
 
 # Clean scratch output folder if requested
-clear_sop=$(get_value "clear_sop")
+clear_sop=$(get_value "clear_scr")
 if [ "$clear_sop" = "TRUE" ] && [ "$new_sess" = "TRUE" ]; then
 echo "Clearing scratch directories..."
 rm -r "$sop/outputs/" 2>/dev/null || true
@@ -200,15 +190,14 @@ do_proj=$(get_value "do_proj")    # Do scenario analyses?
 #        RUN PRE_B JOB                          
 ##############################################
 # PRE_B Job
-cd $wp/scripts
 PRE_B_m=$(get_value "pre_B_m")
 PRE_B_t=$(get_value "pre_B_t")
 PRE_B_c=$(get_value "pre_B_c")
 
 pre_B_job() {
 local job_name="pre_B_${ssl_id}_${i}" 
-local log_dir="./logs"
-local job_command="export OMP_NUM_THREADS=1; Rscript pre_B.R"
+local log_dir="./0_mainPRE/logs"
+local job_command="Rscript ./0_mainPRE/pre_B.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -223,7 +212,6 @@ mkdir -p "$log_dir"
 submit_and_monitor_job "$job_name" "$PRE_B_m" "$PRE_B_t" "$PRE_B_c" 1 "$job_command" "" "$log_dir"
 check_exit "$job_name" $? "$i" "$ssl_id"
 }
-cd "$wp/scripts/0_mainPRE"
 pre_B_job
 
 # Check number of species processed after pre_B
@@ -237,7 +225,6 @@ check_species_count "$n_spe"
 ##############################################
 #        SET GLO_A JOB                          
 ##############################################
-cd "$wp/scripts/"
 # GLO_A job
 GLO_A_m=$(get_value "glo_A_m")
 GLO_A_t=$(get_value "glo_A_t")
@@ -246,9 +233,9 @@ GLO_A_a=$n_spe
 
 glo_A_job() {
 local job_name="glo_A_${ssl_id}_${i}"
-local log_dir="./logs"
+local log_dir="./1_mainGLO/logs"
 local array_flag="[1-$GLO_A_a]"
-local job_command="export OMP_NUM_THREADS=1; Rscript glo_A.R \$SLURM_ARRAY_TASK_ID"
+local job_command="Rscript ./1_mainGLO/glo_A.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -274,9 +261,9 @@ GLO_B_a=$((n_spe * n_algo))
 
 glo_B_job() {
 local job_name="glo_B_${ssl_id}_${i}"
-local log_dir="./logs"
+local log_dir="./1_mainGLO/logs"
 local array_flag="[1-$GLO_B_a]"
-local job_command="export OMP_NUM_THREADS=1; Rscript glo_B.R \$SLURM_ARRAY_TASK_ID"
+local job_command="Rscript ./1_mainGLO/glo_B.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -302,9 +289,9 @@ GLO_C_a=$n_spe
 
 glo_C_job() {
 local job_name="glo_C_${ssl_id}_${i}"
-local log_dir="./logs"
+local log_dir="./1_mainGLO/logs"
 local array_flag="[1-$GLO_C_a]"
-local job_command="export OMP_NUM_THREADS=1; Rscript glo_C.R \$SLURM_ARRAY_TASK_ID"
+local job_command="Rscript ./1_mainGLO/glo_C.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -323,7 +310,6 @@ check_exit "$job_name" $? "$i" "$ssl_id"
 ##############################################
 #        RUN GLO JOBS                           
 ##############################################
-cd "$wp/scripts/1_mainGLO"
 glo_A_job
 glo_B_job
 glo_C_job
@@ -341,7 +327,6 @@ echo "Number of species considered for REG: $n_spe"
 check_species_count "$n_spe"
 
 ## REGIONAL level
-cd "$wp/scripts/"
 # REG_A job
 REG_A_m=$(get_value "reg_A_m")
 REG_A_t=$(get_value "reg_A_t")
@@ -350,9 +335,9 @@ REG_A_a=$n_spe
 
 reg_A_job() {
 local job_name="reg_A_${ssl_id}_${i}"
-local log_dir="./logs"
+local log_dir="./2_mainREG/logs"
 local array_flag="[1-$REG_A_a]"
-local job_command="export OMP_NUM_THREADS=1; Rscript reg_A.R \$SLURM_ARRAY_TASK_ID"
+local job_command="Rscript ./2_mainREG/reg_A.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -378,9 +363,9 @@ REG_B_a=$((n_spe * n_algo * n_nesting))
 
 reg_B_job() {
 local job_name="reg_B_${ssl_id}_${i}"
-local log_dir="./logs"
+local log_dir="./2_mainREG/logs"
 local array_flag="[1-$REG_B_a]"
-local job_command="export OMP_NUM_THREADS=1; Rscript reg_B.R \$SLURM_ARRAY_TASK_ID"
+local job_command="Rscript ./2_mainREG/reg_B.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -406,9 +391,9 @@ REG_C_a=$n_spe
 
 reg_C_job() {
 local job_name="reg_C_${ssl_id}_${i}"
-local log_dir="./logs"
+local log_dir="./2_mainREG/logs"
 local array_flag="[1-$REG_C_a]"
-local job_command="export OMP_NUM_THREADS=1; Rscript reg_C.R \$SLURM_ARRAY_TASK_ID"
+local job_command="Rscript ./2_mainREG/reg_C.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -427,7 +412,6 @@ check_exit "$job_name" $? "$i" "$ssl_id"
 ##############################################
 #        RUN REG JOBS                           
 ##############################################
-cd "$wp/scripts/2_mainREG"
 reg_A_job
 reg_B_job
 reg_C_job
@@ -446,7 +430,6 @@ echo "Number of species considered for SCE: $n_spe"
 check_species_count "$n_spe"
 
 ## Projections
-cd "$wp/scripts/"
 # SCE_A job
 SCE_A_m=$(get_value "sce_A_m")
 SCE_A_t=$(get_value "sce_A_t")
@@ -455,9 +438,9 @@ SCE_A_a=$((n_spe * n_scenarios))
 
 sce_A_job() {
 local job_name="sce_A_${ssl_id}_${i}"
-local log_dir="./logs"
+local log_dir="./3_mainSCE/logs"
 local array_flag="[1-$SCE_A_a]"
-local job_command="export OMP_NUM_THREADS=1; Rscript sce_A.R \$SLURM_ARRAY_TASK_ID"
+local job_command="Rscript ./3_mainSCE/sce_A.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -483,9 +466,9 @@ SCE_B_a=$n_spe
 
 sce_B_job() {
 local job_name="sce_B_${ssl_id}_${i}"
-local log_dir="./logs"
+local log_dir="./3_mainSCE/logs"
 local array_flag="[1-$SCE_B_a]"
-local job_command="export OMP_NUM_THREADS=1; Rscript sce_B.R \$SLURM_ARRAY_TASK_ID"
+local job_command="Rscript ./3_mainSCE/sce_B.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -504,7 +487,6 @@ check_exit "$job_name" $? "$i" "$ssl_id"
 ##############################################
 #        RUN SCE_A_B JOBS                           
 ##############################################
-cd "$wp/scripts/3_mainSCE"
 sce_A_job
 sce_B_job
 
@@ -512,7 +494,6 @@ sce_B_job
 #        SET SCE_C JOB                           
 ##############################################
 if [ $n_levels -gt 1 ]; then
-cd "$wp/scripts/"
 # SCE_C job
 SCE_C_m=$(get_value "sce_C_m")
 SCE_C_t=$(get_value "sce_C_t")
@@ -521,9 +502,9 @@ SCE_C_a=$((n_spe * n_nesting * n_scenarios))
 
 sce_C_job() {
 local job_name="sce_C_${ssl_id}_${i}"
-local log_dir="./logs"
+local log_dir="./3_mainSCE/logs"
 local array_flag="[1-$SCE_C_a]"
-local job_command="export OMP_NUM_THREADS=1; Rscript sce_C.R \$SLURM_ARRAY_TASK_ID"
+local job_command="Rscript ./3_mainSCE/sce_C.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -549,9 +530,9 @@ SCE_D_a=$((n_spe * n_nesting))
 
 sce_D_job() {
 local job_name="sce_D_${ssl_id}_${i}"
-local log_dir="./logs"
+local log_dir="./3_mainSCE/logs"
 local array_flag="[1-$SCE_D_a]"
-local job_command="export OMP_NUM_THREADS=1; Rscript sce_D.R \$SLURM_ARRAY_TASK_ID"
+local job_command="Rscript ./3_mainSCE/sce_D.R"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then
@@ -570,7 +551,6 @@ check_exit "$job_name" $? "$i" "$ssl_id"
 ##############################################
 #        RUN SCE_C_D JOBS                           
 ##############################################
-cd "$wp/scripts/3_mainSCE"
 sce_C_job
 sce_D_job
 fi
@@ -580,7 +560,6 @@ fi
 #        SYNC TO SAVEPATH                           
 ##############################################
 job_name="sync_files_${ssl_id}_${i}"
-cd "$wp/scripts"
 
 # Check if the job has already been completed
 if job_completed "$job_name"; then 

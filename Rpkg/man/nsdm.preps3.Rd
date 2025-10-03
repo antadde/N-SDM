@@ -4,27 +4,36 @@
 \alias{nsdm.preps3}
 \title{nsdm.preps3}
 \usage{
-nsdm.preps3(pseu_reg = NULL, pseu_glo, n_reps = 10, ratio_abs = 1)
+nsdm.preps3(
+  pseu_reg = NULL,
+  pseu_glo,
+  n_reps = 10,
+  ratio_abs = 1,
+  glo_random = FALSE
+)
 }
 \arguments{
 \item{pseu_reg}{An \code{nsdm.pseudoabsences} object for the regional level (can be NULL)}
 
 \item{pseu_glo}{An \code{nsdm.pseudoabsences} object for the global level}
 
-\item{n_reps}{Integer, number of replicates (also number of spatial clusters)}
+\item{n_reps}{Integer, number of replicates (also number of spatial clusters if \code{glo_random = FALSE})}
 
 \item{ratio_abs}{Numeric, absences per presence, set to \code{0} to skip absences}
+
+\item{glo_random}{Logical, if TRUE then global sets are generated randomly instead of spatially stratified}
 }
 \value{
 A named list of length \code{n_reps}. Each element has \code{reg_train}, \code{reg_test},
 \code{glo_train}, \code{glo_test}, each an \code{nsdm.pseudoabsences} object or \code{NULL}
 }
 \description{
-Build spatially stratified train/test sets for regional and global pseudoabsence data.
-Presences are split by k-means spatial clustering. Each replicate selects one cluster
-as the test set and uses the others as training. Absences are randomly sampled to
-balance the sets according to \code{ratio_abs}.
+Build train/test sets for regional and global pseudoabsence data.
+By default, presences are split by k-means spatial clustering, so each replicate
+uses one cluster as the test set and the others as training. Absences are sampled
+randomly to balance the sets according to \code{ratio_abs}. If \code{glo_random = TRUE},
+the global presences are instead split randomly (not spatially stratified).
 }
 \author{
-Antoine Adde (antoine.adde@eawag.ch)
+Antoine Adde
 }

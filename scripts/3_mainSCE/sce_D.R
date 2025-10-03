@@ -104,7 +104,7 @@ cat(paste0("Starting mapping and ensembling of ", scenar, " ", per,
       score_path = file.path(scr_path, "outputs", "d3_evals", "reg", nesting_method),
       weighting = as.logical(do_weighting),
       weight_metric = weight_metric,
-      discthre = disc_thre
+      discthre = disc_thre_reg
     )
     
     nsdm.savemap(

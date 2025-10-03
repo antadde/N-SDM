@@ -1,32 +1,6 @@
 #!/bin/bash
 
 ##############################################
-# FUNCTION: Count the number of items in a list
-##############################################
-count_items() {
-    local list=$1
-    echo $(( $(grep -o "'" <<< "$list" | wc -l) / 2 ))
-}
-
-##############################################
-# FUNCTION: Create a checkpoint for a job
-##############################################
-create_checkpoint() {
-    local job_name=$1
-    local i=$2
-    local ssl_id=$3
-    echo "$ssl_id $i" > "$checkpoint_dir/${job_name}_done"
-}
-
-##############################################
-# FUNCTION: Check if a job has already been completed
-##############################################
-job_completed() {
-    local job_name=$1
-    [ -f "$checkpoint_dir/${job_name}_done" ]
-}
-
-##############################################
 # FUNCTION: Submit a job to SLURM
 ##############################################
 submit_and_monitor_job() {
@@ -39,56 +13,76 @@ submit_and_monitor_job() {
     local array_flag=$7
     local log_dir=$8
 
-# Create timestamp
-    local timestamp=$(date +%Y%m%d_%H%M%S)
+    # Resolve the R module BEFORE writing the script
+    local module_r
+    module_r=$(get_value "module_r")
 
-    # Customize output and error filenames
+    # Create timestamp for logs
+    local timestamp
+    timestamp=$(date +%Y%m%d_%H%M%S)
+
+    # Log files
+    local output_file error_file
     if [ -z "$array_flag" ]; then
-        local output_file="${log_dir}/${job_name}_$timestamp.out"
-        local error_file="${log_dir}/${job_name}_$timestamp.err"
+        output_file="${log_dir}/${job_name}_${timestamp}.out"
+        error_file="${log_dir}/${job_name}_${timestamp}.err"
     else
-        local output_file="${log_dir}/${job_name}_%A_%a_$timestamp.out"
-        local error_file="${log_dir}/${job_name}_%A_%a_$timestamp.err"
+        output_file="${log_dir}/${job_name}_%A_%a_${timestamp}.out"
+        error_file="${log_dir}/${job_name}_%A_%a_${timestamp}.err"
     fi
+
+    mkdir -p "$log_dir"
+
+    # Temporary job script
+    local job_script="${log_dir}/${job_name}_${timestamp}.sbatch"
+	
+	# Decide what command will actually be written to the script
+    local final_command="$job_command"
+    if [ -n "$array_flag" ]; then
+        final_command="$job_command \$SLURM_ARRAY_TASK_ID"
+    fi
+	
+    cat > "$job_script" <<EOF
+#!/bin/bash -l
+#SBATCH --job-name=$job_name
+#SBATCH --output=$output_file
+#SBATCH --error=$error_file
+#SBATCH --mem-per-cpu=$mem
+#SBATCH --time=$time
+#SBATCH --cpus-per-task=$cpus
+#SBATCH --ntasks=$ntasks
+${array_flag:+#SBATCH --array=$array_flag}
+
+module load $module_r
+export OMP_NUM_THREADS=1
+
+$final_command
+EOF
 
     echo "Submitting job: $job_name..."
     local job_id
-    if [ -z "$array_flag" ]; then
-        job_id=$(sbatch --wait --job-name="$job_name" --output="$output_file" --error="$error_file" \
-                      --mem-per-cpu="$mem" --time="$time" --cpus-per-task="$cpus" --ntasks="$ntasks" --wrap="$job_command" | awk '{print $NF}')
-    else
-        job_id=$(sbatch --wait --job-name="$job_name" --output="$output_file" --error="$error_file" \
-                      --mem-per-cpu="$mem" --time="$time" --cpus-per-task="$cpus" --ntasks="$ntasks" --array="$array_flag" --wrap="$job_command" | awk '{print $NF}')
-    fi
+    job_id=$(sbatch --wait "$job_script" | awk '{print $NF}')
 
-    # Wait a moment for job to register in sacct
     sleep 5
 
-# Fetch the job status from sacct (remove empty lines and consolidate)
-job_status=$(sacct -j "$job_id" --format=State --noheader | awk '{$1=$1};1')
+    job_status=$(sacct -j "$job_id" --format=State --noheader | awk '{$1=$1};1')
+    failed_status=$(echo "$job_status" | grep -E 'FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|OUT_OF_ME|NODE_FAIL' || true)
 
-# Store job failure states if present (but prevent grep from exiting)
-failed_status=$(echo "$job_status" | grep -E 'FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|OUT_OF_ME|NODE_FAIL' || true)
+    echo "Job $job_name finished."
 
-# Print the full job status
-echo "Job $job_name finished."
+    if [[ -n "$failed_status" ]]; then
+        echo "Error: Detected a failure in job $job_name"
+        return 1
+    fi
 
-# If any failure is detected, return non-zero to caller
-if [[ -n "$failed_status" ]]; then
-    echo "Error: Detected a failure in job $job_name"
-    return 1
-fi
-
-    # Check if the log file already exists and is not empty
-    if [[ ! -s "$sacct_log" ]]; then
-        # If the file does not exist or is empty, print the header
-        sacct_summary "$job_id" >> "$sacct_log"
-    else
-        # If the file exists and is not empty, append only the data without the header
-        sacct_summary "$job_id" | tail -n +2 >> "$sacct_log"
+    if [[ -n "$sacct_log" ]]; then
+        if [[ ! -s "$sacct_log" ]]; then
+            sacct_summary "$job_id" >> "$sacct_log"
+        else
+            sacct_summary "$job_id" | tail -n +2 >> "$sacct_log"
+        fi
     fi
 }
-
 
 ##############################################
 # FUNCTION: SACCT SUMMARY
@@ -142,16 +136,37 @@ sacct_summary() {
     }'
 }
 
-##############################################
-# FUNCTION: OTHERS
 #############################################
-# Function: retrieve values from settings.psv
+# OTHERS
+#############################################
+
+# FUNCTION: retrieve values from settings.psv
 get_value() {
   local key=$1
   awk -F "|" -v search_key="$key" '$1 == search_key { print $2 }' ./settings/settings.psv
 }
 
-# Exit if species count is zero
+# FUNCTION: Count the number of items in a list
+count_items() {
+    local list=$1
+    echo $(( $(grep -o "'" <<< "$list" | wc -l) / 2 ))
+}
+
+# FUNCTION: Create a checkpoint for a job
+create_checkpoint() {
+    local job_name=$1
+    local i=$2
+    local ssl_id=$3
+    echo "$ssl_id $i" > "$checkpoint_dir/${job_name}_done"
+}
+
+# FUNCTION: Check if a job has already been completed
+job_completed() {
+    local job_name=$1
+    [ -f "$checkpoint_dir/${job_name}_done" ]
+}
+
+# FUNCTION: Exit if species count is zero
 check_species_count() {
   if [ "$1" -eq 0 ]; then
     echo "No species found."
@@ -159,7 +174,7 @@ check_species_count() {
   fi
 }
 
-# Exit on any error (based on settings)
+# FUNCTION: Exit on any error (based on settings)
 exit_on_error=$(get_value "exit_any")
 if [ "$exit_on_error" = "TRUE" ]; then
   set -e
@@ -168,7 +183,7 @@ else
   echo "[INFO] Exiting on any error is DISABLED (exit_any=$exit_on_error)"
 fi
 
-# Check exiting status
+# FUNCTION: Check exiting status
 check_exit() {
     local job_name=$1
     local exit_code=$2
@@ -186,7 +201,7 @@ check_exit() {
     fi
 }
 
-# Clean up on script exit
+# FUNCTION: Clean up on script exit
 cleanup() {
     local exit_code=$?
     # Always do cleanup actions here (e.g. remove temp files)
@@ -195,4 +210,3 @@ cleanup() {
         echo "An error occurred. Cleaning up and exiting."
     fi
 }
-

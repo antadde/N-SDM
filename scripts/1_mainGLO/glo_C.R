@@ -13,7 +13,7 @@
 set.seed(123)
 
 # Load N-SDM settings
-load(file.path(gsub("scripts", "tmp", gsub("/1_mainGLO", "", getwd())), "settings", "tmp_nsdm_settings.RData"))
+load(file.path(gsub("scripts", "tmp", getwd()), "settings", "tmp_nsdm_settings.RData"))
 
 # Set permissions for new files
 Sys.umask(mode = "000")
@@ -86,7 +86,7 @@ ensemble_glo <- nsdm.ensemble(model_names = mod_algo,
                               score_path = file.path(scr_path, "outputs", "d3_evals/glo"), 
                               weighting = as.logical(do_weighting), 
                               weight_metric = weight_metric, 
-                              discthre = disc_thre)
+                              discthre = disc_thre_glo)
 
 nsdm.savemap(maps = ensemble_glo$ensemble, species_name = ispi_name, model_name = NULL, format="tif",
                save_path = file.path(scr_path, "outputs", "d8_ensembles/glo"))

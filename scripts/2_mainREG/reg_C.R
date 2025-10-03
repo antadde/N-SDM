@@ -95,7 +95,7 @@ ensemble_reg <- nsdm.ensemble(model_names = mod_algo,
                               score_path = file.path(scr_path, "outputs", "d3_evals/reg", nesting_method), 
                               weighting = as.logical(do_weighting), 
                               weight_metric = weight_metric, 
-                              discthre = disc_thre)
+                              discthre = disc_thre_reg)
 
 nsdm.savemap(maps = ensemble_reg$ensemble, species_name = ispi_name, model_name = NULL, format="tif", 
                save_path = file.path(scr_path, "outputs", "d8_ensembles/reg", nesting_method))
