@@ -1,7 +1,5 @@
 #############################################################################
 ## Script: nsdm_update
-## Purpose: Update N-SDM Routine
-## Date: 20-05-2022
 ## Author: Antoine Adde
 #############################################################################
 
@@ -9,11 +7,11 @@
 ### A. Initialization
 ### =========================================================================
 
-# global reproducibility seed
-set.seed(123)
-
 # Load N-SDM settings
 load(file.path(gsub("scripts", "tmp", getwd()), "settings", "ref_nsdm_settings.RData"))
+
+# global reproducibility seed
+set.seed(seed)
 
 ### =========================================================================
 ### B. Species Management

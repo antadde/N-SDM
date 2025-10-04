@@ -1,16 +1,11 @@
 #############################################################################
 ## Script: 0_mainPRE_A
-## Purpose: read N-SDM settings; load input data; occurrences disaggregation; covariate formatting
-## Date: 20-05-2022
 ## Author: Antoine Adde 
 #############################################################################
 
 ### =========================================================================
 ### A- Main N-SDM Settings
 ### =========================================================================
-
-# global reproducibility seed
-set.seed(123)
 
 # Set permissions for new files
 Sys.umask(mode = "000")
@@ -74,6 +69,9 @@ cat("N-SDM settings defined...\n")
 ### =========================================================================
 ### B- Prepare Covariate Data
 ### =========================================================================
+
+# global reproducibility seed
+set.seed(seed)
 
 # Set library path
 .libPaths(lib_path)

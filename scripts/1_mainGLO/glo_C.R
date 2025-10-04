@@ -1,7 +1,5 @@
 #############################################################################
 ## Script: 1_mainGLO_C
-## Purpose: Ensembling and mapping
-## Date: 20-05-2022
 ## Author: Antoine Adde
 #############################################################################
 
@@ -9,11 +7,11 @@
 ### A. Preparation
 ### =========================================================================
 
-# global reproducibility seed
-set.seed(123)
-
 # Load N-SDM settings
 load(file.path(gsub("scripts", "tmp", getwd()), "settings", "tmp_nsdm_settings.RData"))
+
+# global reproducibility seed
+set.seed(seed)
 
 # Set permissions for new files
 Sys.umask(mode = "000")

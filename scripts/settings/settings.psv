@@ -10,8 +10,9 @@ rsync_exclude|d1_covsels,d2_models,d6_preds,d12_preds-sce|General Environment|Ou
 scr_path|/scratch/aadde/nsdm|General Environment|Path to the scratch directory for temporary storage.
 clear_scr|TRUE|General Environment|If TRUE, clears the scratch directory before starting.
 clear_fst|FALSE|General Environment|If TRUE, delete previously converted fst files (covariate and species data).
-lib_path|/users/aadde/R/x86_64-pc-linux-gnu-library/4.4|General Environment|Path to the R libraries.
 module_r|r-light|General Environment|Name and version of the R module to be loaded on the cluster.
+lib_path|/users/aadde/R/x86_64-pc-linux-gnu-library/4.4|General Environment|Path to the R libraries.
+seed|12345|General Environment|Seed value used in R scripts.
 ###
 ### Species Data
 ###
