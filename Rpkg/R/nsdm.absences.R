@@ -59,7 +59,7 @@ pres <- pres[sample(seq_len(nrow(pres)), target_n), ]
 if (type == "po") {
   
   if (is.null(rst_background_weight)) {
-    message("Performing random sampling (no background weight layer provided).")
+    cat("Performing random background sampling (no background weight layer provided).", "\n")
     
     # Convert raster values to a data.table
     dt_ref <- data.table(cell = 1:ncell(rst_ref), weight = values(rst_ref)[,1])  # Rename weight column
@@ -71,7 +71,7 @@ if (type == "po") {
     # Sample randomly
     sampled_cells <- dt_ref[sample(.N, size = n * 1.5, replace = TRUE)]
   } else {
-    message("Performing weighted sampling using the background weight layer.")
+    cat("Performing weighted background sampling using the background weight layer.", "\n")
     
     # Using the background weight layer
     rst_bck <- mask(rast(rst_background_weight), rst_ref)
