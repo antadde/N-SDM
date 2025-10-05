@@ -50,7 +50,7 @@ nsdm.ceval2 <- function(f, pa) {
   tdep <- unlist(nsdm.all.metrics(tb[2, 2], tb[2, 1], tb[1, 2], tb[1, 1]))
 
   # Boyce
-  boyce_s_pe=try(ecospat.boyce(fit=f, obs=f[pa==1], PEplot = FALSE, rm.duplicate = TRUE, method = 'spearman'), TRUE)
+  boyce_s_pe=try(ecospat.boyce(fit=f, obs=f[pa==1], rm.duplicate = TRUE, method = 'spearman'), TRUE)
   if(is.numeric(boyce_s_pe$cor)) {boyce_s_pe=boyce_s_pe$cor} else {boyce_s_pe=NA}
 
   ## AUC and RMSE
