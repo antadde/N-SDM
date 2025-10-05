@@ -10,16 +10,14 @@ ecospat.boyce(
   nclass = 0,
   window.w = "default",
   res = 100,
-  PEplot = TRUE,
   rm.duplicate = TRUE,
   method = "spearman"
 )
 }
 \arguments{
-\item{fit}{A vector or a SpatRaster containing the predicted suitability values.}
+\item{fit}{A vector containing the predicted suitability values.}
 
-\item{obs}{A vector containing the predicted suitability values of validation points,
-or xy-coordinates (if fit is a RasterLayer/SpatRaster).}
+\item{obs}{A vector containing the predicted suitability values of validation points.}
 
 \item{nclass}{Number of classes or a vector with class thresholds.
 If nclass = 0, a moving window approach is used.}
@@ -27,8 +25,6 @@ If nclass = 0, a moving window approach is used.}
 \item{window.w}{Width of the moving window (default = 1/10 of suitability range).}
 
 \item{res}{Resolution of the moving window (default = 100 focal points).}
-
-\item{PEplot}{Logical. If TRUE, plot predicted/expected ratios.}
 
 \item{rm.duplicate}{Logical. If TRUE, remove successive duplicated values.}
 

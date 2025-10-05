@@ -13,7 +13,7 @@
 #' @details Supported model classes and the importance used
 #' 
 #' * `lgb.Booster`: `lightgbm::lgb.importance` Gain
-#' * `glm`: `caret::varImp` Overall, aggregated by base variable
+#' * `glm`: Importance based on absolute t/z statistics (as in `caret::varImp`), aggregated by base variable
 #' * `gam`: `summary(model)$s.table` Chi square for smooth terms
 #' * `randomForest`: `randomForest::importance`
 #' * `maxnet`: sum of absolute betas per original variable
@@ -22,10 +22,6 @@
 #' covariate has importance equal to one. Output columns are `Covariate`
 #' and `Importance`, ordered by decreasing importance.
 #'
-#' @note This function reads a variable named `model_name` from the calling
-#'   environment to decide whether to return a list of importances for ESM
-#'   or a single table. No argument named `model_name` is present in the
-#'   function signature.
 #'
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
@@ -50,11 +46,34 @@ imp<-data.frame(lgb.importance(model))
 imp_scaled <- data.frame(Variable=imp$Feature, Importance=scale(imp$Gain,FALSE,max(imp$Gain)))
 }
 
-if(c("glm") %in% class(model)){
-imp<-varImp(model, scale=FALSE)
-imp$variable<-gsub("[\\(\\,]", "", regmatches(rownames(imp), gregexpr("\\(.*?\\,", rownames(imp))))
-imp<-aggregate(imp[,"Overall"], list(imp$variable), mean)
-imp_scaled <- data.frame(Variable=imp$Group.1, Importance=scale(imp$x,FALSE,max(imp$x)))
+# if(c("glm") %in% class(model)){
+# imp<-caret::varImp(model, scale=FALSE)
+# imp$variable<-gsub("[\\(\\,]", "", regmatches(rownames(imp), gregexpr("\\(.*?\\,", rownames(imp))))
+# imp<-aggregate(imp[,"Overall"], list(imp$variable), mean)
+# imp_scaled <- data.frame(Variable=imp$Group.1, Importance=scale(imp$x,FALSE,max(imp$x)))
+# }
+
+if ("glm" %in% class(model)) {
+  # --- replicate caret::varImp() ---
+  values <- summary(model)$coef
+  stat_col <- grep("value$", colnames(values))  # handles both t and z values
+  varImps <- abs(values[-1, stat_col, drop = FALSE])  # exclude intercept
+  imp <- data.frame(Overall = varImps)
+  rownames(imp) <- rownames(values)[-1]
+
+  # --- keep grouping logic ---
+  imp$variable <- gsub("[\\(\\,]", "",
+                       regmatches(rownames(imp),
+                                  gregexpr("\\(.*?\\,", rownames(imp))))
+
+  # --- aggregate by variable and compute mean importance ---
+  imp <- aggregate(imp[,"Overall"], list(imp$variable), mean)
+
+  # --- scale importance (same logic as your original code) ---
+  imp_scaled <- data.frame(
+    Variable  = imp$Group.1,
+    Importance = scale(imp$x, center = FALSE, scale = max(imp$x))
+  )
 }
 
 if(c("gam") %in% class(model)){
