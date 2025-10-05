@@ -45,7 +45,8 @@ fact=round(thindist / res(rst)[1])
 rstthin <- terra::aggregate(rst, fact = fact)
 
 # Remove species with occurrences below the minimum threshold for modeling
-sp_count <- count(pres, "species")  # Count occurrences per species
+sp_count <- as.data.frame(table(pres$species))
+colnames(sp_count) <- c("species", "freq")
 bad_count <- which(sp_count$freq < min_occ)
 if (length(bad_count) > 0) {
   pres <- pres[!pres$species %in% sp_count[bad_count, "species"], ]
