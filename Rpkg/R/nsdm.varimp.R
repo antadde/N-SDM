@@ -46,7 +46,7 @@ imp<-data.frame(lgb.importance(model))
 imp_scaled <- data.frame(Variable=imp$Feature, Importance=scale(imp$Gain,FALSE,max(imp$Gain)))
 }
 
-if ("glm" %in% class(model)) {
+if ("glm" %in% class(model) && !"gam" %in% class(model)) {
   values <- summary(model)$coef
   stat_col <- grep("value$", colnames(values))  # handles both t and z values
   varImps <- abs(values[-1, stat_col, drop = FALSE])  # exclude intercept

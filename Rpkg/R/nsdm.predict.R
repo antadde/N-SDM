@@ -35,25 +35,25 @@ model_nameu<-names(models@fits)[m]
 ## GLM
 if(c("glm") %in% class(model) & !("gam") %in% class(model)){
 ndata<-parallel::mclapply(splits_ix, function(x){round(data.frame(fit=predict(model, nwdata[x,], se.fit = FALSE, type = "response")),2)}, mc.cores = nsplits)
-ndata_bck<-rbind.fill(ndata)
+ndata_bck<-data.table::rbindlist(ndata, fill = TRUE)
 }
 
 ## GAM
 if(c("gam") %in% class(model)){
 ndata<-parallel::mclapply(splits_ix, function(x){data.frame(fit=round(predict(model, nwdata[x,], se.fit = FALSE, gc.level=1, type = "response", block.size=round(nrow(nwdata[x,])/3)),2))}, mc.cores = nsplits)
-ndata_bck<-rbind.fill(ndata)
+ndata_bck<-data.table::rbindlist(ndata, fill = TRUE)
 }
 
 ## Maxent
 if(c("maxnet") %in% class(model)){
 ndata<-parallel::mclapply(splits_ix, function(x){data.frame(fit=round(predict(model, nwdata[x,], type="cloglog", clamp=F),2))}, mc.cores = nsplits)
-ndata_bck<-rbind.fill(ndata)
+ndata_bck<-data.table::rbindlist(ndata, fill = TRUE)
 }
 
 ## RF
 if(c("randomForest") %in% class(model)){
 ndata<-parallel::mclapply(splits_ix, function(x){data.frame(fit=predict(model, nwdata[x,], type="prob")[,2])}, mc.cores = nsplits)
-ndata_bck<-rbind.fill(ndata)
+ndata_bck<-data.table::rbindlist(ndata, fill = TRUE)
 }
 
 ## GBM
