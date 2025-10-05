@@ -46,34 +46,23 @@ imp<-data.frame(lgb.importance(model))
 imp_scaled <- data.frame(Variable=imp$Feature, Importance=scale(imp$Gain,FALSE,max(imp$Gain)))
 }
 
-# if(c("glm") %in% class(model)){
-# imp<-caret::varImp(model, scale=FALSE)
-# imp$variable<-gsub("[\\(\\,]", "", regmatches(rownames(imp), gregexpr("\\(.*?\\,", rownames(imp))))
-# imp<-aggregate(imp[,"Overall"], list(imp$variable), mean)
-# imp_scaled <- data.frame(Variable=imp$Group.1, Importance=scale(imp$x,FALSE,max(imp$x)))
-# }
-
 if ("glm" %in% class(model)) {
-  # --- replicate caret::varImp() ---
   values <- summary(model)$coef
   stat_col <- grep("value$", colnames(values))  # handles both t and z values
   varImps <- abs(values[-1, stat_col, drop = FALSE])  # exclude intercept
   imp <- data.frame(Overall = varImps)
   rownames(imp) <- rownames(values)[-1]
 
-  # --- keep grouping logic ---
-  imp$variable <- gsub("[\\(\\,]", "",
+imp$variable <- gsub("[\\(\\,]", "",
                        regmatches(rownames(imp),
                                   gregexpr("\\(.*?\\,", rownames(imp))))
 
-  # --- aggregate by variable and compute mean importance ---
-  imp <- aggregate(imp[,"Overall"], list(imp$variable), mean)
+imp <- aggregate(z.value ~ variable, data = imp, mean)
 
-  # --- scale importance (same logic as your original code) ---
-  imp_scaled <- data.frame(
-    Variable  = imp$Group.1,
-    Importance = scale(imp$x, center = FALSE, scale = max(imp$x))
-  )
+imp_scaled <- data.frame(
+  Variable  = imp$variable,
+  Importance = as.numeric(scale(imp$z.value, center = FALSE, scale = max(imp$z.value)))
+)
 }
 
 if(c("gam") %in% class(model)){
