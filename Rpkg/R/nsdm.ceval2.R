@@ -54,9 +54,8 @@ nsdm.ceval2 <- function(f, pa) {
   if(is.numeric(boyce_s_pe$cor)) {boyce_s_pe=boyce_s_pe$cor} else {boyce_s_pe=NA}
 
   ## AUC and RMSE
-  prd  <- ROCR::prediction(f, pa)
-  auc  <- ROCR::performance(prd, measure = "auc")@y.values[[1]]
-  rmse <- ROCR::performance(prd, measure = "rmse")@y.values[[1]]
+   auc  <- Metrics::auc(pa, f)
+   rmse <- Metrics::rmse(pa, f)
 
   ## Somers scaled AUC
   aucS <- 2 * auc - 1

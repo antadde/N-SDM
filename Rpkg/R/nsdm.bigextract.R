@@ -52,7 +52,7 @@ suppressMessages({
     if (file.exists(i)) {
       r <- read_fst(i)
       xt <- data.frame(r[cells, 1])
-      names(xt) <- basename(file_path_sans_ext(i))
+      names(xt) <- sub("\\.[^.]+$", "", basename(i))
       return(xt)
     } else {
       warning(paste("File not found:", i))
@@ -146,7 +146,7 @@ names(xt_pres) <- nm
 ### Extract absences
 ### ------------------------
 # Get the basenames (without extension) of all .fst files
-fst_basenames <- tools::file_path_sans_ext(basename(cov_fst))
+fst_basenames <- sub("\\.[^.]+$", "", basename(cov_fst))
 
 # Get the names of xt_pres_sta
 xt_names <- names(xt_pres)
@@ -161,7 +161,7 @@ cells <- cellFromXY(rst_ref, xy[pa == 0,])
     if (file.exists(i)) {
       r <- read_fst(i)
       xt <- data.frame(r[cells, 1])
-      names(xt) <- basename(file_path_sans_ext(i))
+      names(xt) <- sub("\\.[^.]+$", "", basename(i))
       return(xt)
     } else {
       warning(paste("File not found:", i))
