@@ -52,7 +52,7 @@ suppressMessages({
     if (file.exists(i)) {
       r <- read_fst(i)
       xt <- data.frame(r[cells, 1])
-      names(xt) <- gsub("_msk", "", basename(file_path_sans_ext(i)))
+      names(xt) <- basename(file_path_sans_ext(i))
       return(xt)
     } else {
       warning(paste("File not found:", i))
@@ -85,16 +85,19 @@ if (!all(is.na(years)) && isTRUE(t_match) && nrow(cov_info_fst_tempo) > 0) {
       if (nrow(x) == 0) return(character(0))
 
       if (tmatch_scheme == "npts") {
-        # Strategy: Nearest previous time only
+        
+		# Strategy: Nearest previous time only
         past_years <- x$year[x$year < y_r]
 
-        if (length(past_years) == 0) {
-          # No previous year: remove all
-          return(paste(x$dataset, x$year, sep = "_"))
-        }
+		if (length(past_years) == 0) {
+		  # No previous year: assign the nearest year overall
+		  prev_year <- x$year[which.min(abs(x$year - y_r))]
+		} else {
+		  # There are past years: pick the closest past one
+		  prev_year <- max(past_years)
+		}
 
-        prev_year <- max(past_years)
-        to_remove_years <- x$year[x$year != prev_year]
+       to_remove_years <- x$year[x$year != prev_year]
 
       } else if (tmatch_scheme == "nts") {
         # Strategy: Nearest overall (previous or future)
@@ -149,7 +152,7 @@ fst_basenames <- tools::file_path_sans_ext(basename(cov_fst))
 xt_names <- names(xt_pres)
 
 # Match and retrieve paths
-matched_cov_fst <- cov_fst[gsub("_msk","",fst_basenames) %in% xt_names]
+matched_cov_fst <- cov_fst[fst_basenames %in% xt_names]
 
 # Identify cell positions for absence points
 cells <- cellFromXY(rst_ref, xy[pa == 0,])
@@ -158,7 +161,7 @@ cells <- cellFromXY(rst_ref, xy[pa == 0,])
     if (file.exists(i)) {
       r <- read_fst(i)
       xt <- data.frame(r[cells, 1])
-      names(xt) <- gsub("_msk", "", basename(file_path_sans_ext(i)))
+      names(xt) <- basename(file_path_sans_ext(i))
       return(xt)
     } else {
       warning(paste("File not found:", i))
@@ -220,7 +223,7 @@ if (!is.null(env_vars) && ncol(env_vars) > 0) {
 
 # Identify unmatched layers from cov_info
 filtered_out_layers$unmatched_covariates <- setdiff(
-  gsub("_msk$", "", gsub("\\.tif$", "", basename(cov_info$file))),  # Remove ".tif" and "_msk"
+  gsub("\\.tif$", "", basename(cov_info$file)),
   colnames(env_vars)  # Existing covariate names
 )
 

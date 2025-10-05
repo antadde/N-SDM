@@ -2,14 +2,12 @@
 #'
 #' Updated ecospat.boyce (ecospat package) function for calculating Boyce index as in Hirzel et al. 2006
 #'
-#' @param fit A vector or a SpatRaster containing the predicted suitability values.
-#' @param obs A vector containing the predicted suitability values of validation points,
-#'            or xy-coordinates (if fit is a RasterLayer/SpatRaster).
+#' @param fit A vector containing the predicted suitability values.
+#' @param obs A vector containing the predicted suitability values of validation points.
 #' @param nclass Number of classes or a vector with class thresholds.
 #'               If nclass = 0, a moving window approach is used.
 #' @param window.w Width of the moving window (default = 1/10 of suitability range).
 #' @param res Resolution of the moving window (default = 100 focal points).
-#' @param PEplot Logical. If TRUE, plot predicted/expected ratios.
 #' @param rm.duplicate Logical. If TRUE, remove successive duplicated values.
 #' @param method Correlation method used for the Boyce index ('spearman' or 'pearson').
 #'
@@ -17,7 +15,7 @@
 #' @export
 
 ecospat.boyce <- function(fit, obs, nclass = 0, window.w = "default", res = 100, 
-                          PEplot = TRUE, rm.duplicate = TRUE, method = 'spearman') {
+                          rm.duplicate = TRUE, method = 'spearman') {
   
   # Internal function to compute predicted-to-expected ratio
   boycei <- function(interval, obs, fit) {
@@ -25,17 +23,7 @@ ecospat.boyce <- function(fit, obs, nclass = 0, window.w = "default", res = 100,
     ei <- sum(fit >= interval[1] & fit <= interval[2]) / length(fit)
     return(round(pi / ei, 10))
   }
-  
-  # Handle SpatRaster input
-  if (inherits(fit, "SpatRaster")) {
-    if (is.data.frame(obs) || is.matrix(obs)) {
-      obs <- terra::extract(fit, as.data.frame(obs), ID = FALSE)
-      obs <- as.numeric(obs[, 1])
-    }
-    fit <- terra::values(fit, na.rm = TRUE)
-    fit <- as.numeric(fit)
-  }
-  
+   
   mini <- min(fit, obs)
   maxi <- max(fit, obs)
   
@@ -82,15 +70,6 @@ ecospat.boyce <- function(fit, obs, nclass = 0, window.w = "default", res = 100,
     HS[length(HS)] <- HS[length(HS)] - 1  # Correct "trick"
   }
   HS <- HS[to.keep]
-  
-  # Optional plot
-  if (PEplot) {
-    plot(HS, f, xlab = "Habitat suitability", ylab = "Predicted/Expected ratio",
-         col = "grey", cex = 0.75)
-    if (!is.null(r)) {
-      points(HS[r], f[r], pch = 19, cex = 0.75)
-    }
-  }
-  
+   
   return(list(F.ratio = f, cor = round(b, 3), HS = HS))
 }

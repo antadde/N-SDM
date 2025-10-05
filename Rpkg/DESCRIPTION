@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "antoine.adde@eawag.ch",
            comment = c(ORCID = "0000-0003-4388-0880"))
-Depends: data.table, stringi, stringr, plyr, parallel, terra, sf, zoo, fst, tools, glmnet, gam, mgcv, randomForest, RRF, lightgbm, maxnet, caret, ROCR
+Depends: data.table, stringi, stringr, plyr, parallel, terra, sf, fst, glmnet, gam, mgcv, randomForest, RRF, lightgbm, maxnet, caret, ROCR
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
