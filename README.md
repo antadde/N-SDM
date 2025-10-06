@@ -26,7 +26,11 @@ Prerequisites for running N-SDM include:
 
 4. An installation of the **nsdm2 R package**:
    ```r
-   remotes::install_github("antadde/N-SDM/Rpkg", upgrade=FALSE)
+   # --- Stable release ---
+   remotes::install_github("antadde/N-SDM/Rpkg", ref = "v2.0.0", upgrade = FALSE)
+
+   # --- Development version ---
+   remotes::install_github("antadde/N-SDM/Rpkg", upgrade = FALSE)
    ```
 
 5. [Optional for running the N-SDM example] Download and unzip the example dataset available at https://zenodo.org/records/17177174 in the `./data` directory. Follow the instructions provided on Zenodo.
