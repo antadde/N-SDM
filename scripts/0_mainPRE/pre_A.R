@@ -71,6 +71,7 @@ cat("N-SDM settings defined...\n")
 ### =========================================================================
 
 # global reproducibility seed
+RNGkind("L'Ecuyer-CMRG")
 set.seed(seed)
 
 # Set library path

@@ -4,20 +4,20 @@ Parameter|Value|Group|Details
 ###
 new_sess|TRUE|General Environment|Indicates whether this run is treated as a new N-SDM session.
 exit_any|TRUE|General Environment|Exiting N-SDM on any error.
-w_path|/work/FAC/FGSE/IDYST/aguisan/valpar/nsdm|General Environment|Path to the working directory.
-svp_path|/scratch/aadde/nsdm_save|General Environment|Path where final outputs are transferred and stored permanently.
+w_path|/work/nsdm|General Environment|Path to the working directory.
+svp_path|/scratch/nsdm_save|General Environment|Path where final outputs are transferred and stored permanently.
 rsync_exclude|d1_covsels,d2_models,d6_preds,d12_preds-sce|General Environment|Output folders excluded when transferring results to svp_path. Default excludes non-essential files, preserving core outputs.
-scr_path|/scratch/aadde/nsdm|General Environment|Path to the scratch directory for temporary storage.
+scr_path|/scratch/nsdm|General Environment|Path to the scratch directory for temporary storage.
 clear_scr|TRUE|General Environment|If TRUE, clears the scratch directory before starting.
 clear_fst|FALSE|General Environment|If TRUE, delete previously converted fst files (covariate and species data).
-module_r|r-light|General Environment|Name and version of the R module to be loaded on the cluster.
-lib_path|/users/aadde/R/x86_64-pc-linux-gnu-library/4.4|General Environment|Path to the R libraries.
+module_r|r|General Environment|Name and version of the R module to be loaded on the cluster.
+lib_path|/users/R|General Environment|Path to the R libraries.
 seed|12345|General Environment|Seed value used in R scripts.
 ###
 ### Species Data
 ###
-n_spe|1|Species Data|Number of species included in the run.
-n_mx_spe|2|Species Data|Maximum number of species processed simultaneously.
+n_spe|3|Species Data|Number of species included in the run.
+n_mx_spe|3|Species Data|Maximum number of species processed simultaneously.
 forced_species|forced.psv|Species Data|(Optional) Name of the .psv file stored in ./scripts/settings listing species to be used for the run.
 glo_use_reg|TRUE|Species Data|If TRUE, regional species data stored in ./data/species/reg are also included in the global model.
 pa_po_reg|po|Species Data|Specifies whether regional species data are presence-only (po) or presence-absence (pa)
@@ -47,7 +47,7 @@ max_thre|12|Covariate Data and Selection|Maximum possible number of covariates a
 ###
 ### Modelling Algorithms and Validation
 ###
-mod_algo|c('glm', 'gam', 'max', 'rf', 'gbm')|Modelling Algorithms and Validation|List of algorithms to run ('glm', 'gam', 'max', 'rf','gbm'). ‘esm’ may also be specified, but independently.
+mod_algo|c('glm','gam','max','rf','gbm')|Modelling Algorithms and Validation|List of algorithms to run ('glm', 'gam', 'max', 'rf','gbm'). ‘esm’ may also be specified, but independently.
 param_grid|param_grid.psv|Modelling Algorithms and Validation|Name of the .psv file stored in ./scripts/settings specifying the hyperparameter tuning grid.
 reps|5|Modelling Algorithms and Validation|Number of cross-validation replicates.
 use_spatial_stratification|FALSE|Modelling Algorithms and Validation|If TRUE, uses spatial clustering (k-means on coordinates) for building training/testing splits. If FALSE, points are drawn randomly (repeated split sampling).

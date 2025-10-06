@@ -11,6 +11,7 @@
 load(file.path(gsub("scripts", "tmp", getwd()), "settings", "tmp_nsdm_settings.RData"))
 
 # global reproducibility seed
+RNGkind("L'Ecuyer-CMRG")
 set.seed(seed)
 
 # Set permissions for new files
@@ -230,7 +231,7 @@ raster_list <- unlist(stk, recursive = TRUE)
 
 # Stack them into a single SpatRaster
 raster_stack<-rast(raster_list)
-names(raster_stack)<-gsub("reg_", "glo_", basename(file_path_sans_ext(files)))
+names(raster_stack) <- gsub("reg_", "glo_", sub("\\.[^.]+$", "", basename(files)))
 raster_stack <- wrap(raster_stack)
 
 # F.4 Save Results

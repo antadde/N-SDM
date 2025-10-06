@@ -132,7 +132,7 @@ sacct_summary() {
         rec_ss = rec_sec % 60
         recommended_time = sprintf("%02d:%02d:%02d", rec_hh, rec_mm, rec_ss)
 
-        printf "%s|%s|%s|%s|%s|%s|%s|%.1f|%s|%s|%s|%s\n", $1, jobname, $3, $4, timelimit, $5, reqcpus, used_cpus, $8, $9, $10, reqmem
+        printf "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n", $1, jobname, $3, $4, timelimit, $5, reqcpus, $8, $9, $10, reqmem
     }'
 }
 

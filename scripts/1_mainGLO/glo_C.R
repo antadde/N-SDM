@@ -11,6 +11,7 @@
 load(file.path(gsub("scripts", "tmp", getwd()), "settings", "tmp_nsdm_settings.RData"))
 
 # global reproducibility seed
+RNGkind("L'Ecuyer-CMRG")
 set.seed(seed)
 
 # Set permissions for new files

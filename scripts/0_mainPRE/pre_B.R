@@ -11,6 +11,7 @@
 load(file.path(gsub("scripts", "tmp", getwd()), "settings", "tmp_nsdm_settings.RData"))
 
 # global reproducibility seed
+RNGkind("L'Ecuyer-CMRG")
 set.seed(seed)
 
 # Set permissions for new files
@@ -196,7 +197,7 @@ if (n_levels > 1) {
 
 if (use_spatial_stratification) {
   if (use_random_global) {
-    message(">>> Using spatial clustering for REG and random splits for GLO (nsdm.preps3 with glo_random = TRUE)")
+    cat("Training and testing sets built using spatial clustering for REG and random splits for GLO (nsdm.preps3 with glo_random = TRUE)", "\n")
     
     if (n_levels > 1) {
       all_sets <- nsdm.preps3(
@@ -214,7 +215,7 @@ if (use_spatial_stratification) {
     }
     
   } else {
-    message(">>> Using spatially clustered sampling (nsdm.preps3)")
+    cat("Training and testing sets built using spatially clustered sampling (nsdm.preps3)", "\n")
     
     if (n_levels > 1) {
       all_sets <- nsdm.preps3(
@@ -231,7 +232,7 @@ if (use_spatial_stratification) {
   }
 
 } else {
-  message(">>> Using random sampling (nsdm.preps2)")
+  cat("Training and testing sets built using random sampling (nsdm.preps2)", "\n")
   
   if (n_levels > 1) {
     all_sets <- nsdm.preps2(

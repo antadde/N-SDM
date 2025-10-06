@@ -11,6 +11,7 @@
 load(file.path(gsub("scripts", "tmp", getwd()), "settings", "tmp_nsdm_settings.RData"))
 
 # global reproducibility seed
+RNGkind("L'Ecuyer-CMRG")
 set.seed(seed)
 
 # Set permissions for new files
@@ -241,7 +242,7 @@ if ("covariate" %in% nesting_methods) {
     names(glo_out) <- "mainGLO"
     
 	raster_stack<-rast(stk)
-    names(raster_stack)<-basename(file_path_sans_ext(files))
+    names(raster_stack) <- sub("\\.[^.]+$", "", basename(files))
 	covstk_res[["cov"]] <- wrap(c(raster_stack, glo_out))
     covdata_res[["cov"]] <- cov.embed_i$covdata
   } else {
@@ -309,7 +310,7 @@ if (any(c("multiply") %in% nesting_methods)) {
     })
 
     raster_stack<-rast(stk)
-    names(raster_stack)<-basename(file_path_sans_ext(files))
+    names(raster_stack) <- sub("\\.[^.]+$", "", basename(files))
     covstk_res[["mul"]] <- wrap(raster_stack)
     covdata_res[["mul"]] <- cov.embed_i$covdata
 	

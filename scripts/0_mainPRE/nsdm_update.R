@@ -11,6 +11,7 @@
 load(file.path(gsub("scripts", "tmp", getwd()), "settings", "ref_nsdm_settings.RData"))
 
 # global reproducibility seed
+RNGkind("L'Ecuyer-CMRG")
 set.seed(seed)
 
 ### =========================================================================
