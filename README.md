@@ -26,7 +26,7 @@ Prerequisites for running N-SDM include:
 
 4. An installation of the **nsdm2 R package**:
    ```r
-   # --- Stable release ---
+   # --- Stable release --- NOT OUT YET !!!
    remotes::install_github("antadde/N-SDM/Rpkg", ref = "v2.0.0", upgrade = FALSE)
 
    # --- Development version ---
