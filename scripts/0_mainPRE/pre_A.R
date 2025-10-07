@@ -11,25 +11,31 @@
 Sys.umask(mode = "000")
 
 # Load and retrieve main settings
-settings <- read.csv("./settings/settings.psv", sep = "|")
+settings <- read.csv("./settings/settings.psv", sep = "|", stringsAsFactors = FALSE)
 parameters <- settings$Parameter
 values <- settings$Value
 
 # Iterate through parameters and assign values
 for (i in seq_along(parameters)) {
   param <- parameters[i]
-  value <- values[i]
-  
-  if (grepl(pattern = "NULL", value)) {
+  value <- trimws(values[i])
+
+  # Case 1: NULL
+  if (toupper(value) == "NULL") {
     do.call("<-", list(param, NULL))
-  } else if (grepl(pattern = paste0(c("c\\(", "paste", ":20"), collapse = "|"), value)) {
-    do.call("<-", list(param, eval(parse(text = value))))
+
+  # Case 2: comma-separated list (e.g., glm,gam,gbm)
+  } else if (grepl(",", value)) {
+    items <- trimws(unlist(strsplit(value, ",")))
+    do.call("<-", list(param, items))
+
+  # Case 3: numeric value
+  } else if (!is.na(suppressWarnings(as.numeric(value)))) {
+    do.call("<-", list(param, as.numeric(value)))
+
+  # Case 4: plain string
   } else {
-    if (is.na(as.numeric(value))) {
-      do.call("<-", list(param, value))
-    } else {
-      do.call("<-", list(param, as.numeric(value)))
-    }
+    do.call("<-", list(param, value))
   }
 }
 
