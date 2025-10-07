@@ -34,8 +34,7 @@ Prerequisites for running N-SDM include:
 
 ## Tested cluster environments
 
-N-SDM v2.0.0 (and nsdm2 R package) has been successfully installed and executed on multiple high-performance computing (HPC) systems.  
-The following configurations describe the module environments and R setups that were verified to work.
+N-SDM v2.0.0 (and nsdm2 R package) has been successfully installed and executed on multiple high-performance computing (HPC) systems. The following configurations describe the module environments and R setups that were verified to work.
 
 #### ETH Zürich – Euler Cluster
 
@@ -62,10 +61,10 @@ The following configurations describe the module environments and R setups that 
 - Operating system: Linux (Rocky Linux 8)
 - Workload manager: SLURM
 - Modules:
-  - `r-light`
+  - `r-light` (which uses a container)
 - Same settings parameters used:
   - `module_r = r-light`
-  - `module_others = left empty`
+  - `module_others = ""` (no additional modules required)
 
 **R environment:**
 - Platform: R 4.3.2
