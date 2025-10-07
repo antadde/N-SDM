@@ -36,7 +36,7 @@ Prerequisites for running N-SDM include:
 
 N-SDM v2.0.0 (and nsdm2 R package) has been successfully installed and executed on multiple high-performance computing (HPC) systems. The following configurations describe the module environments and R setups that were verified to work.
 
-#### ETH Zürich – Euler Cluster
+#### 1. ETH Zürich – Euler Cluster
 ***Cluster environment:***
 - Operating system: Ubuntu 22.04.5 LTS
 - Workload manager: SLURM
@@ -54,18 +54,18 @@ N-SDM v2.0.0 (and nsdm2 R package) has been successfully installed and executed 
 - Platform: R version 4.3.2 (2023-10-31)
 - Verified with the following [sessionInfo()](./documentation/R_session_info/ETHZ_Euler.txt)
 
-#### University of Lausanne – Curnagl Cluster
+#### 2. University of Lausanne – Curnagl Cluster
 ***Cluster environment:***
-- Operating system: Linux (Rocky Linux 8)
+- Operating system: Red Hat Enterprise Linux 9.4 (Plow)
 - Workload manager: SLURM
 - Modules:
   - `r-light` (which uses a container)
 - Same settings parameters used:
   - `module_r = r-light`
-  - `module_others = ""` (no additional modules required)
+  - `module_others = ` (no additional modules required)
 
 ***R environment:***
-- Platform: R 4.3.2
+- Platform: R version 4.4.1 (2024-06-14)
 - Verified with the following [sessionInfo()](./documentation/R_session_info/UNIL_Curnagl.txt)
 
 # Example N-SDM run
