@@ -20,7 +20,7 @@ seed|12345|General Environment|Seed value used in R scripts.
 n_spe|3|Species Data|Number of species included in the run.
 n_mx_spe|3|Species Data|Maximum number of species processed simultaneously.
 forced_species|forced.psv|Species Data|(Optional) Name of the .psv file stored in ./scripts/settings listing species to be used for the run.
-glo_use_reg|TRUE|Species Data|If TRUE, regional species data stored in ./data/species/reg are also included in the global model.
+glo_use_reg|TRUE|Species Data|If TRUE, regional species data are also included in the global model.
 pa_po_reg|po|Species Data|Specifies whether regional species data are presence-only (po) or presence-absence (pa)
 pa_po_glo|po|Species Data|Specifies whether global species data are presence-only (po) or presence-absence (pa)
 min_occ_reg|50|Species Data|Minimum number of occurrences required for a species at the regional level.
@@ -31,30 +31,30 @@ thin_dist_reg|200|Species Data|If disag_reg. Distance threshold for spatial thin
 thin_time_reg|5|Species Data|If disag_reg. Minimum temporal distance (in years) between retained presences for regional data.
 thin_dist_glo|0.008333333|Species Data|If disag_reg. Distance threshold for spatial thinning of regional occurrences (level units, usually degrees).
 thin_time_glo|NULL|Species Data|If disag_reg. Minimum temporal distance (in years) between retained presences for global data.
-back_strat|random|Species Data|Strategy for generating background points in presence-only data. Currently,  "random" or "random_w" are available.
+back_strat|random|Species Data|Strategy for generating background points in presence-only data. Currently,  'random' or 'random_w' are available.
 n_back|10000|Species Data|If pa_po_reg  or pa_po_glo is TRUE. Number of background points to generate.
 expert_table|expert_table.psv|Covariate Data and Selection|(Optional) Name of the .psv file for the pre-filtering table listing allowed covariates for each species group, to be stored in ./scripts/settings.
 ###
 ### Covariate Data and Selection
 ###
-cov_observ|c('reg_transport_tlm3d_dist2road', 'reg_transport_sonbase_noise', 'reg_popdensity_statpop13_populationdensity', 'reg_lulc_geostat8_present_20132018_cl3')|Covariate Data and Selection|List of observational covariates, provided in the form level_category_dataset_variable. 
-cov_observ_val|median|Covariate Data and Selection|If any cov_observ. Specifies how observational covariate values are fixed ("median", "zero", or "max").
+cov_observ|reg_transport_tlm3d_dist2road,reg_transport_sonbase_noise,reg_popdensity_statpop13_populationdensity,reg_lulc_geostat8_present_20132018_cl3|Covariate Data and Selection|List of observational covariates, provided in the form 'level_category_dataset_variable'. 
+cov_observ_val|median|Covariate Data and Selection|If any cov_observ. Specifies how observational covariate values are fixed ('median', 'zero', or 'max').
 tmatch_glo|FALSE|Covariate Data and Selection|If TRUE, when possible, applies temporal matching between occurrence records and covariate data in global models
 tmatch_reg|TRUE|Covariate Data and Selection|If TRUE, when possible, applies temporal matching between occurrence records and covariate data in regional models
-tmatch_scheme_glo|npts|Covariate Data and Selection|Scheme for temporal matching (regional level) ("npts" = nearest previous time slice, "nts" = nearest time slice).
-tmatch_scheme_reg|npts|Covariate Data and Selection|Scheme for temporal matching (regional level) ("npts" or "nts").
+tmatch_scheme_glo|npts|Covariate Data and Selection|Scheme for temporal matching (regional level) ('npts' = nearest previous time slice, 'nts' = nearest time slice).
+tmatch_scheme_reg|npts|Covariate Data and Selection|Scheme for temporal matching (regional level) ('npts' or 'nts').
 cor_cut|0.7|Covariate Data and Selection|Threshold for Pearson correlation coefficient used to filter colinear covariates.
 max_thre|12|Covariate Data and Selection|Maximum possible number of covariates allowed in a model.
 ###
 ### Modelling Algorithms and Validation
 ###
-mod_algo|c('glm','gam','max','rf','gbm')|Modelling Algorithms and Validation|List of algorithms to run ('glm', 'gam', 'max', 'rf','gbm'). ‘esm’ may also be specified, but independently.
+mod_algo|glm,gam,max,rf,gbm|Modelling Algorithms and Validation|List of algorithms to run ('glm', 'gam', 'max', 'rf','gbm'). ‘esm’ may also be specified, but independently.
 param_grid|param_grid.psv|Modelling Algorithms and Validation|Name of the .psv file stored in ./scripts/settings specifying the hyperparameter tuning grid.
 reps|5|Modelling Algorithms and Validation|Number of cross-validation replicates.
 use_spatial_stratification|FALSE|Modelling Algorithms and Validation|If TRUE, uses spatial clustering (k-means on coordinates) for building training/testing splits. If FALSE, points are drawn randomly (repeated split sampling).
 use_random_global|TRUE|Modelling Algorithms and Validation|If use_spatial_stratification is TRUE. If TRUE, points for global splits are still drawn randomly while regional remain spatially stratified.
-eval_crit|maxTSS|Modelling Algorithms and Validation|Metric used for thresholding predictions for threshold-dependent evaluations. Only maxTSS is supported for now.
-best_met|Score|Modelling Algorithms and Validation|Metric used to select best models (default Score averages AUC’, Boyce, maxTSS).
+eval_crit|maxTSS|Modelling Algorithms and Validation|Metric used for thresholding predictions for threshold-dependent evaluations. Only 'maxTSS' is supported for now.
+best_met|Score|Modelling Algorithms and Validation|Metric used to select best models (default 'Score' averages AUC’, Boyce, maxTSS).
 ###
 ### ESM-Specific Parameters
 ###
@@ -65,22 +65,22 @@ best_thre_esm|0.5|ESM-Specific Parameters|Threshold for retaining ESM models bas
 ### Ensembling
 ###
 do_weighting|FALSE|Ensembling|If TRUE, individual algorithms are weighted in ensembles based on a chosen metric.
-weight_metric|Score|Ensembling|Metric for weighting and discarding algorithms in ensembles (default Score averages AUC’, Boyce, maxTSS).
+weight_metric|Score|Ensembling|Metric for weighting and discarding algorithms in ensembles (default 'Score' averages AUC’, Boyce, maxTSS).
 disc_thre_glo|-1|Ensembling|Global model algorithms with score below this threshold are discarded. -1 = keep all.
 disc_thre_reg|-1|Ensembling|Regional model algorithms with score below this threshold are discarded. -1 = keep all.
 ###
 ### Nesting
 ###
-n_levels|2|Nesting|Number of nested modelling levels (1 = Global only, 2 = Global + Regional).
-nesting_methods|c('covariate','multiply')|Nesting|Methods for nesting global and regional models (covariate and/or multiply nesting).
+n_levels|2|Nesting|Number of nested modelling levels ('1' = Global only, '2' = Global + Regional).
+nesting_methods|covariate,multiply|Nesting|Methods for nesting global and regional models ('covariate' and/or 'multiply' nesting).
 multiply_weighted|TRUE|Nesting|If TRUE, also computes a weighted version of the multiply nested ensemble, using the weight_metric.
 ###
 ### Predicting and Projecting
 ###
 mask_pred|lakes_mask.tif|Predicting and Projecting|Optional binary raster .tif prediction mask (0/1) stored in the folder ./data/masks. Pixels with value 0 are excluded from predictions. 
 do_proj|TRUE|Predicting and Projecting|If TRUE, performs projections under alternative scenarios.
-proj_scenarios|c('rcp45', 'rcp85')|Predicting and Projecting|List of scenario names. Must match names in covariate scenario folders.
-proj_periods|c('2085')|Predicting and Projecting|Projection periods, must match names covariate scenario folders.
+proj_scenarios|rcp45,rcp85|Predicting and Projecting|List of scenario names. Must match names in covariate scenario folders.
+proj_periods|2085|Predicting and Projecting|Projection periods, must match names covariate scenario folders.
 ###
 ### HPC Ressources
 ###
