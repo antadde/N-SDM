@@ -45,25 +45,25 @@ Following the spatially nested framework (see Figure 1 and the section 'Highligh
 
 ## Data
 
+Further details on covariate and species data preparation are available in the [DATA_PREPARATION.odt](./documentation/DATA_PREPARATION_20251002.odt) document located in the `documentation` directory.
+
 ### Species data
 
 Global-level species occurrence records were obtained from GBIF, and regional-level records from the Swiss Species Information Center. To reduce spatial clustering, records were disaggregated so that no two points were closer than 1 km at the global level and 200 m at the regional level. For each species and level, 10,000 background absence points were randomly generated across the target areas to contrast with the occurrence records.
 
 ### Covariate data
 
-We used suite of 374 candidate covariates dcategorized into six main categories: bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation. Only bioclimatic covariates were used to fit the global-level model, while all other categories were used for the regional model. To capture environmental conditions beyond the immediate occurrence points, covariates from the 'land use and cover' category were extracted using 13 moving radii, ranging from 25 m to 5 km. All covariates were standardized to have a mean of zero and a unit variance.
-
-Further details on covariate and species data preparation are available in the [DATA_PREPARATION.odt](./documentation/DATA_PREPARATION_20251002.odt) document located in the `documentation` directory.
+We used suite of 374 candidate covariates categorized into six main categories: bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation. Only bioclimatic covariates were used to fit the global-level model, while all other categories were used for the regional model. To capture environmental conditions beyond the immediate occurrence points, covariates from the 'land use and cover' category were extracted using 13 moving radii, ranging from 25 m to 5 km. All covariates were standardized to have a mean of zero and a unit variance.
 
 ## N-SDM settings
 
+Further details on N-SDM settings and hyperparameter tuning options are available in the [SETTINGS_DETAILS.odt](./documentation/SETTINGS_DETAILS_20251002.odt) and [ALGORITHMS_PARAMETERS.odt](./documentation/ALGORITHMS_PARAMETERS_20251003.odt) documents located in the `documentation` directory.
+
 N-SDM settings must be adapted to your computing environment (e.g., paths and module versions) by editing the `settings.psv` file in `./scripts/settings` with an editor that preserves the `"|"` delimiter. You can also customize data and modeling options such as covariate selection, modeling algorithms, and ensembling strategies.  
 
-In the same directory:  
+In the same `./scripts/settings` directory:  
 - `param_grid.psv` defines the grid for hyperparameter tuning  
 - `expert_table.psv` (pre-filled) allows expert-based prefiltering of candidate covariates  
-
-Further details on N-SDM settings and hyperparameter tuning options are available in the [SETTINGS_DETAILS.odt](./documentation/SETTINGS_DETAILS_20251002.odt) and [ALGORITHMS_PARAMETERS.odt](./documentation/ALGORITHMS_PARAMETERS_20251003.odt) documents located in the `documentation` directory.
 
 ## Running N-SDM
 
