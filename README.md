@@ -27,10 +27,10 @@ Prerequisites for running N-SDM include:
 4. An installation of the **nsdm2 R package**:
    ```r
    # --- Stable release --- NOT OUT YET !!!
-   remotes::install_github("antadde/N-SDM/Rpkg", ref = "v2.0.0", upgrade = FALSE)
+   remotes::install_github("antadde/N-SDM/Rpkg", ref = "v2.0.0")
 
    # --- Development version ---
-   remotes::install_github("antadde/N-SDM/Rpkg", upgrade = FALSE)
+   remotes::install_github("antadde/N-SDM/Rpkg")
    ```
 
 5. [Optional for running the N-SDM example] Download and unzip the example dataset available at https://zenodo.org/records/17177174 in the `./data` directory. Follow the instructions provided on Zenodo.
@@ -53,7 +53,7 @@ Global-level species occurrence records were obtained from GBIF, and regional-le
 
 We used suite of 374 candidate covariates dcategorized into six main categories: bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation. Only bioclimatic covariates were used to fit the global-level model, while all other categories were used for the regional model. To capture environmental conditions beyond the immediate occurrence points, covariates from the 'land use and cover' category were extracted using 13 moving radii, ranging from 25 m to 5 km. All covariates were standardized to have a mean of zero and a unit variance.
 
-Further details on covariate and species data preparation are available in the `./documentation` directory (N-SDM_dataprep.odt)
+Further details on covariate and species data preparation are available in the [documentation directory](./documentation/DATA_PREPARATION_20251002.odt).
 
 ## N-SDM settings
 
@@ -63,7 +63,7 @@ In the same directory:
 - `param_grid.psv` defines the grid for hyperparameter tuning  
 - `expert_table.psv` (pre-filled) allows expert-based prefiltering of candidate covariates  
 
-Further details on N-SDM settings and hyperparameter tuning options are available in the `./documentation` directory (N-SDM_settings and _algoparameters.odt)
+Further details on N-SDM settings and hyperparameter tuning options are available in the [SETTINGS_DETAILS.odt](./documentation/SETTINGS_DETAILS_20251002.odt) and [ALGORITHMS_PARAMETERS.odt](./documentation/ALGORITHMS_PARAMETERS_20251003.odt) documents located in the `documentation` directory.
 
 ## Running N-SDM
 

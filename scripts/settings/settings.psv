@@ -6,11 +6,12 @@ new_sess|TRUE|General Environment|Indicates whether this run is treated as a new
 exit_any|TRUE|General Environment|Exiting N-SDM on any error.
 w_path|/work/nsdm|General Environment|Path to the working directory.
 svp_path|/scratch/nsdm_save|General Environment|Path where final outputs are transferred and stored permanently.
-rsync_exclude|d1_covsels,d2_models,d6_preds,d12_preds-sce|General Environment|Output folders excluded when transferring results to svp_path. Default excludes non-essential files, preserving core outputs.
+rsync_exclude|d1_covsels,d2_models,d6_preds,d12_preds-sce|General Environment|Output folders excluded when transferring results to svp_path.
 scr_path|/scratch/nsdm|General Environment|Path to the scratch directory for temporary storage.
 clear_scr|TRUE|General Environment|If TRUE, clears the scratch directory before starting.
 clear_fst|FALSE|General Environment|If TRUE, delete previously converted fst files (covariate and species data).
 module_r|r|General Environment|Name and version of the R module to be loaded on the cluster.
+module_others||General Environment|Comma-separated list of additional modules required to load R. Leave empty if not relevant.
 lib_path|/users/R|General Environment|Path to the R libraries.
 seed|12345|General Environment|Seed value used in R scripts.
 ###
