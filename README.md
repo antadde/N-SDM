@@ -12,8 +12,6 @@ N-SDM is a high-performance computing pipeline for Nested-Species Distribution M
 
 # Prerequisites
 
-Prerequisites for running N-SDM include:
-
 1. **Linux HPC cluster** equipped with the **Slurm Workload Manager**.
    
 2. A **clone of the N-SDM GitHub repository** in the working directory:
