@@ -32,12 +32,12 @@ Prerequisites for running N-SDM include:
    
 4. [Optional for running the N-SDM example] Download and unzip the example dataset available at https://zenodo.org/records/17177174 in the `./data` directory. Follow the instructions provided on Zenodo.
 
-# Tested Cluster Environments
+## Tested cluster environments
 
 N-SDM v2.0.0 (and nsdm2 R package) has been successfully installed and executed on multiple high-performance computing (HPC) systems.  
 The following configurations describe the module environments and R setups that were verified to work.
 
-### ETH Zürich – Euler Cluster
+#### ETH Zürich – Euler Cluster
 
 **Cluster environment:**
 - Operating system: Ubuntu 22.04.5 LTS
@@ -56,7 +56,7 @@ The following configurations describe the module environments and R setups that 
 - Platform: R version 4.3.2 (2023-10-31)
 - Verified with the following [sessionInfo()](./documentation/R_session_info/ETHZ_Euler.txt)
 
-### University of Lausanne – Curnagl Cluster
+#### University of Lausanne – Curnagl Cluster
 
 **Cluster environment:**
 - Operating system: Linux (Rocky Linux 8)
