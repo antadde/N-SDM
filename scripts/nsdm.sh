@@ -23,9 +23,12 @@ echo "##############################################"
 ##############################################
 #        SESSION MANAGEMENT                  #
 ##############################################
-# Load nsdm functions
-source "./helpers/functions.sh"
+# Load helper functions
+for f in ./helpers/*.sh; do
+  [ -f "$f" ] && source "$f"
+done
 
+# Run cleanup function on script exit
 trap cleanup EXIT
 
 # Retrieve main paths from settings.psv
@@ -126,6 +129,9 @@ spe_runs="$(cat $wp/tmp/settings/ref_species_runs.txt)"
 
 # Iterate through each run
 for i in $(seq 1 "$spe_runs"); do
+
+cd "$wp/scripts/"
+
 # Save the current run ID
 echo "$i" > "$wp/tmp/settings/tmp_run_id.txt"
 echo "Starting N-SDM run $i out of $spe_runs runs"
@@ -134,9 +140,8 @@ echo "Starting N-SDM run $i out of $spe_runs runs"
 dt=$(date +"%FT%T")
 echo "Run $i started at $dt"
 
-# Update N-SDM settings using the R script
-cd "$wp/scripts/"
-module load "$(get_value module_r)" && Rscript ./0_mainPRE/nsdm_update.R >/dev/null 2>&1 || true
+# Update N-SDM settings
+run_update
 
 # Retrieve the number of species to model in this run
 output_list="$wp/tmp/settings/tmp_species_list.txt"
@@ -567,32 +572,8 @@ echo "Job $job_name has already been completed successfully. Skipping..."
 else
 echo "Starting job $job_name..."
 
-# Set permissions
-chmod -R 777 "$wp/scripts/"
-
-# Get the rsync exclude list
-rsync_exclude=$(get_value "rsync_exclude" | tr ',' ' ')
-
-# Check if "d2_models" is NOT in the exclude list to filter only final model objects
-if [[ ! " $rsync_exclude " =~ " d2_models " ]]; then
-cd "$sop/outputs/" || exit 1
-find d2_models/ -name '*glm.rds' -o -name '*gam.rds' -o -name '*rf.rds' \
--o -name '*max.rds' -o -name '*gbm.rds' -o -name '*esm.rds' > "$wp/tmp/settings/tmp_modfiles.txt"
-
-# Perform rsync only if tmp_modfiles.txt is not empty
-[[ -s "$wp/tmp/settings/tmp_modfiles.txt" ]] && rsync -a --files-from="$wp/tmp/settings/tmp_modfiles.txt" . "$svp/outputs"
-fi
-
-# Generate exclusion list and sync excluding files
-awk -F "|" '$1 == "rsync_exclude" { print $2 }' "$wp/scripts/settings/settings.psv" | tr ',' '\n' > "$wp/tmp/settings/tmp_exclfiles.txt"
-rsync -a --exclude-from="$wp/tmp/settings/tmp_exclfiles.txt" "$sop/outputs/" "$svp/outputs"
-
-# Sync sacct file
-sacct_name="sacct_${ssl_id}_${i}.txt"
-sacct_dir="$svp/outputs/sacct"
-mkdir -p "$sacct_dir" && rsync -a "$wp/tmp/sacct/sacct_log.txt" "$sacct_dir/$sacct_name"
-
-echo "Outputs synced to saving location."
+# Call the sync function
+sync_outputs
 
 # Create a checkpoint after successful completion
 create_checkpoint "$job_name"
