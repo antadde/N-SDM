@@ -16,15 +16,12 @@ Prerequisites for running N-SDM include:
 
 1. **Linux HPC cluster** equipped with the **Slurm Workload Manager**.
    
-2. Availability of the following **modules** (below are the versions used during N-SDM development):
-   - ...
-     
-3. A **clone of the N-SDM GitHub repository** in the working directory:
+2. A **clone of the N-SDM GitHub repository** in the working directory:
    ```bash
    git clone https://github.com/antadde/N-SDM.git nsdm
    ```
 
-4. An installation of the **nsdm2 R package**:
+3. An installation of the **nsdm2 R package**:
    ```r
    # --- Stable release --- NOT OUT YET !!!
    remotes::install_github("antadde/N-SDM/Rpkg", ref = "v2.0.0")
@@ -32,8 +29,47 @@ Prerequisites for running N-SDM include:
    # --- Development version ---
    remotes::install_github("antadde/N-SDM/Rpkg")
    ```
+   
+#### Tested Cluster Environments
 
-5. [Optional for running the N-SDM example] Download and unzip the example dataset available at https://zenodo.org/records/17177174 in the `./data` directory. Follow the instructions provided on Zenodo.
+N-SDM v2.0.0 (and nsdm2 R package) has been successfully installed and executed on multiple high-performance computing (HPC) systems.  
+The following configurations describe the module environments and R setups that were verified to work.
+
+##### ETH Zürich – Euler Cluster
+
+**Cluster environment:**
+- Operating system: Ubuntu 22.04.5 LTS
+- Workload manager: SLURM
+- Modules:
+  - `stack/2024-06`
+  - `gcc/12.2.0`
+  - `gdal`
+  - `udunits/2.2.28`
+  - `r/4.3.2`
+- Required modules are specified in the `settings.psv` file through the parameters:
+  - `module_r = r/4.3.2`
+  - `module_others = stack/2024-06,gcc/12.2.0,gdal,udunits/2.2.28`
+
+**R environment:**
+- Platform: R version 4.3.2 (2023-10-31)
+- Verified with the following [sessionInfo()](./documentation/R_session_info/ETHZ_Euler.txt)
+
+##### University of Lausanne – Curnagl Cluster
+
+**Cluster environment:**
+- Operating system: Linux (Rocky Linux 8)
+- Workload manager: SLURM
+- Modules:
+  - `r-light`
+- Same settings parameters used:
+  - `module_r = r-light`
+  - `module_others = left empty`
+
+**R environment:**
+- Platform: R 4.3.2
+- Verified with the following [sessionInfo()](./documentation/R_session_info/UNIL_Curnagl.txt)
+
+4. [Optional for running the N-SDM example] Download and unzip the example dataset available at https://zenodo.org/records/17177174 in the `./data` directory. Follow the instructions provided on Zenodo.
 
 # Example N-SDM run
 
