@@ -22,7 +22,7 @@ echo "##############################################"
 #        SESSION MANAGEMENT                  #
 ##############################################
 # Load helper functions
-for f in ./helpers/*.sh; do
+for f in ./helpers/functions/*.sh; do
   [ -f "$f" ] && source "$f"
 done
 
@@ -98,6 +98,7 @@ fi
 PRE_A_m=$(get_value "pre_A_m")  # Memory
 PRE_A_t=$(get_value "pre_A_t")  # Time
 PRE_A_c=$(get_value "pre_A_c")  # Cores
+PRE_A_p=$(get_value "pre_A_p")  # Partition (optional)
 
 pre_A_job() {
 local job_name="pre_A_${ssl_id}"
@@ -114,7 +115,7 @@ fi
 mkdir -p "$log_dir"
 
 # Submit the job
-submit_and_monitor_job "$job_name" "$PRE_A_m" "$PRE_A_t" "$PRE_A_c" 1 "$job_command" "" "$log_dir"
+submit_and_monitor_job "$job_name" "$PRE_A_m" "$PRE_A_t" "$PRE_A_c" 1 "$PRE_A_p" "$job_command" "" "$log_dir"
 check_exit "$job_name" $? "$i" "$ssl_id"
 }
 pre_A_job
@@ -192,28 +193,28 @@ do_proj=$(get_value "do_proj")    # Do scenario analyses?
 ##############################################
 #        RUN PRE_B JOB                          
 ##############################################
-# PRE_B Job
-PRE_B_m=$(get_value "pre_B_m")
-PRE_B_t=$(get_value "pre_B_t")
-PRE_B_c=$(get_value "pre_B_c")
+PRE_B_m=$(get_value "pre_B_m")  # Memory
+PRE_B_t=$(get_value "pre_B_t")  # Time
+PRE_B_c=$(get_value "pre_B_c")  # Cores
+PRE_B_p=$(get_value "pre_B_p")  # Partition (optional)
 
 pre_B_job() {
-local job_name="pre_B_${ssl_id}_${i}" 
-local log_dir="./0_mainPRE/logs"
-local job_command="Rscript ./0_mainPRE/pre_B.R"
+    local job_name="pre_B_${ssl_id}_${i}" 
+    local log_dir="./0_mainPRE/logs"
+    local job_command="Rscript ./0_mainPRE/pre_B.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed successfully. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$PRE_B_m" "$PRE_B_t" "$PRE_B_c" 1 "$job_command" "" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$PRE_B_m" "$PRE_B_t" "$PRE_B_c" 1 "$PRE_B_p" "$job_command" "" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 pre_B_job
 
@@ -228,86 +229,88 @@ check_species_count "$n_spe"
 ##############################################
 #        SET GLO_A JOB                          
 ##############################################
-# GLO_A job
-GLO_A_m=$(get_value "glo_A_m")
-GLO_A_t=$(get_value "glo_A_t")
-GLO_A_c=$(get_value "glo_A_c")
-GLO_A_a=$n_spe
+GLO_A_m=$(get_value "glo_A_m")  # Memory
+GLO_A_t=$(get_value "glo_A_t")  # Time
+GLO_A_c=$(get_value "glo_A_c")  # Cores
+GLO_A_p=$(get_value "glo_A_p")  # Partition (optional)
+GLO_A_a=$n_spe                  # Array size
 
 glo_A_job() {
-local job_name="glo_A_${ssl_id}_${i}"
-local log_dir="./1_mainGLO/logs"
-local array_flag="[1-$GLO_A_a]"
-local job_command="Rscript ./1_mainGLO/glo_A.R"
+    local job_name="glo_A_${ssl_id}_${i}"
+    local log_dir="./1_mainGLO/logs"
+    local array_flag="[1-$GLO_A_a]"
+    local job_command="Rscript ./1_mainGLO/glo_A.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed successfully. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$GLO_A_m" "$GLO_A_t" "$GLO_A_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$GLO_A_m" "$GLO_A_t" "$GLO_A_c" 1 "$GLO_A_p" "$job_command" "$array_flag" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
 #        SET GLO_B JOB                          
 ##############################################
-GLO_B_m=$(get_value "glo_B_m")
-GLO_B_t=$(get_value "glo_B_t")
-GLO_B_c=$(get_value "glo_B_c")
-GLO_B_a=$((n_spe * n_algo))
+GLO_B_m=$(get_value "glo_B_m")  # Memory
+GLO_B_t=$(get_value "glo_B_t")  # Time
+GLO_B_c=$(get_value "glo_B_c")  # Cores
+GLO_B_p=$(get_value "glo_B_p")  # Partition (optional)
+GLO_B_a=$((n_spe * n_algo))     # Array size
 
 glo_B_job() {
-local job_name="glo_B_${ssl_id}_${i}"
-local log_dir="./1_mainGLO/logs"
-local array_flag="[1-$GLO_B_a]"
-local job_command="Rscript ./1_mainGLO/glo_B.R"
+    local job_name="glo_B_${ssl_id}_${i}"
+    local log_dir="./1_mainGLO/logs"
+    local array_flag="[1-$GLO_B_a]"
+    local job_command="Rscript ./1_mainGLO/glo_B.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed successfully. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$GLO_B_m" "$GLO_B_t" "$GLO_B_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$GLO_B_m" "$GLO_B_t" "$GLO_B_c" 1 "$GLO_B_p" "$job_command" "$array_flag" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
 #        SET GLO_C JOB                           
 ##############################################
-GLO_C_m=$(get_value "glo_C_m")
-GLO_C_t=$(get_value "glo_C_t")
-GLO_C_c=$(get_value "glo_C_c")
-GLO_C_a=$n_spe
+GLO_C_m=$(get_value "glo_C_m")  # Memory
+GLO_C_t=$(get_value "glo_C_t")  # Time
+GLO_C_c=$(get_value "glo_C_c")  # Cores
+GLO_C_p=$(get_value "glo_C_p")  # Partition (optional)
+GLO_C_a=$n_spe                  # Array size
 
 glo_C_job() {
-local job_name="glo_C_${ssl_id}_${i}"
-local log_dir="./1_mainGLO/logs"
-local array_flag="[1-$GLO_C_a]"
-local job_command="Rscript ./1_mainGLO/glo_C.R"
+    local job_name="glo_C_${ssl_id}_${i}"
+    local log_dir="./1_mainGLO/logs"
+    local array_flag="[1-$GLO_C_a]"
+    local job_command="Rscript ./1_mainGLO/glo_C.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed successfully. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$GLO_C_m" "$GLO_C_t" "$GLO_C_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$GLO_C_m" "$GLO_C_t" "$GLO_C_c" 1 "$GLO_C_p" "$job_command" "$array_flag" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -317,9 +320,7 @@ glo_A_job
 glo_B_job
 glo_C_job
 
-##############################################
-#        SET REG_A JOB                           
-##############################################
+## REGIONAL level
 if [ $n_levels -gt 1 ]; then 
 # Check number of species processed after glo_C
 save_dir="$sop/outputs/d8_ensembles/glo"
@@ -329,87 +330,91 @@ n_spe=$(wc -l < "$output_list")
 echo "Number of species considered for REG: $n_spe"
 check_species_count "$n_spe"
 
-## REGIONAL level
-# REG_A job
-REG_A_m=$(get_value "reg_A_m")
-REG_A_t=$(get_value "reg_A_t")
-REG_A_c=$(get_value "reg_A_c")
-REG_A_a=$n_spe
+##############################################
+#        SET REG_A JOB                        
+##############################################
+REG_A_m=$(get_value "reg_A_m")  # Memory
+REG_A_t=$(get_value "reg_A_t")  # Time
+REG_A_c=$(get_value "reg_A_c")  # Cores
+REG_A_p=$(get_value "reg_A_p")  # Partition (optional)
+REG_A_a=$n_spe                  # Array size
 
 reg_A_job() {
-local job_name="reg_A_${ssl_id}_${i}"
-local log_dir="./2_mainREG/logs"
-local array_flag="[1-$REG_A_a]"
-local job_command="Rscript ./2_mainREG/reg_A.R"
+    local job_name="reg_A_${ssl_id}_${i}"
+    local log_dir="./2_mainREG/logs"
+    local array_flag="[1-$REG_A_a]"
+    local job_command="Rscript ./2_mainREG/reg_A.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed successfully. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$REG_A_m" "$REG_A_t" "$REG_A_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$REG_A_m" "$REG_A_t" "$REG_A_c" 1 "$REG_A_p" "$job_command" "$array_flag" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
 #        SET REG_B JOB                           
 ##############################################
-REG_B_m=$(get_value "reg_B_m")
-REG_B_t=$(get_value "reg_B_t")
-REG_B_c=$(get_value "reg_B_c")
-REG_B_a=$((n_spe * n_algo * n_nesting))
+REG_B_m=$(get_value "reg_B_m")  # Memory
+REG_B_t=$(get_value "reg_B_t")  # Time
+REG_B_c=$(get_value "reg_B_c")  # Cores
+REG_B_p=$(get_value "reg_B_p")  # Partition (optional)
+REG_B_a=$((n_spe * n_algo * n_nesting))  # Array size
 
 reg_B_job() {
-local job_name="reg_B_${ssl_id}_${i}"
-local log_dir="./2_mainREG/logs"
-local array_flag="[1-$REG_B_a]"
-local job_command="Rscript ./2_mainREG/reg_B.R"
+    local job_name="reg_B_${ssl_id}_${i}"
+    local log_dir="./2_mainREG/logs"
+    local array_flag="[1-$REG_B_a]"
+    local job_command="Rscript ./2_mainREG/reg_B.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed successfully. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$REG_B_m" "$REG_B_t" "$REG_B_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$REG_B_m" "$REG_B_t" "$REG_B_c" 1 "$REG_B_p" "$job_command" "$array_flag" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
 #        SET REG_C JOB                           
 ##############################################
-REG_C_m=$(get_value "reg_C_m")
-REG_C_t=$(get_value "reg_C_t")
-REG_C_c=$(get_value "reg_C_c")
-REG_C_a=$n_spe
+REG_C_m=$(get_value "reg_C_m")  # Memory
+REG_C_t=$(get_value "reg_C_t")  # Time
+REG_C_c=$(get_value "reg_C_c")  # Cores
+REG_C_p=$(get_value "reg_C_p")  # Partition (optional)
+REG_C_a=$n_spe                  # Array size
 
 reg_C_job() {
-local job_name="reg_C_${ssl_id}_${i}"
-local log_dir="./2_mainREG/logs"
-local array_flag="[1-$REG_C_a]"
-local job_command="Rscript ./2_mainREG/reg_C.R"
+    local job_name="reg_C_${ssl_id}_${i}"
+    local log_dir="./2_mainREG/logs"
+    local array_flag="[1-$REG_C_a]"
+    local job_command="Rscript ./2_mainREG/reg_C.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed successfully. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$REG_C_m" "$REG_C_t" "$REG_C_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$REG_C_m" "$REG_C_t" "$REG_C_c" 1 "$REG_C_p" "$job_command" "$array_flag" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -420,9 +425,7 @@ reg_B_job
 reg_C_job
 fi
 
-##############################################
-#        SET SCE_A JOB                           
-##############################################
+## Scenarios
 if [ $do_proj = "TRUE" ]; then
 # Check number of species processed after reg_C
 save_dir="$sop/outputs/d8_ensembles/reg"
@@ -432,59 +435,62 @@ n_spe=$(wc -l < "$output_list")
 echo "Number of species considered for SCE: $n_spe"
 check_species_count "$n_spe"
 
-## Projections
-# SCE_A job
-SCE_A_m=$(get_value "sce_A_m")
-SCE_A_t=$(get_value "sce_A_t")
-SCE_A_c=$(get_value "sce_A_c")
-SCE_A_a=$((n_spe * n_scenarios))
+##############################################
+#        SET SCE_A JOB                           
+##############################################
+SCE_A_m=$(get_value "sce_A_m")  # Memory
+SCE_A_t=$(get_value "sce_A_t")  # Time
+SCE_A_c=$(get_value "sce_A_c")  # Cores
+SCE_A_p=$(get_value "sce_A_p")  # Partition (optional)
+SCE_A_a=$((n_spe * n_scenarios))  # Array size
 
 sce_A_job() {
-local job_name="sce_A_${ssl_id}_${i}"
-local log_dir="./3_mainSCE/logs"
-local array_flag="[1-$SCE_A_a]"
-local job_command="Rscript ./3_mainSCE/sce_A.R"
+    local job_name="sce_A_${ssl_id}_${i}"
+    local log_dir="./3_mainSCE/logs"
+    local array_flag="[1-$SCE_A_a]"
+    local job_command="Rscript ./3_mainSCE/sce_A.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed successfully. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$SCE_A_m" "$SCE_A_t" "$SCE_A_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$SCE_A_m" "$SCE_A_t" "$SCE_A_c" 1 "$SCE_A_p" "$job_command" "$array_flag" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
 #        SET SCE_B JOB                           
 ##############################################
-SCE_B_m=$(get_value "sce_B_m")
-SCE_B_t=$(get_value "sce_B_t")
-SCE_B_c=$(get_value "sce_B_c")
-SCE_B_a=$n_spe
+SCE_B_m=$(get_value "sce_B_m")  # Memory
+SCE_B_t=$(get_value "sce_B_t")  # Time
+SCE_B_c=$(get_value "sce_B_c")  # Cores
+SCE_B_p=$(get_value "sce_B_p")  # Partition (optional)
+SCE_B_a=$n_spe                  # Array size
 
 sce_B_job() {
-local job_name="sce_B_${ssl_id}_${i}"
-local log_dir="./3_mainSCE/logs"
-local array_flag="[1-$SCE_B_a]"
-local job_command="Rscript ./3_mainSCE/sce_B.R"
+    local job_name="sce_B_${ssl_id}_${i}"
+    local log_dir="./3_mainSCE/logs"
+    local array_flag="[1-$SCE_B_a]"
+    local job_command="Rscript ./3_mainSCE/sce_B.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed successfully. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$SCE_B_m" "$SCE_B_t" "$SCE_B_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$SCE_B_m" "$SCE_B_t" "$SCE_B_c" 1 "$SCE_B_p" "$job_command" "$array_flag" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
@@ -493,62 +499,64 @@ check_exit "$job_name" $? "$i" "$ssl_id"
 sce_A_job
 sce_B_job
 
+
+if [ $n_levels -gt 1 ]; then
 ##############################################
 #        SET SCE_C JOB                           
 ##############################################
-if [ $n_levels -gt 1 ]; then
-# SCE_C job
-SCE_C_m=$(get_value "sce_C_m")
-SCE_C_t=$(get_value "sce_C_t")
-SCE_C_c=$(get_value "sce_C_c")
-SCE_C_a=$((n_spe * n_nesting * n_scenarios))
+SCE_C_m=$(get_value "sce_C_m")  # Memory
+SCE_C_t=$(get_value "sce_C_t")  # Time
+SCE_C_c=$(get_value "sce_C_c")  # Cores
+SCE_C_p=$(get_value "sce_C_p")  # Partition (optional)
+SCE_C_a=$((n_spe * n_nesting * n_scenarios))  # Array size
 
 sce_C_job() {
-local job_name="sce_C_${ssl_id}_${i}"
-local log_dir="./3_mainSCE/logs"
-local array_flag="[1-$SCE_C_a]"
-local job_command="Rscript ./3_mainSCE/sce_C.R"
+    local job_name="sce_C_${ssl_id}_${i}"
+    local log_dir="./3_mainSCE/logs"
+    local array_flag="[1-$SCE_C_a]"
+    local job_command="Rscript ./3_mainSCE/sce_C.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$SCE_C_m" "$SCE_C_t" "$SCE_C_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$SCE_C_m" "$SCE_C_t" "$SCE_C_c" 1 "$SCE_C_p" "$job_command" "$array_flag" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
 #        SET SCE_D JOB                           
 ##############################################
-SCE_D_m=$(get_value "sce_D_m")
-SCE_D_t=$(get_value "sce_D_t")
-SCE_D_c=$(get_value "sce_D_c")
-SCE_D_a=$((n_spe * n_nesting))
+SCE_D_m=$(get_value "sce_D_m")  # Memory
+SCE_D_t=$(get_value "sce_D_t")  # Time
+SCE_D_c=$(get_value "sce_D_c")  # Cores
+SCE_D_p=$(get_value "sce_D_p")  # Partition (optional)
+SCE_D_a=$((n_spe * n_nesting))  # Array size
 
 sce_D_job() {
-local job_name="sce_D_${ssl_id}_${i}"
-local log_dir="./3_mainSCE/logs"
-local array_flag="[1-$SCE_D_a]"
-local job_command="Rscript ./3_mainSCE/sce_D.R"
+    local job_name="sce_D_${ssl_id}_${i}"
+    local log_dir="./3_mainSCE/logs"
+    local array_flag="[1-$SCE_D_a]"
+    local job_command="Rscript ./3_mainSCE/sce_D.R"
 
-# Check if the job has already been completed
-if job_completed "$job_name"; then
-echo "$job_name has already been completed successfully. Skipping..."
-return 0
-fi
+    # Check if the job has already been completed
+    if job_completed "$job_name"; then
+        echo "$job_name has already been completed successfully. Skipping..."
+        return 0
+    fi
 
-# Create logs directory if it doesn't exist
-mkdir -p "$log_dir"
+    # Create logs directory if it doesn't exist
+    mkdir -p "$log_dir"
 
-# Submit the job
-submit_and_monitor_job "$job_name" "$SCE_D_m" "$SCE_D_t" "$SCE_D_c" 1 "$job_command" "$array_flag" "$log_dir"
-check_exit "$job_name" $? "$i" "$ssl_id"
+    # Submit the job
+    submit_and_monitor_job "$job_name" "$SCE_D_m" "$SCE_D_t" "$SCE_D_c" 1 "$SCE_D_p" "$job_command" "$array_flag" "$log_dir"
+    check_exit "$job_name" $? "$i" "$ssl_id"
 }
 
 ##############################################
