@@ -53,35 +53,24 @@ colnames(res) <- c("model_name", "score", "discard")
 
 for (i in seq_along(model_names)) {
   model_name <- model_names[i]
-  full_score_path <- file.path(score_path, species_name, model_name, paste0(species_name, "_", model_name, ".rds"))
-
-  if (file.exists(full_score_path)) {
-    score <- readRDS(full_score_path) 
+  full_score_path <- file.path(score_path, species_name, model_name, paste0(species_name, "_", model_name, ".psv"))
+   
+    Score <- fread(full_score_path, sep="|") 
 
     # Identify selected model(s) and retrieve scores
     if (model_name == "esm") {
       esm_ix <- grep("_esm", names(stack_map))  # Find ESM-related layers
       esm_names <- paste("esm", stri_extract_first_regex(names(stack_map)[esm_ix], "[0-9]+"), sep="-")
-
-      if (!is.null(score[weight_metric, esm_names])) {
-        score_val <- score[weight_metric, esm_names]
-        res[esm_ix, "score"] <- score_val
-        res[esm_ix, "model_name"] <- esm_names
-      }
-    } else {
-      if (length(score) > 1) {
-        score_val <- sort(score[weight_metric, ], decreasing = TRUE)[1]  
+      score_val <- Score[Metric == weight_metric, ..esm_names]
+      res[esm_ix, "score"] <- as.numeric(score_val)
+      res[esm_ix, "model_name"] <- esm_names
+     
+	 } else {
+        vals <- unlist(Score[Metric == weight_metric, -1, with = FALSE])
+        score_val  <- max(vals)
         res[i, "score"] <- as.numeric(score_val)
         res[i, "model_name"] <- model_name
-      } else {
-        score_val <- score[weight_metric, ]
-        res[i, "score"] <- score_val
-        res[i, "model_name"] <- model_name
-      }
     }
-  } else {
-    warning(paste("File not found:", full_score_path))
-  }
 }
 
 # Check if models fulfill discard threshold, and remove if needed
