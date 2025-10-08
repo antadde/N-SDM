@@ -22,7 +22,7 @@ nsdm.loadthis <- function(model_name = NULL,
 
   # Build base filename
   if (is.null(tag)) {
-    base_name <- paste(species_name, model_name, sep = "_")
+    base_name <- species_name
   } else {
     base_name <- paste(species_name, tag, sep = "_")
   }
