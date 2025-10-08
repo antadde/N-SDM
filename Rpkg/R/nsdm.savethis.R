@@ -21,14 +21,18 @@ nsdm.savethis <- function(object,
                           save_path,
                           format = "rds") {
 
-  # Create save directory
-  save_this_path <- paste(save_path, species_name, model_name, sep = "/")
+  # Build save directory (independent of tag)
+  dir_parts <- c(save_path, species_name)
+  if (!is.null(model_name) && nzchar(model_name)) {
+    dir_parts <- c(dir_parts, model_name)
+  }
+  save_this_path <- paste(dir_parts, collapse = "/")
   suppressWarnings(dir.create(save_this_path, recursive = TRUE))
 
-  # --- Clean base name construction ---
-  parts <- c(species_name, model_name, tag)
-  parts <- as.character(parts[!sapply(parts, is.null)])   # fix: ensure character
-  parts <- parts[nzchar(parts)]                           # drop empty strings
+  # --- Clean and safe base name ---
+  parts <- c(species_name, tag)
+  parts <- as.character(parts[!sapply(parts, is.null)])
+  parts <- parts[nzchar(parts)]
   base_name <- paste(parts, collapse = "_")
 
   # Handle GBM separately
@@ -37,19 +41,16 @@ nsdm.savethis <- function(object,
     lgb.save(object, file = f)
 
   } else if (tolower(format) == "psv") {
-    # Save as PSV (pipe-separated values)
     f <- paste0(save_this_path, "/", base_name, ".psv")
-
     if (is.data.frame(object)) {
       write.table(object, file = f, sep = "|", quote = FALSE, row.names = FALSE)
     } else {
       warning("PSV format is intended for data frames; object saved as RDS instead.")
-      f <- paste0(save_this_path, "/", base_name, ".rds")
+      f <- sub("\\.psv$", ".rds", f)
       saveRDS(object, file = f, compress = compression)
     }
 
   } else {
-    # Default RDS saving
     f <- paste0(save_this_path, "/", base_name, ".rds")
     saveRDS(object, file = f, compress = compression)
   }

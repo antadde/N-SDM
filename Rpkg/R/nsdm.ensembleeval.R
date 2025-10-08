@@ -70,18 +70,15 @@ names(testa_glo) <- names(papa_glo) <- sprintf("replicate_%02d", rep_ids)
 
 for (model in model_names) {
   # Retrieve evaluation table and identify best model
-  eval_list <- nsdm.loadthis(model_name = model, species_name = species_name,
+  eval_list <- nsdm.loadthis(model_name = model, species_name = species_name, format = "psv",
                              read_path = file.path(scr_path, "outputs", "d3_evals", "glo"))
   
-  if (!is.null(eval_list) && best_met %in% rownames(eval_list)) {
-   modinp_top <- colnames(eval_list)[which.max(eval_list[best_met, ])]
-  } else {
-    warning("best_met is not found in eval_list for model: ", model)
-    next
-  }
-  
+   metric_row <- eval_list[eval_list$Metric == best_met, -1, drop = FALSE]
+   
+   modinp_top <- names(metric_row)[which.max(as.numeric(metric_row))]
+
   if (model == "esm") {
-    modinp_top <- colnames(eval_list)[eval_list[best_met, ] > best_thre_esm]
+    modinp_top <- names(metric_row)[as.numeric(metric_row) > best_thre_esm]
   }
   
   # Load model(s)
