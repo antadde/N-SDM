@@ -84,7 +84,7 @@ proj_periods|2085|Predicting and Projecting|Projection periods, must match names
 ###
 ### HPC Ressources
 ###
-pre_A_m|75G|HPC Ressources|Requested memory for pre_A step.
+pre_A_m|100G|HPC Ressources|Requested memory for pre_A step.
 pre_A_t|00-00:15|HPC Ressources|Requested runtime for pre_A step.
 pre_A_c|10|HPC Ressources|Requested CPU cores for pre_A step.
 pre_B_m|10G|HPC Ressources|Requested memory for pre_B step.
