@@ -25,12 +25,10 @@ nsdm.savethis <- function(object,
   save_this_path <- paste(save_path, species_name, model_name, sep = "/")
   suppressWarnings(dir.create(save_this_path, recursive = TRUE))
 
-  # Define output filename (without extension)
-  if (is.null(tag)) {
-    base_name <- paste(species_name, model_name, sep = "_")
-  } else {
-    base_name <- paste(species_name, tag, sep = "_")
-  }
+  # --- Clean base name construction ---
+  parts <- c(species_name, model_name, tag)
+  parts <- parts[!sapply(parts, is.null) & nzchar(parts)]  # drop NULL or empty
+  base_name <- paste(parts, collapse = "_")
 
   # Handle GBM separately
   if ("lgb.Booster" %in% class(object)) {
