@@ -28,7 +28,7 @@ N-SDM is a high-performance computing pipeline for Nested-Species Distribution M
    remotes::install_github("antadde/N-SDM/Rpkg")
    ```
    
-4. [Optional for running the N-SDM example] Download and unzip the example dataset available at https://zenodo.org/records/17177174 in the `./data` directory. Follow the instructions provided on Zenodo.
+4. [Optional for running the N-SDM example] Download and unzip the example dataset available at https://zenodo.org/records/17177174 in the `./data` directory. Details about the data are available on Zenodo.
    ```bash
 	# go to your nsdm directory
 	 cd ./nsdm
