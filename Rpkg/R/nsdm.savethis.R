@@ -27,7 +27,8 @@ nsdm.savethis <- function(object,
 
   # --- Clean base name construction ---
   parts <- c(species_name, model_name, tag)
-  parts <- parts[!sapply(parts, is.null) & nzchar(parts)]  # drop NULL or empty
+  parts <- as.character(parts[!sapply(parts, is.null)])   # fix: ensure character
+  parts <- parts[nzchar(parts)]                           # drop empty strings
   base_name <- paste(parts, collapse = "_")
 
   # Handle GBM separately
