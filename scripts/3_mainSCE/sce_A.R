@@ -66,23 +66,29 @@ cat(paste0("Starting computation of ", scenar, " ", per, " ", toupper(model_name
     
     # Specific loading strategy for lgb.booster
     if (model_name == "gbm") {
+	
+	substitut <- c("glm", "gam", "max", "rf")[c("glm", "gam", "max", "rf") %in% mod_algo][1]
+
       prmod2 <- lgb.load(
         file.path(scr_path, "outputs", "d2_models", "glo", 
                   ispi_name, "gbm", paste0(ispi_name, "_gbm.rds"))
       )
       prmod <- nsdm.loadthis(
-        model_name = "glm",
+        model_name = substitut,
         species_name = ispi_name,
+		tag = substitut,
         read_path = file.path(scr_path, "outputs", "d2_models", "glo")
       )
       prmod@fits[[1]] <- prmod2
     } else {
+	
 	    # Load GLO model
     prmod <- nsdm.loadthis(
       model_name = model_name,
       species_name = ispi_name,
-      read_path = file.path(scr_path, "outputs", "d2_models", "glo")
-    )}
+	  tag = model_name,
+      read_path = file.path(scr_path, "outputs", "d2_models", "glo"))
+	}
     
     # List covariates
     cov <- unlist(strsplit(prmod@meta$env_vars, ", "))

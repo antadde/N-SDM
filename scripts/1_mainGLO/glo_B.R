@@ -139,11 +139,12 @@ if (!inherits(mod, "try-error")) {
 if (exists("smev")) {
   suppressWarnings(
     nsdm.savethis(
-      object = smev,
+      object =  data.frame(Metric = rownames(smev), smev, row.names = NULL, check.names = FALSE),
       model_name = model_name, 
       species_name = ispi_name,
       compression = TRUE,
-      save_path = file.path(scr_path, "outputs", "d3_evals", "glo")
+      save_path = file.path(scr_path, "outputs", "d3_evals", "glo"),
+	  format = "psv"
     )
   )
 }
@@ -217,7 +218,8 @@ nsdm.savethis(
   model_name = model_name, 
   species_name = ispi_name,
   compression = TRUE,
-  save_path = file.path(scr_path, "outputs", "d4_varimps", "glo")
+  save_path = file.path(scr_path, "outputs", "d4_covimps", "glo"),
+  format = "psv"
 )
 
 ## G.2 Response Curves

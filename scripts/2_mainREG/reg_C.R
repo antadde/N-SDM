@@ -115,10 +115,19 @@ scores_array<-nsdm.ensembleeval(sets = d0_test_train, level = "reg", model_names
 
 print(lapply(scores_array$scores_array, round, 2))
 
-nsdm.savethis(object = scores_array,
+scores_array_df = do.call(rbind, lapply(names(scores_array$scores_array), function(level)
+  data.frame(
+    Level = level,
+    Metric = names(scores_array$scores_array[[level]]),
+    Value = as.numeric(scores_array$scores_array[[level]]),
+    row.names = NULL
+  )))
+
+nsdm.savethis(object = scores_array_df,
               species_name = ispi_name,
               compression = TRUE,
-              save_path = file.path(scr_path, "outputs", "d11_evals-final", "reg"))
+              save_path = file.path(scr_path, "outputs", "d11_evals-ensembles", "reg"),
+			  format = "psv")
 
 cat("Ensemble predictions evaluated \n")
 
@@ -151,8 +160,8 @@ if (nesting_method == "multiply") {
 # E.1.1.2 "Multiply" (weighted geometric mean) nesting
 if (multiply_weighted == TRUE) {
   # Define weights
-  w_glo <- scores_array$w_glo
-  w_reg <- scores_array$w_reg
+  w_glo <- scores_array_df[scores_array_df$Level == "GLO" & scores_array_df$Metric == weight_metric, ]$Value
+  w_reg <- scores_array_df[scores_array_df$Level == "REG" & scores_array_df$Metric == weight_metric, ]$Value
   
   # Weighted geometric mean: (glo^w1 * reg^w2)^(1 / (w1 + w2))
   weighted_product <- (ensemble_glo ^ w_glo) * (ensemble_reg ^ w_reg)

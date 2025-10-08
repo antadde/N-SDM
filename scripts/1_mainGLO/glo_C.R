@@ -105,7 +105,15 @@ d1_covsels <- readRDS(file.path(scr_path, "outputs", "d1_covsels", "glo", ispi_n
 d0_test_train <- readRDS(file.path(scr_path, "outputs", "d0_datasets", "base", ispi_name, paste0(ispi_name, ".rds")))$all_sets
 
 # Evaluate
-scores_array<-nsdm.ensembleeval(sets = d0_test_train, level = "glo", model_names = mod_algo, species_name = ispi_name, scratch_path=scr_path)
+scores_array<-nsdm.ensembleeval(sets = d0_test_train, level = "glo", model_names = mod_algo, species_name = ispi_name, scratch_path = scr_path)
+
+scores_array_df = do.call(rbind, lapply(names(scores_array$scores_array), function(level)
+  data.frame(
+    Level = level,
+    Metric = names(scores_array$scores_array[[level]]),
+    Value = as.numeric(scores_array$scores_array[[level]]),
+    row.names = NULL
+  )))
 
 print(lapply(scores_array$scores_array, round, 2))
 
@@ -113,10 +121,11 @@ print(lapply(scores_array$scores_array, round, 2))
 ### Save
 ### =========================================================================
 
-nsdm.savethis(object = scores_array,
+nsdm.savethis(object = scores_array_df,
               species_name = ispi_name,
               compression = TRUE,
-              save_path = file.path(scr_path, "outputs", "d11_evals-final", "glo"))
+              save_path = file.path(scr_path, "outputs", "d11_evals-ensembles", "glo"),
+			  format = "psv")
 
 cat("Ensemble predictions evaluated \n")
 

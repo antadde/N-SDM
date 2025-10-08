@@ -149,12 +149,13 @@ cat(paste0("Starting mapping and ensembling of ", scenar, " ", per,
 	
 	scores_array <- nsdm.loadthis(
         species_name = ispi_name,
-        read_path = file.path(scr_path, "outputs", "d11_evals-final", "reg")
+        read_path = file.path(scr_path, "outputs", "d11_evals-ensembles", "reg"),
+		format = "psv"
       )
 	  
 	  # Define weights
-	  w_glo <- scores_array$w_glo
-	  w_reg <- scores_array$w_reg
+  w_glo <- scores_array[scores_array$Level == "GLO" & scores_array$Metric == weight_metric, ]$Value
+  w_reg <- scores_array[scores_array$Level == "REG" & scores_array$Metric == weight_metric, ]$Value
 	  
 	  # Load response data
 	  ensemble_glo <- rast(list.files(

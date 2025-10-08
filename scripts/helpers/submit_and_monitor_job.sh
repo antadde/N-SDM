@@ -56,7 +56,7 @@ submit_and_monitor_job() {
 #SBATCH --job-name=$job_name
 #SBATCH --output=$output_file
 #SBATCH --error=$error_file
-#SBATCH --mem-per-cpu=$mem
+#SBATCH --mem=$mem
 #SBATCH --time=$time
 #SBATCH --cpus-per-task=$cpus
 #SBATCH --ntasks=$ntasks

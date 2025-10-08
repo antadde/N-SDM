@@ -34,7 +34,7 @@ sync_outputs() {
   rsync -a --exclude-from="$wp/tmp/settings/tmp_exclfiles.txt" "$sop/outputs/" "$svp/outputs"
 
   # Sync sacct log
-  sacct_name="sacct_${ssl_id}_${i}.txt"
+  sacct_name="sacct_${ssl_id}_${i}.psv"
   sacct_dir="$svp/outputs/sacct"
   mkdir -p "$sacct_dir"
   rsync -a "$wp/tmp/sacct/sacct_log.txt" "$sacct_dir/$sacct_name"

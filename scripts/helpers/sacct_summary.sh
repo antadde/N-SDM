@@ -13,43 +13,48 @@ sacct_summary() {
 
     job_id="$1"
 
-    sacct -j "$job_id" --format=JobID,JobName,State,Elapsed,TotalCPU,ReqCPUS,Timelimit,MaxRSS,NNodes,NTasks,ReqMem --parsable2 | awk -F '|' '
-    NR==1 { print "JobID|JobName|State|Elapsed|Timelimit|TotalCPU|ReqCPUS|UsedCPUS|MaxRSS|NNodes|NTasks|ReqMem"; next }
-    $2 !~ /batch|extern/ { jobname=$2; reqmem=$11; timelimit=$7; reqcpus=$6 }  # Store main job info
-    $2 == "batch" {
+    sacct -j "$job_id" \
+        --format=JobID,JobName,State,Elapsed,TotalCPU,ReqCPUS,Timelimit,MaxRSS,NNodes,NTasks,ReqMem \
+        --parsable2 | \
+    awk -F '|' '
+    NR==1 {
+        print "JobID|JobName|State|Elapsed|Timelimit|ReqCPUS|UsedCPUS|NNodes|NTasks|MaxRSS|ReqMem"
+        next
+    }
+
+    # Skip extern/noise jobs
+    $2 !~ /batch|extern/ {
+        jobname = $2
+        reqmem = $11
+        timelimit = $7
+        reqcpus = $6
+    }
+
+    # Process main batch lines
+    $2 == "batch" && $4 ~ /:/ {
         sub(/\.batch/, "", $1)
 
-        mem_kb = ($8+0)
-        mem_gb = (mem_kb / (1024^2))
-        mem_rec = (mem_gb * 1.2) * reqcpus
-
+        # --- Convert Elapsed and TotalCPU to seconds ---
         split($4, elapsed, ":")
-        if (length(elapsed) == 3) { elapsed_sec = elapsed[1] * 3600 + elapsed[2] * 60 + elapsed[3] }
-        else if (length(elapsed) == 2) { elapsed_sec = elapsed[1] * 60 + elapsed[2] }
-        else { elapsed_sec = elapsed[1] }
+        elapsed_sec = (length(elapsed) == 3) ? elapsed[1]*3600 + elapsed[2]*60 + elapsed[3] :
+                      (length(elapsed) == 2) ? elapsed[1]*60 + elapsed[2] : elapsed[1]
 
         split($5, totalcpu, ":")
-        if (length(totalcpu) == 3) { totalcpu_sec = totalcpu[1] * 3600 + totalcpu[2] * 60 + totalcpu[3] }
-        else if (length(totalcpu) == 2) { totalcpu_sec = totalcpu[1] * 60 + totalcpu[2] }
-        else { totalcpu_sec = totalcpu[1] }
+        totalcpu_sec = (length(totalcpu) == 3) ? totalcpu[1]*3600 + totalcpu[2]*60 + totalcpu[3] :
+                       (length(totalcpu) == 2) ? totalcpu[1]*60 + totalcpu[2] : totalcpu[1]
 
-        if (elapsed_sec > 0) {
-            used_cpus = totalcpu_sec / elapsed_sec
-        } else {
-            used_cpus = 0
-        }
+        used_cpus = (elapsed_sec > 0) ? totalcpu_sec / elapsed_sec : 0
 
-        split(timelimit, reqtime_arr, ":")
-        if (length(reqtime_arr) == 3) { req_sec = reqtime_arr[1] * 3600 + reqtime_arr[2] * 60 + reqtime_arr[3] }
-        else if (length(reqtime_arr) == 2) { req_sec = reqtime_arr[1] * 60 + reqtime_arr[2] }
-        else { req_sec = reqtime_arr[1] }
+        # --- Convert MaxRSS to GB ---
+        mem = $8
+        mem_val = mem
+        if (mem ~ /K$/) { sub(/K$/, "", mem_val); mem_gb = mem_val / (1024^2) }
+        else if (mem ~ /M$/) { sub(/M$/, "", mem_val); mem_gb = mem_val / 1024 }
+        else if (mem ~ /G$/) { sub(/G$/, "", mem_val); mem_gb = mem_val + 0 }
+        else { mem_gb = 0 }
+        mem_gb = sprintf("%.1fG", mem_gb)
 
-        rec_sec = int(elapsed_sec * 1.2)
-        rec_hh = int(rec_sec / 3600)
-        rec_mm = int((rec_sec % 3600) / 60)
-        rec_ss = rec_sec % 60
-        recommended_time = sprintf("%02d:%02d:%02d", rec_hh, rec_mm, rec_ss)
-
-        printf "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n", $1, jobname, $3, $4, timelimit, $5, reqcpus, $8, $9, $10, reqmem
+        printf "%s|%s|%s|%s|%s|%s|%.2f|%s|%s|%s|%s\n",
+            $1, jobname, $3, $4, timelimit, reqcpus, used_cpus, $9, $10, mem_gb, reqmem
     }'
 }

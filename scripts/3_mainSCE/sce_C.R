@@ -1,5 +1,5 @@
 #############################################################################
-## Script: 3_mainSCE_1
+## Script: 3_mainSCE_C
 ## Author: Antoine Adde 
 #############################################################################
 
@@ -66,20 +66,26 @@ cat(paste0("Starting computation of ", scenar, " ", per, " ", toupper(model_name
      
     # Specific loading strategy for lgb.booster
     if (model_name == "gbm") {
-      prmod2 <- lgb.load(
+	
+	substitut <- c("glm", "gam", "max", "rf")[c("glm", "gam", "max", "rf") %in% mod_algo][1]
+	
+     prmod2 <- lgb.load(
         file.path(scr_path, "outputs", "d2_models", "reg", 
                   nesting_method, ispi_name, "gbm", paste0(ispi_name, "_gbm.rds"))
       )
       prmod <- nsdm.loadthis(
-        model_name = "glm",
+        model_name = substitut,
+		tag = substitut,
         species_name = ispi_name,
         read_path = file.path(scr_path, "outputs", "d2_models", "reg", nesting_method)
       )
       prmod@fits[[1]] <- prmod2
     } else {
+	
 	    # Load REG model
     prmod <- nsdm.loadthis(
       model_name = model_name,
+	  tag = model_name,
       species_name = ispi_name,
       read_path = file.path(scr_path, "outputs", "d2_models", "reg", nesting_method)
     )}
