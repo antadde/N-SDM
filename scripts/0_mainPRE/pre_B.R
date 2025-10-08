@@ -21,7 +21,7 @@ Sys.umask(mode = "000")
 setwd(w_path)
 
 # Set library path
-.libPaths(lib_path)
+.libPaths(Rlib_path)
 
 # Load N-SDM package
 require(nsdm2)

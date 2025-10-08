@@ -81,7 +81,7 @@ RNGkind("L'Ecuyer-CMRG")
 set.seed(seed)
 
 # Set library path
-.libPaths(lib_path)
+.libPaths(Rlib_path)
 
 # Load nsdm package
 require(nsdm2)
