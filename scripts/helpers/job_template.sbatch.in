@@ -1,0 +1,23 @@
+#!/bin/bash -l
+#SBATCH --job-name={{JOB_NAME}}
+#SBATCH --output={{OUTPUT_FILE}}
+#SBATCH --error={{ERROR_FILE}}
+#SBATCH --time={{TIME}}
+#SBATCH --cpus-per-task={{CPUS}}
+#SBATCH --ntasks={{NTASKS}}
+{{PARTITION_LINE}}
+{{ARRAY_LINE}}
+{{MEM_LINE}}
+
+# --- Optional user customization section ---
+# You can uncomment or edit this
+# #SBATCH --qos=long
+# #SBATCH --account=my_project
+# --------------------------------------------
+
+{{MODULE_OTHERS}}
+module load {{MODULE_R}}
+
+export OMP_NUM_THREADS=1
+
+{{COMMAND}}
