@@ -33,14 +33,17 @@ nsdm.loadthis <- function(model_name = NULL,
 
   # Determine which file to load
   if (tolower(format) == "psv" && file.exists(file_psv)) {
-    object <- read.table(file_psv, sep = "|", header = TRUE, stringsAsFactors = FALSE)
+    # Preserve exact column names (no automatic name fixing)
+    object <- read.table(file_psv, sep = "|", header = TRUE,
+                         stringsAsFactors = FALSE, check.names = FALSE)
 
   } else if (file.exists(file_rds)) {
     object <- readRDS(file_rds)
 
   } else if (file.exists(file_psv)) {
     # Fallback if .rds not found but .psv exists
-    object <- read.table(file_psv, sep = "|", header = TRUE, stringsAsFactors = FALSE)
+    object <- read.table(file_psv, sep = "|", header = TRUE,
+                         stringsAsFactors = FALSE, check.names = FALSE)
     warning("RDS file not found; loaded PSV file instead.")
 
   } else {
