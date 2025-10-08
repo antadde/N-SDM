@@ -52,8 +52,9 @@ res <- data.frame(matrix(nrow = nlyr(stack_map), ncol = 3))
 colnames(res) <- c("model_name", "score", "discard")
 
 for (i in seq_along(model_names)) {
-  model_name <- model_names[i]
-  full_score_path <- file.path(score_path, species_name, model_name, paste0(species_name, "_", model_name, ".psv"))
+    model_name <- model_names[i]
+  
+    full_score_path <- file.path(score_path, species_name, model_name, paste0(species_name, ".psv"))
    
     Score <- fread(full_score_path, sep="|") 
 
