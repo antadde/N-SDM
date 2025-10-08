@@ -473,9 +473,6 @@ if (any(c("multiply") %in% nesting_name)) {
 scores_array <- lapply(scores_ensemble, simplify2array)
 scores_array <- lapply(scores_array, rowMeans)
 
-if (exists("w_reg") && exists("w_glo")) {
-  return(list(scores_array = scores_array, w_reg = w_reg, w_glo = w_glo))
-} else {
-return(list(scores_array = scores_array))}
+return(list(scores_array = scores_array))
 }
 
