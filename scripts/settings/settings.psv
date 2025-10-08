@@ -116,19 +116,19 @@ reg_C_m|25G|HPC Ressources|Requested memory for regional step (reg_C).
 reg_C_t|00-00:15|HPC Ressources|Requested runtime for regional step (reg_C).
 reg_C_c|1|HPC Ressources|Requested CPU cores for regional step (reg_C).
 reg_C_p||HPC Ressources|Requested partition for regional step (reg_C).
-sce_A_m|80G|HPC Ressources|Requested memory for scenario projections (sce_A).
-sce_A_t|00-00:15|HPC Ressources|Requested runtime for scenario projections (sce_A).
-sce_A_c|10|HPC Ressources|Requested CPU cores for scenario projections (sce_A).
-sce_A_p||HPC Ressources|Requested partition for scenario projections (sce_A).
-sce_B_m|25G|HPC Ressources|Requested memory for scenario projections (sce_B).
-sce_B_t|00-00:15|HPC Ressources|Requested runtime for scenario projections (sce_B).
-sce_B_c|1|HPC Ressources|Requested CPU cores for scenario projections (sce_B).
-sce_B_p||HPC Ressources|Requested partition for scenario projections (sce_B).
-sce_C_m|80G|HPC Ressources|Requested memory for scenario projections (sce_C).
-sce_C_t|00-00:15|HPC Ressources|Requested runtime for scenario projections (sce_C).
-sce_C_c|10|HPC Ressources|Requested CPU cores for scenario projections (sce_C).
-sce_C_p||HPC Ressources|Requested partition for scenario projections (sce_C).
-sce_D_m|25G|HPC Ressources|Requested memory for scenario projections (sce_D).
-sce_D_t|00-00:15|HPC Ressources|Requested runtime for scenario projections (sce_D).
-sce_D_c|1|HPC Ressources|Requested CPU cores for scenario projections (sce_D).
-sce_D_p||HPC Ressources|Requested partition for scenario projections (sce_D).
+sce_A_m|80G|HPC Ressources|Requested memory for scenario step (sce_A).
+sce_A_t|00-00:15|HPC Ressources|Requested runtime for scenario step (sce_A).
+sce_A_c|10|HPC Ressources|Requested CPU cores for scenario step (sce_A).
+sce_A_p||HPC Ressources|Requested partition for scenario step (sce_A).
+sce_B_m|25G|HPC Ressources|Requested memory for scenario step (sce_B).
+sce_B_t|00-00:15|HPC Ressources|Requested runtime for scenario step (sce_B).
+sce_B_c|1|HPC Ressources|Requested CPU cores for scenario step (sce_B).
+sce_B_p||HPC Ressources|Requested partition for scenario step (sce_B).
+sce_C_m|80G|HPC Ressources|Requested memory for scenario step (sce_C).
+sce_C_t|00-00:15|HPC Ressources|Requested runtime for scenario step (sce_C).
+sce_C_c|10|HPC Ressources|Requested CPU cores for scenario step (sce_C).
+sce_C_p||HPC Ressources|Requested partition for scenario step (sce_C).
+sce_D_m|25G|HPC Ressources|Requested memory for scenario step (sce_D).
+sce_D_t|00-00:15|HPC Ressources|Requested runtime for scenario step (sce_D).
+sce_D_c|1|HPC Ressources|Requested CPU cores for scenario step (sce_D).
+sce_D_p||HPC Ressources|Requested partition for scenario step (sce_D).
