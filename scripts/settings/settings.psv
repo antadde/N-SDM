@@ -12,7 +12,7 @@ clear_scr|TRUE|General Environment|If TRUE, clears the scratch directory before 
 clear_fst|FALSE|General Environment|If TRUE, delete previously converted fst files (covariate and species data).
 module_r|r|General Environment|Name and version of the R module to be loaded on the cluster.
 module_others||General Environment|Comma-separated list of additional modules required to load R. Leave empty if not relevant.
-lib_path|/users/R|General Environment|Path to the R libraries.
+Rlib_path|/users/R|General Environment|Path to the R libraries.
 seed|12345|General Environment|Seed value used in R scripts.
 ###
 ### Species Data
