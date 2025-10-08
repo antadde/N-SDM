@@ -32,10 +32,11 @@ run_update() {
   local start=$(( (run_id - 1) * n_mx_spe ))
   local end=$(( run_id * n_mx_spe - 1 ))
   (( end >= total )) && end=$(( total - 1 ))
-
+  
   # --- Extract subset and write to file ---
-  > "$out_file"
-  for ((i=start; i<=end; i++)); do
-    echo "${species[$i]}" >> "$out_file"
-  done
+	> "$out_file"
+	local i
+	for ((i=start; i<=end; i++)); do
+		echo "${species[$i]}" >> "$out_file"
+	done
 }
