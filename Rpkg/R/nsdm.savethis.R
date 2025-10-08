@@ -21,29 +21,37 @@ nsdm.savethis <- function(object,
                           save_path,
                           format = "rds") {
 
-  # Build save directory (independent of tag)
-  dir_parts <- c(save_path, species_name)
-  if (!is.null(model_name) && nzchar(as.character(model_name))) {
-    dir_parts <- c(dir_parts, as.character(model_name))
+  # --- Safe coercion helper ---
+  safe_as_char <- function(x) {
+    if (is.null(x)) return(NULL)
+    if (is.character(x)) return(x)
+    if (is.factor(x)) return(as.character(x))
+    if (is.numeric(x)) return(as.character(x))
   }
-  save_this_path <- paste(dir_parts, collapse = "/")
+
+  # --- Coerce inputs safely to character ---
+  model_name   <- safe_as_char(model_name)
+  species_name <- safe_as_char(species_name)
+  tag          <- safe_as_char(tag)
+
+  # --- Build save directory (exclude NULL/empty elements) ---
+  dir_parts <- c(save_path, species_name, model_name)
+  dir_parts <- dir_parts[nzchar(dir_parts)]                # drop empty strings
+  save_this_path <- do.call(file.path, as.list(dir_parts)) # join parts safely
   suppressWarnings(dir.create(save_this_path, recursive = TRUE))
 
-  # --- Clean and safe base name ---
+  # --- Build clean base file name ---
   parts <- c(species_name, tag)
-  parts <- parts[!sapply(parts, is.null)]          # drop NULLs
-  parts <- as.character(parts)                     # ensure character type
-  parts <- parts[nzchar(parts)]                    # drop empty strings safely
+  parts <- parts[nzchar(parts)]
   base_name <- paste(parts, collapse = "_")
 
-  # Handle GBM separately
+  # --- Save depending on format and object type ---
   if ("lgb.Booster" %in% class(object)) {
     f <- file.path(save_this_path, paste0(base_name, ".rds"))
     lgb.save(object, file = f)
 
   } else if (tolower(format) == "psv") {
     f <- file.path(save_this_path, paste0(base_name, ".psv"))
-
     if (is.data.frame(object)) {
       write.table(object, file = f, sep = "|", quote = FALSE, row.names = FALSE)
     } else {
@@ -59,4 +67,5 @@ nsdm.savethis <- function(object,
 
   return(invisible(f))
 }
+
 
