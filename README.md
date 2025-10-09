@@ -78,11 +78,11 @@ N-SDM v2.0.0 (and nsdm2 R package) has been successfully installed and executed 
 
 # Example N-SDM run
 
-We will run an applied example to demonstrate the main operations and outputs of N-SDM by modeling the habitat suitability of three species (Larix decidua, Capra ibex, and Cantharellus cibarius) at 100-meter resolution across Switzerland, for the current period (1980–2021) and a future period (2070–2100).
+We will run an applied example to demonstrate the main operations and outputs of N-SDM by modeling the habitat suitability of three species (Larix decidua, Capra ibex, and Cantharellus cibarius) at 100-meter resolution across Switzerland, for the current period and a future period (2085).
 
 ## Study area
 
-Following the spatially nested framework (see Figure 1 and the section 'Highlighted features' of the N-SDM software note for details), we distinguished between 'regional' and 'global' study areas. The regional area encompassed all of Switzerland, covering approximately 40,000 km². For the global area, we used a bounding box spanning the European continent, from 32.60°N to 71.70°N and from 28.56°W to 40.21°E, covering an area of approximately 10 million km².
+Following the spatially-nested framework, we distinguished between 'regional' and 'global' study areas. The regional area encompassed all of Switzerland. For the global area, we used a bounding box spanning the European continent.
 
 ## Data
 
@@ -90,11 +90,11 @@ Further details on covariate and species data preparation are available in the [
 
 ### Species data
 
-Global-level species occurrence records were obtained from GBIF, and regional-level records from the Swiss Species Information Center. To reduce spatial clustering, records were disaggregated so that no two points were closer than 1 km at the global level and 200 m at the regional level. For each species and level, 10,000 background absence points were randomly generated across the target areas to contrast with the occurrence records.
+Global-level species occurrence records were obtained from GBIF, and regional-level records from the Swiss Species Information Center. To reduce spatial clustering, records were disaggregated automatically by N-SDM so that no two points were closer than 1 km at the global level and 200 m at the regional level. For each species and level, 10,000 background absence points were randomly generated across the target areas to contrast with the occurrence records. These settings can be edited in the './settings/settings.psv' file.
 
 ### Covariate data
 
-We used suite of 374 candidate covariates categorized into six main categories: bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation. Only bioclimatic covariates were used to fit the global-level model, while all other categories were used for the regional model. To capture environmental conditions beyond the immediate occurrence points, covariates from the 'land use and cover' category were extracted using 13 moving radii, ranging from 25 m to 5 km. All covariates were standardized to have a mean of zero and a unit variance.
+We used a suite of 374 candidate covariates categorized into six main categories: bioclimatic, land use and cover, edaphic, topographic, population density, transportation, and vegetation. Only bioclimatic covariates were used to fit the global-level model, while all other categories were used for the regional model. To capture environmental conditions beyond the immediate occurrence points, covariates from the 'land use and cover' category were extracted using 13 moving radii, ranging from 25 m to 5 km.
 
 ## N-SDM settings
 
@@ -104,7 +104,9 @@ N-SDM settings must be adapted to your computing environment (e.g., paths and mo
 
 In the same `./scripts/settings` directory:  
 - `param_grid.psv` defines the grid for hyperparameter tuning  
-- `expert_table.psv` (pre-filled) allows expert-based prefiltering of candidate covariates  
+- `expert_table.psv` (pre-filled) allows expert-based prefiltering of candidate covariates
+
+Note that N-SDM is now designed so that any Slurm-specific options not covered in settings.psv can be managed directly in the template file './helpers/job_template.sbatch.in'. This allows to include optional additional directives such as: #SBATCH --account=... #SBATCH --qos==... #SBATCH --constraint=... etc.
 
 ## Running N-SDM
 
@@ -116,7 +118,7 @@ It is recommended to run N-SDM in the background using no hangup mode, so the pr
 nohup bash nsdm.sh > nsdm.out &
 ```
 
-You can monitor the execution of N-SDM by checking the `nsdm.out` file.
+You can monitor the execution of N-SDM by checking the main `nsdm.out` file, and inspecting the individual job files (.sbatch, .err, .out) generated in the './log' directories of each key step (pre, glo, reg, sce).
 
 ## Outputs
 Further details on N-SDM outputs are available in the [OUTPUTS_DETAILS.odt](./documentation/OUTPUTS_DETAILS_20251003.odt) document located in the `documentation` directory.
@@ -137,9 +139,9 @@ Below is a snapshot of key sample output folders generated by N-SDM:
 
 # Citation
 
-To cite N-SDM or acknowledge its use, cite the Software note as follows, substituting the version of the application that you used for ‘version 1.0':
+To cite N-SDM or acknowledge its use, cite the Software note as follows:
 
-Adde, A. et al. 2023. N-SDM: a high-performance computing pipeline for Nested Species Distribution Modelling. – Ecography 2023: e06272 (ver. 1.0). https://onlinelibrary.wiley.com/doi/10.1111/ecog.06540
+Adde, A. et al. 2023. N-SDM: a high-performance computing pipeline for Nested Species Distribution Modelling. – Ecography 2023: e06272 (ver. 2.0). https://onlinelibrary.wiley.com/doi/10.1111/ecog.06540
 
 # Contact
 
