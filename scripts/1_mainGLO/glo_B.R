@@ -213,6 +213,15 @@ cat("Top model ", names(modinp_top), " refitted on full dataset for predictions 
 imp <- nsdm.varimp(prmod)
 print(imp)
 
+if (model_name == "esm") {
+imp <- do.call(rbind, lapply(names(imp), function(esm_name) {
+     data.frame(
+         esm = esm_name,
+         imp[[esm_name]],
+         stringsAsFactors = FALSE
+     )
+ })) }
+
 nsdm.savethis(
   object = imp,
   model_name = model_name, 
