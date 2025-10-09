@@ -106,7 +106,7 @@ In the same `./scripts/settings` directory:
 - `param_grid.psv` defines the grid for hyperparameter tuning  
 - `expert_table.psv` (pre-filled) allows expert-based prefiltering of candidate covariates
 
-Note that N-SDM is now designed so that any Slurm-specific options not covered in settings.psv can be managed directly in the template file './helpers/job_template.sbatch.in'. This allows to include optional additional directives such as: #SBATCH --account=... #SBATCH --qos==... #SBATCH --constraint=... etc.
+Note that N-SDM is now designed so that any Slurm-specific options not covered in settings.psv can be managed directly in the template file `./helpers/job_template.sbatch.in`. This allows to include optional additional directives such as: #SBATCH --account=... #SBATCH --qos==... #SBATCH --constraint=... etc.
 
 ## Running N-SDM
 
@@ -118,7 +118,7 @@ It is recommended to run N-SDM in the background using no hangup mode, so the pr
 nohup bash nsdm.sh > nsdm.out &
 ```
 
-You can monitor the execution of N-SDM by checking the main `nsdm.out` file, and inspecting the individual job files (.sbatch, .err, .out) generated in the './log' directories of each key step (pre, glo, reg, sce).
+You can monitor the execution of N-SDM by checking the main `nsdm.out` file, and inspecting the individual job files (.sbatch, .err, .out) generated in the `./log` directories of each key step (pre, glo, reg, sce).
 
 ## Outputs
 Further details on N-SDM outputs are available in the [OUTPUTS_DETAILS.odt](./documentation/OUTPUTS_DETAILS_20251003.odt) document located in the `documentation` directory.
