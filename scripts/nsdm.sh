@@ -427,10 +427,17 @@ fi
 
 ## Scenarios
 if [ $do_proj = "TRUE" ]; then
-# Check number of species processed after reg_C
-save_dir="$sop/outputs/d8_ensembles/reg"
-output_list="$wp/tmp/settings/tmp_species_list.txt"
-find "$save_dir" -mindepth 2 -maxdepth 2 -type d -printf "%f\n" | sort | uniq > "$output_list"
+  # Check number of species processed after reg_C
+  if [ "$n_levels" -gt 1 ]; then
+    save_dir="$sop/outputs/d8_ensembles/reg"
+    output_list="$wp/tmp/settings/tmp_species_list.txt"
+    find "$save_dir" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort | uniq > "$output_list"
+  else
+    # glo_C if single level
+    save_dir="$sop/outputs/d8_ensembles/glo"
+	output_list="$wp/tmp/settings/tmp_species_list.txt"
+    find "$save_dir" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort | uniq > "$output_list"
+  fi
 n_spe=$(wc -l < "$output_list")
 echo "Number of species considered for SCE: $n_spe"
 check_species_count "$n_spe"
