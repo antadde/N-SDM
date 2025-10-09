@@ -10,7 +10,8 @@ nsdm.savethis(
   species_name = NULL,
   tag = NULL,
   compression = FALSE,
-  save_path
+  save_path,
+  format = "rds"
 )
 }
 \arguments{
@@ -18,20 +19,22 @@ nsdm.savethis(
 
 \item{model_name}{A character string indicating the name of the target modelling algorithm}
 
-\item{species_name}{A character string  indicating the name of the target taxon}
+\item{species_name}{A character string indicating the name of the target taxon}
 
-\item{tag}{A character string  indicating the tag for the target hyperparameter X modelling algorithm combination}
+\item{tag}{A character string indicating the tag for the target hyperparameter X modelling algorithm combination}
 
-\item{compression}{Logical (TRUE FALSE) for saveRDS "compress" argument}
+\item{compression}{Logical (TRUE/FALSE) for saveRDS "compress" argument}
 
 \item{save_path}{A character string indicating the upper path where to save the object}
+
+\item{format}{A character string, either "rds" (default) or "psv", specifying the output format}
 }
 \value{
-Saved object in .rds format
+Saved object in .rds or .psv format
 }
 \description{
-Easy saving of .rds nsdm.ine objects
+Easy saving of .rds or .psv objects
 }
 \author{
-Antoine Adde (aadde@unil.ch)
+Antoine Adde (antoine.adde@eawag.ch)
 }

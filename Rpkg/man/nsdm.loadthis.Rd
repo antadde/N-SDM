@@ -4,23 +4,31 @@
 \alias{nsdm.loadthis}
 \title{nsdm.loadthis}
 \usage{
-nsdm.loadthis(model_name = NULL, species_name = NULL, tag = NULL, read_path)
+nsdm.loadthis(
+  model_name = NULL,
+  species_name = NULL,
+  tag = NULL,
+  read_path,
+  format = "rds"
+)
 }
 \arguments{
-\item{model_name}{A character string indicating the name of the modelling alogirthm related to the target object to be loaded}
+\item{model_name}{A character string indicating the name of the modelling algorithm related to the target object to be loaded}
 
-\item{species_name}{A character string  indicating the name of the species related to the target object to be loaded}
+\item{species_name}{A character string indicating the name of the species related to the target object to be loaded}
 
 \item{tag}{A character string indicating the tag for the hyperparameter X modelling algorithm combination of the target object to be loaded}
 
 \item{read_path}{A character string indicating the upper path where the target object is stored (above model and species)}
+
+\item{format}{A character string, either "rds" (default) or "psv", specifying the file format to load}
 }
 \value{
-The desired nsdm.ine object
+The desired nsdm object
 }
 \description{
-Easy loading of nsdm.ine objects
+Easy loading of nsdm objects (.rds or .psv)
 }
 \author{
-Antoine Adde (aadde@unil.ch)
+Antoine Adde (antoine.adde@eawag.ch)
 }
