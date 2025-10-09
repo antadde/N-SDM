@@ -34,7 +34,7 @@ job_completed() {
 # FUNCTION: Exit if species count is zero
 check_species_count() {
   if [ "$1" -eq 0 ]; then
-    echo "No species found."
+    echo "No species found, exiting."
     exit 1
   fi
 }
@@ -70,6 +70,6 @@ check_exit() {
 cleanup() {
     local exit_code=$?
     if [ "$exit_on_error" = "TRUE" ] && [ $exit_code -ne 0 ]; then
-        echo "An error occurred. Cleaning up and exiting."
+        echo "An error occurred. Exiting."
     fi
 }
