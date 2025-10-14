@@ -70,39 +70,37 @@ if (type == "po") {
 	
 	# Filter polygons that intersect with presence points
 	hits <- relate(shp_bck, pres_v, "intersects")
-	shp_bck_intersect <- shp_bck[rowSums(hits) > 0]
+	shp_bck_intersect <- shp_bck[rowSums(hits) > 0,]
 	
 	# Mask raster by shapefile
-    rst_masked <- mask(rst_ref, shp_bck_intersect)
+    rst_bck <- mask(rst_ref, shp_bck_intersect)
 
     # Extract valid cells
-    dt_ref <- data.table(cell = 1:ncell(rst_masked), weight = values(rst_masked)[,1])
-    dt_ref <- dt_ref[!is.na(weight)]
-
-    # Random sampling within mask
-    sampled_cells <- dt_ref[sample(.N, size = n * 1.5, replace = TRUE)]
+    valid_cells <- which(!is.na(values(rst_bck, mat = FALSE)))
+    sampled_cells_idx <- sample(valid_cells, size = n * 1.5, replace = TRUE)
+    coords <- xyFromCell(rst_bck, sampled_cells$cell)
 
   # --- Option 2: Weighted background raster ---
   } else if (!is.null(rst_background_weight)) {
 
-    rst_bck <- mask(rast(rst_background_weight), rst_ref)
+    # Mask raster 
+	rst_bck <- mask(rast(rst_background_weight), rst_ref)
 	
-    dt_weights <- data.table(cell = 1:ncell(rst_bck), weight = values(rst_bck)[,1])
-    dt_weights <- dt_weights[!is.na(weight)]
-
-    sampled_cells <- dt_weights[sample(.N, size = n * 1.5, prob = dt_weights$weight, replace = TRUE)]
+	# Extract valid cells
+	vals <- values(rst_bck, mat = FALSE)
+	valid_cells <- which(!is.na(vals))
+	weights <- vals[valid_cells]
+	sampled_cells_idx <- sample(valid_cells, size = n * 1.5, replace = TRUE, prob = weights)
+	coords <- xyFromCell(rst_bck, sampled_cells_idx)
 
   # --- Option 3: Pure random sampling ---
   } else {
 
-    dt_ref <- data.table(cell = 1:ncell(rst_ref), weight = values(rst_ref)[,1])
-    dt_ref <- dt_ref[!is.na(weight)]
-
-    sampled_cells <- dt_ref[sample(.N, size = n * 1.5, replace = TRUE)]
+    # Extract valid cells
+    valid_cells <- which(!is.na(values(rst_ref, mat = FALSE)))
+	sampled_cells_idx <- sample(valid_cells, size = n * 1.5, replace = TRUE)
+    coords <- xyFromCell(rst_ref, sampled_cells_idx)
   }
-
-  # Convert sampled cells to coordinates
-  coords <- xyFromCell(rst_ref, sampled_cells$cell)
 
   # Create an sf object
   abs <- st_as_sf(data.table(coords), coords = c("x", "y"), crs = crs(rst_ref))
@@ -113,9 +111,9 @@ if (type == "po") {
   }
 }
 
-  ### ------------------------
-  ### Prepare output
-  ### ------------------------
+### ------------------------
+### Prepare output
+### ------------------------
   out@pa<-c(rep(1,nrow(pres)),
             rep(0,nrow(abs)))
   out@years<-as.numeric(c(pres$year, rep(NA, nrow(abs))))
@@ -124,10 +122,9 @@ if (type == "po") {
   sid=c(pres$sid,
             paste("NA", 0, 1:nrow(abs), sep="_"))
 
-  
-	### ------------------------
-	### Tag points (assign sid)
-	### ------------------------
+### ------------------------
+### Tag points (assign sid)
+### ------------------------
 	# Tag points
 if (inherits(rst_reg_gloproj, "SpatRaster") && level == "glo") {
 	  # Extract raster values at point locations
