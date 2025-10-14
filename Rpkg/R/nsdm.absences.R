@@ -69,6 +69,7 @@ if (type == "po") {
     }
 	
 	# Filter polygons that intersect with presence points
+	pres_v <- vect(pres)
 	hits <- relate(shp_bck, pres_v, "intersects")
 	shp_bck_intersect <- shp_bck[rowSums(hits) > 0,]
 	
