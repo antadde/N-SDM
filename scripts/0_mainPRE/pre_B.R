@@ -71,19 +71,35 @@ if ("group" %in% colnames(sp_dat_glo)) {
 
 sampf_glo <- if (back_strat == "random_w" & !is.null(selected_group)) {
   selected_files <- list.files(
-    file.path(w_path, "data", "background"),
+    file.path(w_path, "data", "background", "random_w"),
     pattern = paste0(selected_group, "_glo\\.tif$"),  
     full.names = TRUE
   )
-  
+
   if (length(selected_files) > 0) {
     cat("Selected glo background bias file: ", paste(basename(selected_files), collapse = ", "), "\n", sep = "")
+	selected_files
   } else {
     cat("No glo background bias file found for group: ", selected_group, "\n", sep = "")
+	NULL
   }
-  selected_files
-} else {
-  NULL
+}
+
+# Select filtering shapefile if biogeographical background sampling is applied
+biog_glo <- if (back_strat == "random_biog") {
+  selected_files <- list.files(
+    file.path(w_path, "data", "background", "random_biog"),
+    pattern = "_glo\\.shp$",  
+    full.names = TRUE
+  )
+
+  if (length(selected_files) > 0) {
+    cat("Selected glo biogeographic background filtering file: ", paste(basename(selected_files), collapse = ", "), "\n", sep = "")
+	selected_files
+  } else {
+    cat("No glo biogeographic background filtering file found \n")
+	NULL
+  }
 }
 
 # Generate background points
@@ -91,9 +107,9 @@ pseu.abs_i_glo <- nsdm.absences(
   n = n_back,
   rst_ref = rsts_ref$rst_glo,
   rst_background_weight = sampf_glo,
+  shp_background_filter = biog_glo,
   type = pa_po_glo,
   pres = sp_dat_glo,
-  taxon = ispi_name,
   rst_reg_gloproj = if (inherits(rsts_ref$rst_reg_gloproj, "SpatRaster")) rsts_ref$rst_reg_gloproj else NULL,
   level = "glo"
 )
@@ -118,19 +134,35 @@ if ("group" %in% colnames(sp_dat_reg)) {
 }
 sampf_reg <- if (back_strat == "random_w" & !is.null(selected_group)) {
   selected_files <- list.files(
-    file.path(w_path, "data", "background"),
+    file.path(w_path, "data", "background", "random_w"),
     pattern = paste0(selected_group, "_reg\\.tif$"),  
     full.names = TRUE
   )
   
   if (length(selected_files) > 0) {
     cat("Selected reg background bias file: ", paste(basename(selected_files), collapse = ", "), "\n", sep = "")
+	selected_files
   } else {
     cat("No reg background bias file found for group: ", selected_group, "\n", sep = "")
+	NULL
   }
-    selected_files
-} else {
-  NULL
+}
+
+# Select filtering shapefile if biogeographical background sampling is applied
+biog_reg <- if (back_strat == "random_biog") {
+  selected_files <- list.files(
+    file.path(w_path, "data", "background", "random_biog"),
+    pattern = "_reg\\.shp$",  
+    full.names = TRUE
+  )
+
+  if (length(selected_files) > 0) {
+    cat("Selected biogeographic background filtering file: ", paste(basename(selected_files), collapse = ", "), "\n", sep = "")
+	selected_files
+  } else {
+    cat("No reg biogeographic background filtering file found \n")
+	NULL
+  }
 }
 
   # Generate background points
@@ -138,9 +170,9 @@ sampf_reg <- if (back_strat == "random_w" & !is.null(selected_group)) {
     n = n_back,
     rst_ref = rsts_ref$rst_reg,
     rst_background_weight = sampf_reg,
+	shp_background_filter = biog_reg,
     type = pa_po_reg,
     pres = sp_dat_reg,
-    taxon = ispi_name,
 	level = "reg"
   )
 
