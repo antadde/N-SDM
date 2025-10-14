@@ -7,10 +7,10 @@
 nsdm.absences(
   n = 10000,
   pres,
-  taxon = character(),
   type = "po",
   rst_ref,
   rst_background_weight = NULL,
+  shp_background_filter = NULL,
   set_max_npres_to_nabs = TRUE,
   rst_reg_gloproj = NULL,
   level
@@ -21,8 +21,6 @@ nsdm.absences(
 
 \item{pres}{\code{sf} object. Spatial points dataset containing species occurrence data.}
 
-\item{taxon}{Character. Target species name.}
-
 \item{type}{Character. Specifies the type of species data:
 \itemize{
 \item \code{"po"}: Presence-only data
@@ -32,6 +30,8 @@ nsdm.absences(
 \item{rst_ref}{Raster (\code{SpatRaster}). Reference raster used in subsequent analyses.}
 
 \item{rst_background_weight}{Raster (\code{SpatRaster}) or \code{NULL}. Background weight raster used for weighted pseudoabsence sampling. If \code{NULL}, sampling is random.}
+
+\item{shp_background_filter}{Shapefile (\code{SpatVector}) or \code{NULL}. Background filter shapefile used for filtering pseudoabsence sampling. If \code{NULL}, sampling is random.}
 
 \item{set_max_npres_to_nabs}{Logical. If \code{TRUE}, limits the maximum number of presence points to the number of background points.}
 }
