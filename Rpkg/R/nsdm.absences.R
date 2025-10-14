@@ -78,7 +78,7 @@ if (type == "po") {
     # Extract valid cells
     valid_cells <- which(!is.na(values(rst_bck, mat = FALSE)))
     sampled_cells_idx <- sample(valid_cells, size = n * 1.5, replace = TRUE)
-    coords <- xyFromCell(rst_bck, sampled_cells$cell)
+    coords <- xyFromCell(rst_bck, sampled_cells_idx)
 
   # --- Option 2: Weighted background raster ---
   } else if (!is.null(rst_background_weight)) {
