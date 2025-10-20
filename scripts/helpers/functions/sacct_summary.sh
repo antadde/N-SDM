@@ -13,16 +13,20 @@ sacct_summary() {
 
     job_id="$1"
 
+    if [ -z "$sacct_log" ]; then
+        echo "Error: sacct_log variable is not defined"
+        return 1
+    fi
+
+    # Print header only if the log file is empty or missing
+    if [ ! -s "$sacct_log" ]; then
+        echo "JobID|JobName|State|Elapsed|Timelimit|ReqCPUS|UsedCPUS|NNodes|NTasks|MaxRSS|ReqMem"
+    fi
+
     sacct -j "$job_id" \
         --format=JobID,JobName,State,Elapsed,TotalCPU,ReqCPUS,Timelimit,MaxRSS,NNodes,NTasks,ReqMem \
         --parsable2 | \
     awk -F '|' '
-    NR==1 {
-        print "JobID|JobName|State|Elapsed|Timelimit|ReqCPUS|UsedCPUS|NNodes|NTasks|MaxRSS|ReqMem"
-        next
-    }
-
-    # Skip extern/noise jobs
     $2 !~ /batch|extern/ {
         jobname = $2
         reqmem = $11
@@ -30,11 +34,9 @@ sacct_summary() {
         reqcpus = $6
     }
 
-    # Process main batch lines
     $2 == "batch" && $4 ~ /:/ {
         sub(/\.batch/, "", $1)
 
-        # --- Convert Elapsed and TotalCPU to seconds ---
         split($4, elapsed, ":")
         elapsed_sec = (length(elapsed) == 3) ? elapsed[1]*3600 + elapsed[2]*60 + elapsed[3] :
                       (length(elapsed) == 2) ? elapsed[1]*60 + elapsed[2] : elapsed[1]
@@ -45,7 +47,6 @@ sacct_summary() {
 
         used_cpus = (elapsed_sec > 0) ? totalcpu_sec / elapsed_sec : 0
 
-        # --- Convert MaxRSS to GB ---
         mem = $8
         mem_val = mem
         if (mem ~ /K$/) { sub(/K$/, "", mem_val); mem_gb = mem_val / (1024^2) }
