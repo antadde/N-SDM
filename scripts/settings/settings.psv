@@ -72,8 +72,7 @@ disc_thre_reg|-1|Ensembling|Regional model algorithms with score below this thre
 ### Nesting
 ###
 n_levels|2|Nesting|Number of nested modelling levels ('1' = Global only, '2' = Global + Regional).
-nesting_methods|covariate,multiply|Nesting|Methods for nesting global and regional models ('covariate' and/or 'multiply' nesting).
-multiply_weighted|TRUE|Nesting|If TRUE, also computes a weighted version of the multiply nested ensemble, using the weight_metric.
+nesting_methods|covariate,multiply,multiplyw,average,averagew|Nesting|Methods for nesting global and regional models ('covariate', 'multiply', 'multiplyw', 'average', 'averagew' are available).
 ###
 ### Predicting and Projecting
 ###
