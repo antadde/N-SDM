@@ -469,10 +469,14 @@ if (any(c("averagew") %in% posthoc_nesting_methods)) {
    scores_ensemble[["MULW"]] <- scores_mw
    scores_ensemble[["AVG"]]  <- scores_a
    scores_ensemble[["AVGW"]] <- scores_aw
+}  
 }
+}    
+}    
 
 #### Return
 scores_array <- lapply(scores_ensemble, simplify2array)
 scores_array <- lapply(scores_array, rowMeans)
 
-return(list(scores_array = scores_array))}
+return(list(scores_array = scores_array))
+}
