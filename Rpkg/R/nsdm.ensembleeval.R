@@ -475,5 +475,4 @@ if (any(c("averagew") %in% posthoc_nesting_methods)) {
 scores_array <- lapply(scores_ensemble, simplify2array)
 scores_array <- lapply(scores_array, rowMeans)
 
-return(list(scores_array = scores_array))
-}
+return(list(scores_array = scores_array))}
