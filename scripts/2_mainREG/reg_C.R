@@ -39,7 +39,7 @@ species_file <- file.path(w_path, "tmp", "settings", "tmp_species_list.txt")
 species <- readLines(species_file)
 
 # Scale-nesting methods for combining GLO and REG predictions
-nesting_methods<-nesting_methods
+nesting_methods <- nesting_methods
 
 # SBATCH
 ispi_name <- species[arrayID]
@@ -135,49 +135,89 @@ cat("Ensemble predictions evaluated \n")
 ### E- Combine REG and GLO predictions
 ### =========================================================================
 for(nesting_method in nesting_methods){
-# E.1.1.1 "Multiply" (geometric mean) nesting
-if (nesting_method == "multiply") {
-  ## Ensembling
-  # response
+# E.1 "Posthoc" nesting
+if (nesting_method == "posthoc") {
+	
+  # Load ensembles
+  ## Global
   ensemble_glo <- rast(list.files(
     file.path(scr_path, "outputs", "d8_ensembles", "glo", ispi_name),
     pattern = ".tif", full.names = TRUE
   ))
   
+  ## Regional
   ensemble_reg <- rast(list.files(
     file.path(scr_path, "outputs", "d8_ensembles", "reg", nesting_method, ispi_name),
     pattern = ".tif", full.names = TRUE
   ))
   
+# E.1.1 "Multiply" (geometric mean) nesting
+if (any(c("multiply") %in% posthoc_nesting_methods)){
+	
   ensemble_nested <- sqrt(ensemble_glo * ensemble_reg)
-  names(ensemble_nested) <- names(ensemble_reg)
+  
+  # Rename
+  names(ensemble_nested) <- gsub("_posthoc_", "_multiply_", names(ensemble_reg))
    
   # Save
   nsdm.savemap(map = ensemble_nested, species_name = ispi_name, format="tif",
-               save_path = file.path(scr_path, "outputs", "d10_nested-ensembles", nesting_method))
+               save_path = file.path(scr_path, "outputs", "d10_nested-ensembles", "multiply"))
+}
 
-
-# E.1.1.2 "Multiply" (weighted geometric mean) nesting
-if (multiply_weighted == TRUE) {
+# E.1.2 "Multiply weighted" (weighted geometric mean) nesting
+if (any(c("multiplyw") %in% posthoc_nesting_methods)){
+	
   # Define weights
   w_glo <- scores_array_df[scores_array_df$Level == "GLO" & scores_array_df$Metric == weight_metric, ]$Value
   w_reg <- scores_array_df[scores_array_df$Level == "REG" & scores_array_df$Metric == weight_metric, ]$Value
   
-  # Weighted geometric mean: (glo^w1 * reg^w2)^(1 / (w1 + w2))
+  # Weighted geometric mean
   weighted_product <- (ensemble_glo ^ w_glo) * (ensemble_reg ^ w_reg)
   ensemble_nested <- weighted_product ^ (1 / (w_glo + w_reg))
 
-  # Match names
-  names(ensemble_nested) <- gsub("_multiply_", "_multiplyw_", names(ensemble_reg))
+  # Rename
+  names(ensemble_nested) <- gsub("_posthoc_", "_multiplyw_", names(ensemble_reg))
 
   # Save
   nsdm.savemap(map = ensemble_nested, species_name = ispi_name, format="tif",
-               save_path = file.path(scr_path, "outputs", "d10_nested-ensembles", paste0(nesting_method,"w")))
-}}
+               save_path = file.path(scr_path, "outputs", "d10_nested-ensembles", "multiplyw"))
+}
 
-# E.1.2 "Covariate" nesting
+# E.1.3 "Average" (arithmetic mean) nesting
+if (any(c("average") %in% posthoc_nesting_methods)){
+	
+  ensemble_nested <- mean(ensemble_glo, ensemble_reg)
+  
+  # Rename
+  names(ensemble_nested) <- gsub("_posthoc_", "_average_", names(ensemble_reg))
+   
+  # Save
+  nsdm.savemap(map = ensemble_nested, species_name = ispi_name, format="tif",
+               save_path = file.path(scr_path, "outputs", "d10_nested-ensembles", "average"))
+}
+
+# E.1.4 "Average weighted" (weighted arithmetic mean) nesting
+if (any(c("averagew") %in% posthoc_nesting_methods)){
+  # Define weights
+  w_glo <- scores_array_df[scores_array_df$Level == "GLO" & scores_array_df$Metric == weight_metric, ]$Value
+  w_reg <- scores_array_df[scores_array_df$Level == "REG" & scores_array_df$Metric == weight_metric, ]$Value
+  
+  # Weighted arithmetic mean
+  ensemble_nested <- (w_glo * ensemble_glo + w_reg * ensemble_reg) / (w_glo + w_reg)
+
+
+  # Rename
+  names(ensemble_nested) <- gsub("_posthoc_", "_averagew_", names(ensemble_reg))
+
+  # Save
+  nsdm.savemap(map = ensemble_nested, species_name = ispi_name, format="tif",
+               save_path = file.path(scr_path, "outputs", "d10_nested-ensembles", "averagew"))
+}
+}
+
+# E.2 "Covariate" nesting
 if (nesting_method == "covariate") {
-  ## Ensembling
+  ## Load ensemble
   ensemble_nested <- rast(list.files(
     file.path(scr_path, "outputs", "d8_ensembles", "reg", nesting_method, ispi_name),
     pattern = ".tif", full.names = TRUE

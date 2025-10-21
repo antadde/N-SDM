@@ -73,9 +73,9 @@ if (nesting_method == "covariate") {
   d1_covsels$pseu.abs_i@env_vars <- d1_covsels$covdata$cov
   d1_covsels$covstk <- unwrap(d1_covsels$covstk$cov)
 }
-if (nesting_method %in% c("multiply")) {
-  d1_covsels$pseu.abs_i@env_vars <- d1_covsels$covdata$mul
-  d1_covsels$covstk <- unwrap(d1_covsels$covstk$mul)
+if (nesting_method %in% c("posthoc")) {
+  d1_covsels$pseu.abs_i@env_vars <- d1_covsels$covdata$post
+  d1_covsels$covstk <- unwrap(d1_covsels$covstk$post)
 }
 
 cat("reg_A outputs loaded \n")

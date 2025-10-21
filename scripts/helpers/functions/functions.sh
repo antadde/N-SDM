@@ -1,9 +1,15 @@
 # FUNCTION: retrieve values from settings.psv
 get_value() {
   local key=$1
-  local raw_value
-  raw_value=$(awk -F "|" -v search_key="$key" '$1 == search_key { print $2 }' ./settings/settings.psv)
-  echo "$raw_value" | tr -d '\r\t' | xargs
+  local val
+  val=$(awk -F"|" -v k="$key" '$1==k{print $2}' ./settings/settings.psv | tr -d '\r\t' | xargs)
+
+  if [[ $key == "nesting_methods" ]]; then
+    echo "$val" | tr ',' '\n' | grep -E 'covariate|multiply|average' \
+      | sed 's/^\(multiply.*\|average.*\)$/posthoc/' | sort -u | paste -sd',' -
+  else
+    echo "$val"
+  fi
 }
 
 # FUNCTION: Count the number of items in a list

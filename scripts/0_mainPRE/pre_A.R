@@ -65,6 +65,15 @@ if (length(mask_pred) > 0) {
   mask_pred <- file.path(w_path, "data", "masks", mask_pred)
 }
 
+# Identify posthoc nesting methods
+posthoc_nesting_methods <- intersect(nesting_methods, c("multiply", "multiplyw", "average", "averagew"))
+if (length(posthoc_nesting_methods) > 0) {
+  nesting_methods <- unique(c(
+    intersect(nesting_methods, "covariate"),
+    "posthoc"
+  ))
+}
+
 # Save settings and clean up
 rm(settings, parameters, values, i)
 save.image(file.path(w_path, "tmp", "settings", "ref_nsdm_settings.RData"))

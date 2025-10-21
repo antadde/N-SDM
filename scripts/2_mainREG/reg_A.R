@@ -184,7 +184,7 @@ cat("Modelling dataset prepared \n")
 covstk_res <- list()
 covdata_res <- list()
 
-if ("covariate" %in% nesting_methods) {
+if (any(c("covariate") %in% nesting_methods)) {
   counter <- 0
   while (TRUE) {
     counter <- counter + 1
@@ -253,7 +253,7 @@ if ("covariate" %in% nesting_methods) {
 ### =========================================================================
 ### G- Covariate selection without main GLO
 ### =========================================================================
-if (any(c("multiply") %in% nesting_methods)) {
+if (any(c("posthoc") %in% nesting_methods)) {
   counter <- 0
   while (TRUE) {
     counter <- counter + 1
@@ -311,8 +311,8 @@ if (any(c("multiply") %in% nesting_methods)) {
 
     raster_stack<-rast(stk)
     names(raster_stack) <- sub("\\.[^.]+$", "", basename(files))
-    covstk_res[["mul"]] <- wrap(raster_stack)
-    covdata_res[["mul"]] <- cov.embed_i$covdata
+    covstk_res[["post"]] <- wrap(raster_stack)
+    covdata_res[["post"]] <- cov.embed_i$covdata
 	
   } else {
     cat("Covariate embedding failed after 5 attempts.\n")
