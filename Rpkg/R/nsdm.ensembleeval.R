@@ -478,4 +478,3 @@ scores_array <- lapply(scores_array, rowMeans)
 
 return(list(scores_array = scores_array))
 }
-
