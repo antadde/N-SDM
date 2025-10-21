@@ -423,7 +423,7 @@ if (any(c("posthoc") %in% nesting_name)) {
 w_sum <- w_reg + w_glo
 	
 # Posthoc nesting methods
-if (any(c("multiply", "multiplyw", "average", "averagew") %in% posthoc_nesting_methods)){  
+if (any(c("multiply", "multiplyw", "average", "averagew") %in% posthoc_nesting_name)){  
 	target <- REG_posthoc_preds
     for (z in seq_len(outerloop)) {
     good_ix <- which(!is.na(glo_prob2[[z]]))
@@ -433,7 +433,7 @@ if (any(c("multiply", "multiplyw", "average", "averagew") %in% posthoc_nesting_m
 	testa_reg_c <- lapply(testa_reg, function(g){g[good_ix,]})
 	z_glo_prob2 <- glo_prob2[[z]]
 
-if (any(c("multiply") %in% posthoc_nesting_methods)){  
+if (any(c("multiply") %in% posthoc_nesting_name)){  
 # Multiply
 	scores_m <- list()
     score_m <- nsdm.ceval2(
@@ -441,7 +441,7 @@ if (any(c("multiply") %in% posthoc_nesting_methods)){
     pa = papa_reg[[z]])
 	scores_m[[z]] <- score_m}
 
-if (any(c("multiplyw") %in% posthoc_nesting_methods)){  
+if (any(c("multiplyw") %in% posthoc_nesting_name)){  
 # Multiply weigthed
 	scores_mw <- list() 
 	score_mw <- nsdm.ceval2(
@@ -449,7 +449,7 @@ if (any(c("multiplyw") %in% posthoc_nesting_methods)){
     pa = papa_reg[[z]])
 	scores_mw[[z]] <- score_mw}
 
-if (any(c("average") %in% posthoc_nesting_methods)) {  
+if (any(c("average") %in% posthoc_nesting_name)) {  
 # Average
    scores_a <- list()
    score_a <- nsdm.ceval2(
@@ -457,7 +457,7 @@ if (any(c("average") %in% posthoc_nesting_methods)) {
    pa = papa_reg[[z]])
    scores_a[[z]] <- score_a}
 
-if (any(c("averagew") %in% posthoc_nesting_methods)) {  
+if (any(c("averagew") %in% posthoc_nesting_name)) {  
 # Average weighted
    scores_aw <- list()
    score_aw <- nsdm.ceval2(
