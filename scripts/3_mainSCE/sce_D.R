@@ -48,7 +48,7 @@ for (scenar in proj_scenarios) {
     
 cat(paste0("Starting mapping and ensembling of ", scenar, " ", per, 
            " scenario REG projections for ", ispi_name, 
-           " under the ", nesting_method, " nesting method...\n"))
+           " under the ", nesting_method, " nesting method(s)...\n"))
     
     ### =========================================================================
     ### C- Save prediction raster
@@ -126,26 +126,36 @@ cat(paste0("Starting mapping and ensembling of ", scenar, " ", per,
     ### =========================================================================
     
     # E.1 "Multiply" nesting
-    if (nesting_method == "multiply") {
-      # Load response data
+	if (nesting_method == "posthoc") {
+	
+  # Load ensembles
+  ## Global
       ensemble_glo <- rast(list.files(
         file.path(scr_path, "outputs", "d14_ensembles-sce", "glo", scenar, per, ispi_name), 
         pattern = ".tif", full.names = TRUE
       ))
-      
-      ensemble_nested <- sqrt(ensemble_glo * ensemble_reg$ensemble)
-      names(ensemble_nested) <- names(ensemble_reg$ensemble)
+	  
+  ## Regional
+	ensemble_reg <- ensemble_reg$ensemble  
+	
+	if (any(c("multiply") %in% posthoc_nesting_methods)){
+
+     ensemble_nested <- sqrt(ensemble_glo * ensemble_reg)
+     
+	 # Rename
+     names(ensemble_nested) <- gsub("_posthoc_", "_multiply_", names(ensemble_reg))
       
      # Save
       nsdm.savemap(
         map = ensemble_nested, 
         species_name = ispi_name, format="tif",
-        save_path = file.path(scr_path, "outputs", "d16_nested-ensembles-sce", nesting_method, scenar, per)
+        save_path = file.path(scr_path, "outputs", "d16_nested-ensembles-sce", "multiply", scenar, per)
       )
     
 	
 	# E.1.2 "Multiply" (weighted geometric mean) nesting
-	if (multiply_weighted == TRUE) {
+	if (any(c("multiplyw") %in% posthoc_nesting_methods)){
+
 	
 	scores_array <- nsdm.loadthis(
         species_name = ispi_name,
@@ -157,36 +167,63 @@ cat(paste0("Starting mapping and ensembling of ", scenar, " ", per,
   w_glo <- scores_array[scores_array$Level == "GLO" & scores_array$Metric == weight_metric, ]$Value
   w_reg <- scores_array[scores_array$Level == "REG" & scores_array$Metric == weight_metric, ]$Value
 	  
-	  # Load response data
-	  ensemble_glo <- rast(list.files(
-		file.path(scr_path, "outputs", "d14_ensembles-sce", "glo", scenar, per, ispi_name), 
-		pattern = ".tif", full.names = TRUE
-	  ))
+  # Weighted geometric mean
+  weighted_product <- (ensemble_glo ^ w_glo) * (ensemble_reg ^ w_reg)
+  ensemble_nested <- weighted_product ^ (1 / (w_glo + w_reg))
 
-	  # Compute weighted geometric mean
-	  weighted_product <- (ensemble_glo ^ w_glo) * (ensemble_reg$ensemble ^ w_reg)
-	  ensemble_nested <- weighted_product ^ (1 / (w_glo + w_reg))
-	  
-	  # Match names
-	  names(ensemble_nested) <- gsub("_multiply_", "_multiplyw_", names(ensemble_reg$ensemble))
+  # Rename
+  names(ensemble_nested) <- gsub("_posthoc_", "_multiplyw_", names(ensemble_reg))
 	  
 	  # Save
 	  nsdm.savemap(
 		map = ensemble_nested, 
 		species_name = ispi_name, format="tif",
-		save_path = file.path(scr_path, "outputs", "d16_nested-ensembles-sce", paste0(nesting_method,"w"), scenar, per)
+		save_path = file.path(scr_path, "outputs", "d16_nested-ensembles-sce", "multiplyw", scenar, per)
 	  )
-	}}
-    
+	}
+	
+# E.1.3 "Average" (arithmetic mean) nesting
+if (any(c("average") %in% posthoc_nesting_methods)){
+	
+  ensemble_nested <- mean(ensemble_glo, ensemble_reg)
+  
+  # Rename
+  names(ensemble_nested) <- gsub("_posthoc_", "_average_", names(ensemble_reg))
+   
+  # Save
+  nsdm.savemap(map = ensemble_nested, species_name = ispi_name, format="tif",
+               save_path = file.path(scr_path, "outputs", "d16_nested-ensembles-sce", "average", scenar, per))
+}	
+
+# E.1.4 "Average weighted" (weighted arithmetic mean) nesting
+if (any(c("averagew") %in% posthoc_nesting_methods)){
+  # Define weights
+  w_glo <- scores_array[scores_array$Level == "GLO" & scores_array$Metric == weight_metric, ]$Value
+  w_reg <- scores_array[scores_array$Level == "REG" & scores_array$Metric == weight_metric, ]$Value
+  
+  # Weighted arithmetic mean
+  ensemble_nested <- (w_glo * ensemble_glo + w_reg * ensemble_reg) / (w_glo + w_reg)
+
+
+  # Rename
+  names(ensemble_nested) <- gsub("_posthoc_", "_averagew_", names(ensemble_reg))
+
+  # Save
+  nsdm.savemap(map = ensemble_nested, species_name = ispi_name, format="tif",
+               save_path = file.path(scr_path, "outputs", "d16_nested-ensembles-sce", "averagew", scenar, per))
+}
+}}
+	    
     # E.2 "Covariate" nesting
     if (nesting_method == "covariate") {
-      ensemble_nested <- ensemble_reg$ensemble
+      
+	  ensemble_nested <- ensemble_reg$ensemble
       
       # Save
       nsdm.savemap(
         map = ensemble_nested, 
         species_name = ispi_name, format="tif",
-        save_path = file.path(scr_path, "outputs", "d16_nested-ensembles-sce", nesting_method, scenar, per)
+        save_path = file.path(scr_path, "outputs", "d16_nested-ensembles-sce", "covariate", scenar, per)
       )
 	}
   }
