@@ -472,7 +472,6 @@ if (any(c("averagew") %in% posthoc_nesting_methods)) {
 }  
 }
 }    
-}    
 
 #### Return
 scores_array <- lapply(scores_ensemble, simplify2array)
