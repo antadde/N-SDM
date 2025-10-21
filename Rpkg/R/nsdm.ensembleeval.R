@@ -439,7 +439,8 @@ if (any(c("multiply") %in% posthoc_nesting_name)){
     score_m <- nsdm.ceval2(
     f = sqrt(rowMeans(as.data.frame(z_target), na.rm = TRUE) * z_glo_prob2)[[1]],
     pa = papa_reg[[z]])
-	scores_m[[z]] <- score_m}
+	scores_m[[z]] <- score_m
+	scores_ensemble[["MUL"]]  <- scores_m}
 
 if (any(c("multiplyw") %in% posthoc_nesting_name)){  
 # Multiply weigthed
@@ -447,7 +448,8 @@ if (any(c("multiplyw") %in% posthoc_nesting_name)){
 	score_mw <- nsdm.ceval2(
     f =(((rowMeans(as.data.frame(z_target), na.rm = TRUE) ^ w_reg) * (z_glo_prob2[[1]] ^ w_glo)) ^ (1 / w_sum)),
     pa = papa_reg[[z]])
-	scores_mw[[z]] <- score_mw}
+	scores_mw[[z]] <- score_mw
+	scores_ensemble[["MULW"]] <- scores_mw}
 
 if (any(c("average") %in% posthoc_nesting_name)) {  
 # Average
@@ -455,7 +457,8 @@ if (any(c("average") %in% posthoc_nesting_name)) {
    score_a <- nsdm.ceval2(
    f = ((rowMeans(as.data.frame(z_target), na.rm = TRUE) + z_glo_prob2[[1]]) / 2),
    pa = papa_reg[[z]])
-   scores_a[[z]] <- score_a}
+   scores_a[[z]] <- score_a
+   scores_ensemble[["AVG"]]  <- scores_a}
 
 if (any(c("averagew") %in% posthoc_nesting_name)) {  
 # Average weighted
@@ -463,12 +466,9 @@ if (any(c("averagew") %in% posthoc_nesting_name)) {
    score_aw <- nsdm.ceval2(
    f = ((w_reg * rowMeans(as.data.frame(z_target), na.rm = TRUE)) + (w_glo * z_glo_prob2[[1]])) / (w_reg + w_glo),
    pa = papa_reg[[z]])
-   scores_aw[[z]] <- score_aw}
+   scores_aw[[z]] <- score_aw
+   scores_ensemble[["AVGW"]] <- scores_aw}
 }
-   scores_ensemble[["MUL"]]  <- scores_m
-   scores_ensemble[["MULW"]] <- scores_mw
-   scores_ensemble[["AVG"]]  <- scores_a
-   scores_ensemble[["AVGW"]] <- scores_aw
 }  
 }
 }    
