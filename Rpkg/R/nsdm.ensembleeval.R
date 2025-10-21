@@ -15,25 +15,21 @@
 #' @param model_names Character vector of modeling algorithms to ensemble 
 #'   (e.g. `c("glm", "rf", "esm")`).
 #' @param species_name Character string, the name of the species or taxon being evaluated.
-#' @param nesting_name Character string (default = `NA`), indicating the nesting strategy 
-#'   such as `"multiply"`, `"multiplyw"`, or `"covariate"`.
+#' @param nesting_name Character string (default = `NA`), indicating the nesting strategies evaluated 
+#'   `"posthoc"` or `"covariate"`.
+#' @param posthoc_nesting_name Character string (default = `NA`), indicating the posthoc_nesting strategies evaluated 
+#'   `"multiply"`, `"average"`, etc.
 #'
 #' @return A named list of ensemble evaluation scores, averaged across replicates. 
 #' Elements correspond to ensemble types (e.g. `"GLO"`, `"REG"`, `"MUL"`, `"MULW"`, `"COV"`).
 #'
-#' @details Ensemble strategies include:
-#' - `GLO`: global-level ensemble  
-#' - `REG`: regional-level ensemble  
-#' - `MUL`: multiply nested ensemble  
-#' - `MULW`: multiply-weighted nested ensemble  
-#' - `COV`: covariate-nested ensemble
 #'
 #' Evaluation is performed with [nsdm.ceval()], returning mean values over replicates.
 #'
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
-nsdm.ensembleeval <- function(sets, level, model_names, species_name, nesting_name=NA, scratch_path){
+nsdm.ensembleeval <- function(sets, level, model_names, species_name, nesting_name=NA, posthoc_nesting_name=NA, scratch_path){
 
 pred_all <- list()
 
@@ -185,16 +181,16 @@ if(level == "reg"){
 names(testa_reg) <- names(coord_reg) <- names(papa_reg) <- sprintf("replicate_%02d", rep_ids)
 
 ### =========================================================================
-### REG MULTIPLY
+### REG POSTHOC
 ### =========================================================================
-if (any(c("multiply") %in% nesting_name)) {
+if (any(c("posthoc") %in% nesting_name)) {
 ## Loop on target algorithms
 pred_all <- list()
 for (model in model_names) {
   
   # Retrieve evaluation table and identify best model
   eval_list <- nsdm.loadthis(model_name = model, species_name = species_name, format = "psv",
-                             read_path = file.path(scr_path, "outputs", "d3_evals", "reg", "multiply"))
+                             read_path = file.path(scr_path, "outputs", "d3_evals", "reg", "posthoc"))
   
    metric_row <- eval_list[eval_list$Metric == best_met, -1, drop = FALSE]
    
@@ -207,7 +203,7 @@ for (model in model_names) {
   # Load best model
   mod_m <- nsdm.loadthis(species_name = ispi_name, model_name = model,
                           tag = paste0(model, "_tune"),
-                          read_path = file.path(scr_path, "outputs", "d2_models", "reg", "multiply"))$model
+                          read_path = file.path(scr_path, "outputs", "d2_models", "reg", "posthoc"))$model
   
   # Loop over models (one in regular cases; more for ESMs)
   pop <- list()
@@ -259,17 +255,17 @@ n_models <- length(pred_all)
 n_reps <- length(pred_all[[1]])
 
 # Make list for each replicate
-REG_multiply_preds <- vector("list", n_reps)
-names(REG_multiply_preds) <- paste0("rep", seq_len(n_reps))
+REG_posthoc_preds <- vector("list", n_reps)
+names(REG_posthoc_preds) <- paste0("rep", seq_len(n_reps))
 
 for (rep_idx in seq_len(n_reps)) {
-  REG_multiply_preds[[rep_idx]] <- lapply(pred_all, `[[`, rep_idx)
-  names(REG_multiply_preds[[rep_idx]]) <- names(pred_all)
+  REG_posthoc_preds[[rep_idx]] <- lapply(pred_all, `[[`, rep_idx)
+  names(REG_posthoc_preds[[rep_idx]]) <- names(pred_all)
 }
  
 } else {
   warning("No predictions were made.")
-  REG_multiply_preds <- NULL
+  REG_posthoc_preds <- NULL
 }
 }
 
@@ -369,7 +365,7 @@ for (rep_idx in seq_len(n_reps)) {
 ### =========================================================================
 scores_ensemble <- list()
 
-# GLO-level ensemble
+# GLO-level
 target <- GLO_preds
 scores <- list()
 for (z in seq_len(outerloop)) {
@@ -383,11 +379,24 @@ scores <- simplify2array(scores)
 w_glo <- rowMeans(scores)[weight_metric]
 
 if(level == "reg"){
-  # REG-level ensemble without nesting
-if (any(c("multiply") %in% nesting_name)) {
-    target <- REG_multiply_preds
-    scores <- list()
-    
+# REG-Covariate
+if ("covariate" %in% nesting_name) {
+    target <- REG_covariate_preds
+    scores <- list()    
+    for (z in seq_len(outerloop)) {
+	  z_target <- target[[z]]
+      score <- nsdm.ceval2(
+        f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
+        pa = papa_reg[[z]])
+      scores[[z]] <- score
+    }   
+    scores_ensemble[["COV"]] <- scores
+  }
+  
+if (any(c("posthoc") %in% nesting_name)) {
+# REG without nesting
+    target <- REG_posthoc_preds
+    scores <- list()  
     for (z in seq_len(outerloop)) {
 	  z_target <- target[[z]]
       score <- nsdm.ceval2(
@@ -398,49 +407,24 @@ if (any(c("multiply") %in% nesting_name)) {
     scores_ensemble[["REG"]] <- scores
 	scores <- simplify2array(scores)
     w_reg <- rowMeans(scores)[weight_metric]
-  }	
 
-  # Covariate nested ensemble
-  if ("covariate" %in% nesting_name) {
-    target <- REG_covariate_preds
-    scores <- list()
-    
-    for (z in seq_len(outerloop)) {
-	  z_target <- target[[z]]
-      score <- nsdm.ceval2(
-        f = rowMeans(as.data.frame(z_target), na.rm = TRUE),
-        pa = papa_reg[[z]])
-      scores[[z]] <- score
-    }
-    
-    scores_ensemble[["COV"]] <- scores
-  }
-
-  # Multiply nested ensemble
-  if ("multiply" %in% nesting_name) {
-    
-	target <- REG_multiply_preds
- 
-   # Preprocess GLO probabilities
+# GLO probabilities
    	glo_out <- rast(list.files(file.path(scr_path, "outputs", "d8_ensembles", "glo", ispi_name), pattern = ".tif", full.names = TRUE))
 	glo_prob <- list()
 	for (rep_id in seq_len(outerloop)) {
     glo_prob[[rep_id]] <- terra::extract(glo_out, coord_reg[[rep_id]], ID=FALSE) / 100
-	}
-    
+	}   
 	glo_prob2 <- lapply(glo_prob, function(eux) {
       eux[eux < 0] <- 0
       return(eux)
     })
 	
-	# define weight sums
-	w_sum <- w_reg + w_glo
+# Define weight sum
+w_sum <- w_reg + w_glo
 	
-	# Evaluate
-    scores <- list()
-	scores_w <- list()
-
-    
+# Posthoc nesting methods
+if (any(c("multiply", "multiplyw", "average", "averagew") %in% posthoc_nesting_methods)){  
+	target <- REG_posthoc_preds
     for (z in seq_len(outerloop)) {
     good_ix <- which(!is.na(glo_prob2[[z]]))
 	z_target <- target[[z]]
@@ -448,24 +432,43 @@ if (any(c("multiply") %in% nesting_name)) {
 	papa_reg_c <- lapply(papa_reg, function(g){g[good_ix]})
 	testa_reg_c <- lapply(testa_reg, function(g){g[good_ix,]})
 	z_glo_prob2 <- glo_prob2[[z]]
-	  
-	  # normal multiply
-      score <- nsdm.ceval2(
-        f = sqrt(rowMeans(as.data.frame(z_target), na.rm = TRUE) * z_glo_prob2)[[1]],
-        pa = papa_reg[[z]])
-	  
-	  # multiply weigthed
-	    score_w <- nsdm.ceval2(
-        f =(((rowMeans(as.data.frame(z_target), na.rm = TRUE) ^ w_reg) *
-         (z_glo_prob2[[1]] ^ w_glo)) ^ (1 / w_sum)),
-        pa = papa_reg[[z]])
-	  
-      scores[[z]] <- score
-	  scores_w[[z]] <- score_w
-    }
-    
-    scores_ensemble[["MUL"]] <- scores
-	scores_ensemble[["MULW"]] <- scores_w
+
+if (any(c("multiply") %in% posthoc_nesting_methods)){  
+# Multiply
+	scores_m <- list()
+    score_m <- nsdm.ceval2(
+    f = sqrt(rowMeans(as.data.frame(z_target), na.rm = TRUE) * z_glo_prob2)[[1]],
+    pa = papa_reg[[z]])
+	scores_m[[z]] <- score_m}
+
+if (any(c("multiplyw") %in% posthoc_nesting_methods)){  
+# Multiply weigthed
+	scores_mw <- list() 
+	score_mw <- nsdm.ceval2(
+    f =(((rowMeans(as.data.frame(z_target), na.rm = TRUE) ^ w_reg) * (z_glo_prob2[[1]] ^ w_glo)) ^ (1 / w_sum)),
+    pa = papa_reg[[z]])
+	scores_mw[[z]] <- score_mw}
+
+if (any(c("average") %in% posthoc_nesting_methods)) {  
+# Average
+   scores_a <- list()
+   score_a <- nsdm.ceval2(
+   f = ((rowMeans(as.data.frame(z_target), na.rm = TRUE) + z_glo_prob2[[1]]) / 2),
+   pa = papa_reg[[z]])
+   scores_a[[z]] <- score_a}
+
+if (any(c("averagew") %in% posthoc_nesting_methods)) {  
+# Average weighted
+   scores_aw <- list()
+   score_aw <- nsdm.ceval2(
+   f = ((w_reg * rowMeans(as.data.frame(z_target), na.rm = TRUE)) + (w_glo * z_glo_prob2[[1]])) / (w_reg + w_glo),
+   pa = papa_reg[[z]])
+   scores_aw[[z]] <- score_aw}
+}
+   scores_ensemble[["MUL"]]  <- scores_m
+   scores_ensemble[["MULW"]] <- scores_mw
+   scores_ensemble[["AVG"]]  <- scores_a
+   scores_ensemble[["AVGW"]] <- scores_aw
 }
 }
 
