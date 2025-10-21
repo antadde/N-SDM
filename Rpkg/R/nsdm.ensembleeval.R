@@ -423,8 +423,13 @@ if (any(c("posthoc") %in% nesting_name)) {
 w_sum <- w_reg + w_glo
 	
 # Posthoc nesting methods
-if (any(c("multiply", "multiplyw", "average", "averagew") %in% posthoc_nesting_name)){  
-	target <- REG_posthoc_preds
+if (any(c("multiply", "multiplyw", "average", "averagew") %in% posthoc_nesting_name)){
+	scores_m <- list()
+	scores_mw <- list()
+	scores_a <- list()
+	scores_aw <- list()
+
+target <- REG_posthoc_preds
     for (z in seq_len(outerloop)) {
     good_ix <- which(!is.na(glo_prob2[[z]]))
 	z_target <- target[[z]]
@@ -435,43 +440,46 @@ if (any(c("multiply", "multiplyw", "average", "averagew") %in% posthoc_nesting_n
 
 if (any(c("multiply") %in% posthoc_nesting_name)){  
 # Multiply
-	scores_m <- list()
     score_m <- nsdm.ceval2(
     f = sqrt(rowMeans(as.data.frame(z_target), na.rm = TRUE) * z_glo_prob2)[[1]],
     pa = papa_reg[[z]])
 	scores_m[[z]] <- score_m
-	scores_ensemble[["MUL"]]  <- scores_m}
+	}
 
 if (any(c("multiplyw") %in% posthoc_nesting_name)){  
 # Multiply weigthed
-	scores_mw <- list() 
 	score_mw <- nsdm.ceval2(
     f =(((rowMeans(as.data.frame(z_target), na.rm = TRUE) ^ w_reg) * (z_glo_prob2[[1]] ^ w_glo)) ^ (1 / w_sum)),
     pa = papa_reg[[z]])
 	scores_mw[[z]] <- score_mw
-	scores_ensemble[["MULW"]] <- scores_mw}
+	}
 
 if (any(c("average") %in% posthoc_nesting_name)) {  
 # Average
-   scores_a <- list()
    score_a <- nsdm.ceval2(
    f = ((rowMeans(as.data.frame(z_target), na.rm = TRUE) + z_glo_prob2[[1]]) / 2),
    pa = papa_reg[[z]])
    scores_a[[z]] <- score_a
-   scores_ensemble[["AVG"]]  <- scores_a}
+   }
 
 if (any(c("averagew") %in% posthoc_nesting_name)) {  
 # Average weighted
-   scores_aw <- list()
    score_aw <- nsdm.ceval2(
    f = ((w_reg * rowMeans(as.data.frame(z_target), na.rm = TRUE)) + (w_glo * z_glo_prob2[[1]])) / (w_reg + w_glo),
    pa = papa_reg[[z]])
    scores_aw[[z]] <- score_aw
-   scores_ensemble[["AVGW"]] <- scores_aw}
+   }
 }
-}  
 }
-}    
+}
+}
+
+if (any(c("posthoc") %in% nesting_name)) {
+  if (exists("scores_m")  && length(scores_m)  > 0) scores_ensemble[["MUL"]]  <- scores_m
+  if (exists("scores_mw") && length(scores_mw) > 0) scores_ensemble[["MULW"]] <- scores_mw
+  if (exists("scores_a")  && length(scores_a)  > 0) scores_ensemble[["AVG"]]  <- scores_a
+  if (exists("scores_aw") && length(scores_aw) > 0) scores_ensemble[["AVGW"]] <- scores_aw
+}
 
 #### Return
 scores_array <- lapply(scores_ensemble, simplify2array)
