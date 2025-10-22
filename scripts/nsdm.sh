@@ -218,6 +218,7 @@ pre_B_job() {
 }
 pre_B_job
 
+sleep 5
 # Check number of species processed after pre_B
 save_dir="$sop/outputs/d0_datasets/base"
 output_list="$wp/tmp/settings/tmp_species_list.txt"
@@ -321,7 +322,8 @@ glo_B_job
 glo_C_job
 
 ## REGIONAL level
-if [ $n_levels -gt 1 ]; then 
+if [ $n_levels -gt 1 ]; then
+sleep 5
 # Check number of species processed after glo_C
 save_dir="$sop/outputs/d8_ensembles/glo"
 output_list="$wp/tmp/settings/tmp_species_list.txt"
@@ -427,6 +429,7 @@ fi
 
 ## Scenarios
 if [ $do_proj = "TRUE" ]; then
+sleep 5
   # Check number of species processed after reg_C
   if [ "$n_levels" -gt 1 ]; then
     save_dir="$sop/outputs/d8_ensembles/reg"

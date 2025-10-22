@@ -111,7 +111,7 @@ cat("Ensemble predictions saved \n")
 # Load test sets
 d0_test_train <- readRDS(file.path(scr_path, "outputs", "d0_datasets", "base", ispi_name, paste0(ispi_name, ".rds")))$all_sets
 
-scores_array<-nsdm.ensembleeval(sets = d0_test_train, level = "reg", model_names = mod_algo, species_name = ispi_name, scratch_path=scr_path, nesting_name=nesting_methods)
+scores_array<-nsdm.ensembleeval(sets = d0_test_train, level = "reg", model_names = mod_algo, species_name = ispi_name, scratch_path=scr_path, nesting_name=nesting_methods, posthoc_nesting_name=posthoc_nesting_methods)
 
 print(lapply(scores_array$scores_array, round, 2))
 
