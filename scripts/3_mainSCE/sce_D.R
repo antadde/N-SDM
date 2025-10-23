@@ -164,8 +164,8 @@ cat(paste0("Starting mapping and ensembling of ", scenar, " ", per,
       )
 	  
 	  # Define weights
-  w_glo <- scores_array[scores_array$Level == "GLO" & scores_array$Metric == weight_metric, ]$Value
-  w_reg <- scores_array[scores_array$Level == "REG" & scores_array$Metric == weight_metric, ]$Value
+  w_glo <- mean(scores_array[scores_array$Level == "GLO" & scores_array$Metric == weight_metric, ]$Value)
+  w_reg <- mean(scores_array[scores_array$Level == "REG" & scores_array$Metric == weight_metric, ]$Value)
 	  
   # Weighted geometric mean
   weighted_product <- (ensemble_glo ^ w_glo) * (ensemble_reg ^ w_reg)
@@ -198,8 +198,8 @@ if (any(c("average") %in% posthoc_nesting_methods)){
 # E.1.4 "Average weighted" (weighted arithmetic mean) nesting
 if (any(c("averagew") %in% posthoc_nesting_methods)){
   # Define weights
-  w_glo <- scores_array[scores_array$Level == "GLO" & scores_array$Metric == weight_metric, ]$Value
-  w_reg <- scores_array[scores_array$Level == "REG" & scores_array$Metric == weight_metric, ]$Value
+  w_glo <- mean(scores_array[scores_array$Level == "GLO" & scores_array$Metric == weight_metric, ]$Value)
+  w_reg <- mean(scores_array[scores_array$Level == "REG" & scores_array$Metric == weight_metric, ]$Value)
   
   # Weighted arithmetic mean
   ensemble_nested <- (w_glo * ensemble_glo + w_reg * ensemble_reg) / (w_glo + w_reg)

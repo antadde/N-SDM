@@ -107,15 +107,17 @@ d0_test_train <- readRDS(file.path(scr_path, "outputs", "d0_datasets", "base", i
 # Evaluate
 scores_array<-nsdm.ensembleeval(sets = d0_test_train, level = "glo", model_names = mod_algo, species_name = ispi_name, scratch_path = scr_path)
 
-scores_array_df = do.call(rbind, lapply(names(scores_array$scores_array), function(level)
+print(lapply(scores_array, function(x) round(rowMeans(x), 2)))
+
+scores_array_df <- do.call(rbind, lapply(names(scores_array), function(level)
   data.frame(
     Level = level,
-    Metric = names(scores_array$scores_array[[level]]),
-    Value = as.numeric(scores_array$scores_array[[level]]),
-    row.names = NULL
-  )))
-
-print(lapply(scores_array$scores_array, round, 2))
+    Rep = rep(1:ncol(scores_array[[level]]), each = nrow(scores_array[[level]])),
+    Metric = rep(rownames(scores_array[[level]]), ncol(scores_array[[level]])),
+    Value = round(c(scores_array[[level]]), 3),
+    stringsAsFactors = FALSE
+  )
+))
 
 ### =========================================================================
 ### Save

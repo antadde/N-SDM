@@ -113,15 +113,17 @@ d0_test_train <- readRDS(file.path(scr_path, "outputs", "d0_datasets", "base", i
 
 scores_array<-nsdm.ensembleeval(sets = d0_test_train, level = "reg", model_names = mod_algo, species_name = ispi_name, scratch_path=scr_path, nesting_name=nesting_methods, posthoc_nesting_name=posthoc_nesting_methods)
 
-print(lapply(scores_array$scores_array, round, 2))
+print(lapply(scores_array, function(x) round(rowMeans(x), 2)))
 
-scores_array_df = do.call(rbind, lapply(names(scores_array$scores_array), function(level)
+scores_array_df <- do.call(rbind, lapply(names(scores_array), function(level)
   data.frame(
     Level = level,
-    Metric = names(scores_array$scores_array[[level]]),
-    Value = as.numeric(scores_array$scores_array[[level]]),
-    row.names = NULL
-  )))
+    Rep = rep(1:ncol(scores_array[[level]]), each = nrow(scores_array[[level]])),
+    Metric = rep(rownames(scores_array[[level]]), ncol(scores_array[[level]])),
+    Value = round(c(scores_array[[level]]), 3),
+    stringsAsFactors = FALSE
+  )
+))
 
 nsdm.savethis(object = scores_array_df,
               species_name = ispi_name,
@@ -168,8 +170,8 @@ if (any(c("multiply") %in% posthoc_nesting_methods)){
 if (any(c("multiplyw") %in% posthoc_nesting_methods)){
 	
   # Define weights
-  w_glo <- scores_array_df[scores_array_df$Level == "GLO" & scores_array_df$Metric == weight_metric, ]$Value
-  w_reg <- scores_array_df[scores_array_df$Level == "REG" & scores_array_df$Metric == weight_metric, ]$Value
+  w_glo <- mean(scores_array_df[scores_array_df$Level == "GLO" & scores_array_df$Metric == weight_metric, ]$Value)
+  w_reg <- mean(scores_array_df[scores_array_df$Level == "REG" & scores_array_df$Metric == weight_metric, ]$Value)
   
   # Weighted geometric mean
   weighted_product <- (ensemble_glo ^ w_glo) * (ensemble_reg ^ w_reg)
@@ -199,8 +201,8 @@ if (any(c("average") %in% posthoc_nesting_methods)){
 # E.1.4 "Average weighted" (weighted arithmetic mean) nesting
 if (any(c("averagew") %in% posthoc_nesting_methods)){
   # Define weights
-  w_glo <- scores_array_df[scores_array_df$Level == "GLO" & scores_array_df$Metric == weight_metric, ]$Value
-  w_reg <- scores_array_df[scores_array_df$Level == "REG" & scores_array_df$Metric == weight_metric, ]$Value
+  w_glo <- mean(scores_array_df[scores_array_df$Level == "GLO" & scores_array_df$Metric == weight_metric, ]$Value)
+  w_reg <- mean(scores_array_df[scores_array_df$Level == "REG" & scores_array_df$Metric == weight_metric, ]$Value)
   
   # Weighted arithmetic mean
   ensemble_nested <- (w_glo * ensemble_glo + w_reg * ensemble_reg) / (w_glo + w_reg)
