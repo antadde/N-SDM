@@ -10,6 +10,7 @@ nsdm.ensembleeval(
   model_names,
   species_name,
   nesting_name = NA,
+  posthoc_nesting_name = NA,
   scratch_path
 )
 }
@@ -25,8 +26,11 @@ for testing.}
 
 \item{species_name}{Character string, the name of the species or taxon being evaluated.}
 
-\item{nesting_name}{Character string (default = \code{NA}), indicating the nesting strategy
-such as \code{"multiply"}, \code{"multiplyw"}, or \code{"covariate"}.}
+\item{nesting_name}{Character string (default = \code{NA}), indicating the nesting strategies evaluated
+\code{"posthoc"} or \code{"covariate"}.}
+
+\item{posthoc_nesting_name}{Character string (default = \code{NA}), indicating the posthoc_nesting strategies evaluated
+\code{"multiply"}, \code{"average"}, etc.}
 
 \item{x}{An \code{nsdm.pseudoabsences} object that holds the master covariates, SIDs,
 and presence values.}
@@ -34,6 +38,8 @@ and presence values.}
 \value{
 A named list of ensemble evaluation scores, averaged across replicates.
 Elements correspond to ensemble types (e.g. \code{"GLO"}, \code{"REG"}, \code{"MUL"}, \code{"MULW"}, \code{"COV"}).
+
+Evaluation is performed with \code{\link[=nsdm.ceval]{nsdm.ceval()}}, returning mean values over replicates.
 }
 \description{
 Evaluate ensemble predictions for a given species, level, and nesting strategy.
@@ -41,17 +47,6 @@ Evaluate ensemble predictions for a given species, level, and nesting strategy.
 \details{
 This function loads the best model(s) for each algorithm, applies them to test data,
 and evaluates ensemble performance across replicates using specified ensemble criteria.
-
-Ensemble strategies include:
-\itemize{
-\item \code{GLO}: global-level ensemble
-\item \code{REG}: regional-level ensemble
-\item \code{MUL}: multiply nested ensemble
-\item \code{MULW}: multiply-weighted nested ensemble
-\item \code{COV}: covariate-nested ensemble
-}
-
-Evaluation is performed with \code{\link[=nsdm.ceval]{nsdm.ceval()}}, returning mean values over replicates.
 }
 \author{
 Antoine Adde (antoine.adde@eawag.ch)
