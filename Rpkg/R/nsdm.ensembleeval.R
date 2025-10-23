@@ -374,9 +374,8 @@ for (z in seq_len(outerloop)) {
                        pa = papa_glo[[z]])
   scores[[z]] <- score
 }
-scores_ensemble[["GLO"]] <- scores
-scores <- simplify2array(scores)
-w_glo <- rowMeans(scores)[weight_metric]
+scores_ensemble[["GLO"]] <- simplify2array(scores)
+w_glo <- rowMeans(scores_ensemble[["GLO"]])[weight_metric]
 
 if(level == "reg"){
 # REG-Covariate
@@ -390,7 +389,7 @@ if ("covariate" %in% nesting_name) {
         pa = papa_reg[[z]])
       scores[[z]] <- score
     }   
-    scores_ensemble[["COV"]] <- scores
+    scores_ensemble[["COV"]] <- simplify2array(scores)
   }
   
 if (any(c("posthoc") %in% nesting_name)) {
@@ -404,9 +403,8 @@ if (any(c("posthoc") %in% nesting_name)) {
         pa = papa_reg[[z]])
       scores[[z]] <- score
     }
-    scores_ensemble[["REG"]] <- scores
-	scores <- simplify2array(scores)
-    w_reg <- rowMeans(scores)[weight_metric]
+    scores_ensemble[["REG"]] <- simplify2array(scores)
+    w_reg <- rowMeans(scores_ensemble[["REG"]])[weight_metric]
 
 # GLO probabilities
    	glo_out <- rast(list.files(file.path(scr_path, "outputs", "d8_ensembles", "glo", ispi_name), pattern = ".tif", full.names = TRUE))
@@ -475,14 +473,12 @@ if (any(c("averagew") %in% posthoc_nesting_name)) {
 }
 
 if (any(c("posthoc") %in% nesting_name)) {
-  if (exists("scores_m")  && length(scores_m)  > 0) scores_ensemble[["MUL"]]  <- scores_m
-  if (exists("scores_mw") && length(scores_mw) > 0) scores_ensemble[["MULW"]] <- scores_mw
-  if (exists("scores_a")  && length(scores_a)  > 0) scores_ensemble[["AVG"]]  <- scores_a
-  if (exists("scores_aw") && length(scores_aw) > 0) scores_ensemble[["AVGW"]] <- scores_aw
+  if (exists("scores_m")  && length(scores_m)  > 0) scores_ensemble[["MUL"]]  <- simplify2array(scores_m)
+  if (exists("scores_mw") && length(scores_mw) > 0) scores_ensemble[["MULW"]] <- simplify2array(scores_mw)
+  if (exists("scores_a")  && length(scores_a)  > 0) scores_ensemble[["AVG"]]  <- simplify2array(scores_a)
+  if (exists("scores_aw") && length(scores_aw) > 0) scores_ensemble[["AVGW"]] <- simplify2array(scores_aw)
 }
 
 #### Return
-scores_array <- lapply(scores_ensemble, simplify2array)
-scores_array <- lapply(scores_array, rowMeans)
-
-return(list(scores_array = scores_array))}
+return(scores_ensemble)
+}
