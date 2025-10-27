@@ -5,7 +5,7 @@ Parameter|Value|Group|Details
 new_sess|TRUE|General Environment|Indicates whether this run is treated as a new N-SDM session.
 exit_any|TRUE|General Environment|Exiting N-SDM on any error.
 w_path|/work/nsdm|General Environment|Path to the working directory.
-svp_path|/scratch/nsdm_save|General Environment|Path where final outputs are transferred and stored permanently.
+svp_path|/project/nsdm_save|General Environment|Path where final outputs are transferred and stored permanently.
 rsync_exclude|d1_covsels,d2_models,d6_preds,d12_preds-sce|General Environment|Output folders excluded when transferring results to svp_path.
 scr_path|/scratch/nsdm|General Environment|Path to the scratch directory for temporary storage.
 clear_scr|TRUE|General Environment|If TRUE, clears the scratch directory before starting.
