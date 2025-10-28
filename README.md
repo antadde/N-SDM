@@ -2,9 +2,9 @@
 
 <img src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" align="right" width="40%"/>
 
-<h3>📢 NSDM 2.0 Development Version Available </h3>
+<h3>📢 N-SDM 2.0 Development Version Available </h3>
 
-N-SDM 2.0 is now available in its development version, featuring updated modelling functionalities and improved workflows. The official release is planned for November/December 2025.
+N-SDM 2.0 is now available in its development version, featuring updated modelling functionalities and improved workflow. The official release is planned for November/December 2025.
 
 # About N-SDM
 
