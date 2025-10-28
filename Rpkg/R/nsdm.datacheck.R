@@ -86,7 +86,7 @@ nsdm.datacheck <- function(data_dir, n_levels) {
 
   # Step 2b: Check for special characters in folder names
   spec_char <- dirs_with_data |>
-  sub(".*?/data/covariates/", "", x = _) |>                # keep only relative path after ./data/covariates
+  sub(".*?/data/covariates/", "", x = _) |>
   (\(rel_paths) rel_paths[grepl("_|[^a-zA-Z0-9/\\.]", rel_paths)])()
   
   if (length(spec_char) > 0) {
@@ -97,9 +97,45 @@ nsdm.datacheck <- function(data_dir, n_levels) {
   for (level in valid_levels) {
     check_covariate_consistency(level, cov_dir, sp_dir)
   }
+  
+ # Step 4: Verify that global-level layers have corresponding regional versions
+  if (n_levels > 1) {
 
-}
+    # --- Helper to create a comparable "key" for each raster ---
+    normalize_path <- function(path) {
+      rel <- sub(paste0("^", cov_dir, "/"), "", path)   # remove base
+      rel <- gsub("\\.tif$", "", rel)                   # remove extension
+      rel <- sub("^glo/", "", rel)                      # remove glo/ prefix
+      rel <- sub("^reg/", "", rel)                      # remove reg/ prefix
+      rel <- sub("/glo_", "/", rel)                     # remove /glo_ prefix in filename
+      rel <- sub("/reg_", "/", rel)                     # remove /reg_ prefix in filename
+      basename_only <- basename(rel)
+      folder_only   <- dirname(rel)
+      # Also remove glo_/reg_ prefixes from filename itself
+      clean_file <- gsub("^(glo_|reg_)", "", basename_only)
+      file.path(folder_only, clean_file)
+    }
 
+    glo_tifs <- tif_paths[grepl("/glo/", tif_paths)]
+    reg_tifs <- tif_paths[grepl("/reg/", tif_paths)]
+
+    if (length(glo_tifs) == 0 || length(reg_tifs) == 0) {
+      message("⚠️  Cannot run GLO–REG consistency check (no .tif files found in one of the folders).")
+    } else {
+      # Create comparable keys for both
+      glo_keys <- vapply(glo_tifs, normalize_path, character(1))
+      reg_keys <- vapply(reg_tifs, normalize_path, character(1))
+
+      # Identify missing matches
+      missing_reg <- glo_keys[!glo_keys %in% reg_keys]
+
+      if (length(missing_reg) > 0) {
+        stop("🚨 The following GLO layers have no matching REG version:\n",
+                paste(missing_reg, collapse = "\n"))
+    }
+  }
+  }
+  
 check_covariate_consistency <- function(level = "reg", cov_dir, sp_dir) {
   base_path <- file.path(cov_dir, level)
   dataset_paths <- list.dirs(base_path, recursive = TRUE, full.names = TRUE)

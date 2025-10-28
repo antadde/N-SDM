@@ -234,12 +234,49 @@ raster_stack<-rast(raster_list)
 names(raster_stack) <- gsub("reg_", "glo_", sub("\\.[^.]+$", "", basename(files)))
 raster_stack <- wrap(raster_stack)
 
+# F.3 Finalize: Create raster stack for selected covariates for glo_full_extent
+if(n_levels == 2 && glo_full_extent == TRUE){
+files <- na.omit(cov_info_glo$file[match(
+    cov.embed_i$ranks_2$covariate, 
+    gsub("\\.tif$", "", basename(cov_info_glo$file))
+  )])
+ 
+		
+stk <- lapply(files, function(f) { 
+  toMemory(rast(f))
+})
+
+# Extract SpatRasters from nested lists
+raster_list <- unlist(stk, recursive = TRUE)
+
+# Stack them into a single SpatRaster
+raster_stack_glo<-rast(raster_list)
+names(raster_stack_glo) <- sub("\\.[^.]+$", "", basename(files))
+raster_stack_glo <- wrap(raster_stack_glo)
+}
+
 # F.4 Save Results
 pseu.abs_i_glo@env_vars <- cov.embed_i$covdata
 
-nsdm.savethis(object=list(pseu.abs_i=pseu.abs_i_glo, filter=names(cov.filter_i), embed=cov.embed_i, covstk=raster_stack),
-              species_name=ispi_name,
-              save_path=file.path(scr_path,"outputs/d1_covsels/glo"))
+# Build base list
+obj_list <- list(
+  pseu.abs_i = pseu.abs_i_glo,
+  filter     = names(cov.filter_i),
+  embed      = cov.embed_i,
+  covstk     = raster_stack
+)
+
+# Conditionally add raster_stack_glo if it exists
+if (exists("raster_stack_glo", inherits = FALSE)) {
+  obj_list$covstk_glo <- raster_stack_glo
+}
+
+# Save
+nsdm.savethis(
+  object      = obj_list,
+  species_name = ispi_name,
+  save_path    = file.path(scr_path, "outputs/d1_covsels/glo")
+)
 			  
 cat("Covariate preparation and selection completed successfully.\n")
 cat("Finished.\n")

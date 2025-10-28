@@ -258,41 +258,79 @@ cat("\n\nVariable importance scores and response curves computed\n")
 ### =========================================================================
 ### H. Spatial Predictions
 ### =========================================================================
-covstk<-unwrap(d1_covsels$covstk)
+## H.0 Prepare Covariate Data for Predictions (optional glo extent projections)
+if(n_levels == 2 && glo_full_extent == TRUE){
+covstk_glo<-unwrap(d1_covsels$covstk_glo)
 
-## H.1 Prepare Covariate Data for Predictions
 if (length(cov_observ) > 0) {
-  cov_obs <- grep(paste(cov_observ, collapse = "|"), names(covstk), value = TRUE)
+  cov_obs_glo <- grep(paste(cov_observ, collapse = "|"), names(covstk_glo), value = TRUE)
 } else {
-  cov_obs <- NULL
+  cov_obs_glo <- NULL
 }
 
-stk_df <- nsdm.retrieve4pred(
-  covstk = covstk, 
-  observational = cov_obs,
+stk_df_glo <- nsdm.retrieve4pred(
+  covstk = covstk_glo, 
+  observational = cov_obs_glo,
   obsval = cov_observ_val,
-  mask = mask_pred, 
+  mask = mask_pred_glo,
   scaleparam = attributes(d0_datasets$env_vars)[c("scaled:center", "scaled:scale")]
 )
 
+template_glo <- covstk_glo[[1]]
+template_glo <- wrap(template_glo)
+}
+
+
+## H.1 Prepare Covariate Data for Predictions
+covstk_reg<-unwrap(d1_covsels$covstk)
+
+if (length(cov_observ) > 0) {
+  cov_obs_reg <- grep(paste(cov_observ, collapse = "|"), names(covstk_reg), value = TRUE)
+} else {
+  cov_obs_reg <- NULL
+}
+
+stk_df_reg <- nsdm.retrieve4pred(
+  covstk = covstk_reg, 
+  observational = cov_obs_reg,
+  obsval = cov_observ_val,
+  mask = mask_pred_reg,
+  scaleparam = attributes(d0_datasets$env_vars)[c("scaled:center", "scaled:scale")]
+)
+
+template_reg <- covstk_reg[[1]]
+template_reg <- wrap(template_reg)
+
 ## H.2 Clean Workspace to Free Memory Before Predicting
-template <- covstk[[1]]
 suppressWarnings(suppressMessages({
-  rm(d0_datasets, d1_covsels, covstk, respcurves, imp, eval_list)
-  invisible(gc())  # Suppress the output of garbage collection
+  rm(d0_datasets, d1_covsels, covstk_glo, covstk_reg, respcurves, imp, eval_list)
+  invisible(gc())
 }))
 
 ## H.3 Predict
-ndata_bck <- nsdm.predict(
+if(n_levels == 2 && glo_full_extent == TRUE){
+ndata_bck_glo <- nsdm.predict(
   models = prmod,
-  nwdata = stk_df$covdf,
+  nwdata = stk_df_glo$covdf,
   nsplits = ncores
 )
 
-## Save Predictions
-template <- wrap(template)
 nsdm.savethis(
-  object = list(ndata_bck = ndata_bck, template = template, nona_ix = stk_df$covdf_ix),
+  object = list(ndata_bck = ndata_bck_glo, template = template_glo, nona_ix = stk_df_glo$covdf_ix),
+  model_name = model_name, 
+  species_name = ispi_name,
+  save_path = file.path(scr_path, "outputs", "d6_preds", "glo_full_extent")
+)
+}
+
+ndata_bck_reg <- nsdm.predict(
+  models = prmod,
+  nwdata = stk_df_reg$covdf,
+  nsplits = ncores
+)
+
+nsdm.savethis(
+  object = list(ndata_bck = ndata_bck_reg, template = template_reg, nona_ix = stk_df_reg$covdf_ix),
   model_name = model_name, 
   species_name = ispi_name,
   save_path = file.path(scr_path, "outputs", "d6_preds", "glo")

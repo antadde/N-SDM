@@ -198,7 +198,7 @@ names(stk_sce) <- cov
       covstk = stk_sce,
       observational = cov_obs,
       obsval = cov_observ_val,
-      mask = mask_pred,
+      mask = mask_pred_reg,
       scaleparam = attributes(d0_datasets$env_vars)[c("scaled:center", "scaled:scale")]
     )
     

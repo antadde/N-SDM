@@ -71,8 +71,40 @@ for(i in seq_along(mod_algo)){
   save_path <- file.path(scr_path, "outputs", "d7_maps/glo")
   nsdm.savemap(maps=map_i, species_name=ispi_name, model_name=model_name, format="tif", save_path=save_path)
   
-  cat(paste0(model_name, " predictions saved\n"))
+  cat(paste0(model_name, " glo predictions saved\n"))
 }
+
+# Optional glo_full_extent mapping
+if(n_levels == 2 && glo_full_extent == TRUE){
+for(i in seq_along(mod_algo)){
+  # Load raw prediction data
+  model_name <- mod_algo[i]
+  pred_path <- file.path(scr_path, "outputs", "d6_preds/glo_full_extent")
+  full_pred_path <- file.path(pred_path, ispi_name, model_name)
+  pred_file <- list.files(full_pred_path, pattern="\\.rds$", full.names=TRUE)
+  
+  if (length(pred_file) == 0) {
+    warning(paste("No .rds file found for", model_name, "in", full_pred_path))
+    next  
+  }
+  
+  pred <- readRDS(pred_file)
+  pred$template<-terra::unwrap(pred$template)
+
+  # Predict
+  map_i <- nsdm.map(template=pred$template,
+                     nona_ix=pred$nona_ix,
+                     species_name=ispi_name, model_name=model_name, level="glo",
+                     pred=pred$ndata_bck) 
+  
+  # Save
+  save_path <- file.path(scr_path, "outputs", "d7_maps/glo_full_extent")
+  nsdm.savemap(maps=map_i, species_name=ispi_name, model_name=model_name, format="tif", save_path=save_path)
+  
+  cat(paste0(model_name, " glo_full_extent predictions saved\n"))
+}
+}
+
 
 ### =========================================================================
 ### D- Ensemble predictions
@@ -93,7 +125,27 @@ nsdm.savemap(maps = ensemble_glo$ensemble, species_name = ispi_name, model_name 
 nsdm.savemap(maps = ensemble_glo$ensemble_cv, species_name = ispi_name, model_name = NULL, format="tif",
                save_path = file.path(scr_path, "outputs", "d9_ensembles-cv/glo"))
 
-cat("Ensemble predictions saved \n")
+cat("glo ensemble predictions saved \n")
+
+# Optional glo_full_extent ensembling
+if(n_levels == 2 && glo_full_extent == TRUE){
+ensemble_glo <- nsdm.ensemble(model_names = mod_algo,
+                              species_name = ispi_name,
+                              level = "glo",
+                              map_path = file.path(scr_path, "outputs", "d7_maps/glo_full_extent"), 
+                              score_path = file.path(scr_path, "outputs", "d3_evals/glo"), 
+                              weighting = as.logical(do_weighting), 
+                              weight_metric = weight_metric, 
+                              discthre = disc_thre_glo)
+
+nsdm.savemap(maps = ensemble_glo$ensemble, species_name = ispi_name, model_name = NULL, format="tif",
+               save_path = file.path(scr_path, "outputs", "d8_ensembles/glo_full_extent"))
+
+nsdm.savemap(maps = ensemble_glo$ensemble_cv, species_name = ispi_name, model_name = NULL, format="tif",
+               save_path = file.path(scr_path, "outputs", "d9_ensembles-cv/glo_full_extent"))
+
+cat("glo_full_extent ensemble predictions saved \n")	
+}
 
 ### =========================================================================
 ### D- Ensemble predictions evaluation

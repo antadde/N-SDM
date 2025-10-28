@@ -164,9 +164,18 @@ names(stk_sce) <- cov
     ### C- Spatial projections
     ### =========================================================================
     
-    ## C.1 Prepare covariate data for projections
-    clim_df_reg <- nsdm.retrieve4pred(
+	if (length(cov_observ) > 0) {
+	  cov_obs <- grep(paste(cov_observ, collapse = "|"), names(stk_sce), value = TRUE)
+	} else {
+	  cov_obs <- NULL
+	}
+	
+	# C.1 Prepare covariate data for projections
+      clim_df_reg <- nsdm.retrieve4pred(
       covstk = stk_sce,
+	  observational = cov_obs,
+      obsval = cov_observ_val,
+      mask = mask_pred_reg,
       scaleparam = attributes(d0_datasets$env_vars)[c("scaled:center", "scaled:scale")]
     )
     

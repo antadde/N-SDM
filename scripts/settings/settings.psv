@@ -76,7 +76,9 @@ nesting_methods|covariate,multiply,multiplyw,average,averagew|Nesting|Methods fo
 ###
 ### Predicting and Projecting
 ###
-mask_pred|lakes_mask.tif|Predicting and Projecting|Optional binary raster .tif prediction mask (0/1) stored in the folder ./data/masks. Pixels with value 0 are excluded from predictions. 
+glo_full_extent|FALSE|Predicting and Projecting|Predict global model over the full domain extent grid ('TRUE' = full extent, 'FALSE' = regional extent only, default).
+mask_pred_reg|lakes_mask.tif|Predicting and Projecting|Optional binary raster .tif prediction mask (0/1) stored in the folder ./data/masks. Pixels with value 0 are excluded from predictions.
+mask_pred_glo|NULL|Predicting and Projecting|If glo_full_extent, optional binary raster .tif prediction mask (0/1) stored in the folder ./data/masks. Pixels with value 0 are excluded from predictions.
 do_proj|TRUE|Predicting and Projecting|If TRUE, performs projections under alternative scenarios.
 proj_scenarios|rcp45,rcp85|Predicting and Projecting|List of scenario names. Must match names in covariate scenario folders.
 proj_periods|2085|Predicting and Projecting|Projection periods, must match names covariate scenario folders.

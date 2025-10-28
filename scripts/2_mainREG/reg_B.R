@@ -282,7 +282,7 @@ stk_df <- nsdm.retrieve4pred(
   covstk = d1_covsels$covstk, 
   observational = cov_obs,
   obsval = cov_observ_val,
-  mask = mask_pred, 
+  mask = mask_pred_reg, 
   scaleparam = attributes(d1_covsels$env_vars)[c("scaled:center", "scaled:scale")]
 )
 

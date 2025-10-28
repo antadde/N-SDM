@@ -61,8 +61,12 @@ if (length(forced_species) > 0) {
 }
 
 # Check and refine masks
-if (length(mask_pred) > 0) {
-  mask_pred <- file.path(w_path, "data", "masks", mask_pred)
+if (length(mask_pred_reg) > 0) {
+  mask_pred_reg <- file.path(w_path, "data", "masks", mask_pred_reg)
+}
+
+if (length(mask_pred_glo) > 0) {
+  mask_pred_glo <- file.path(w_path, "data", "masks", mask_pred_glo)
 }
 
 # Identify posthoc nesting methods
