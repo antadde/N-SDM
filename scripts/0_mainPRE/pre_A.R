@@ -20,8 +20,8 @@ for (i in seq_along(parameters)) {
   param <- parameters[i]
   value <- trimws(values[i])
 
-  # Case 1: NULL
-  if (toupper(value) == "NULL") {
+  # Case 1: NULL or empty/whitespace-only
+  if (toupper(value) == "NULL" || grepl("^\\s*$", value)) {
     do.call("<-", list(param, NULL))
 
   # Case 2: comma-separated list (e.g., glm,gam,gbm)
@@ -39,35 +39,28 @@ for (i in seq_along(parameters)) {
   }
 }
 
-# Define paths for covariates and species data
-cov_path <- file.path(w_path, "data", "covariates")
-spe_glo <- list.files(file.path(w_path, "data", "species", "glo"), 
-                      full.names = TRUE, pattern = "\\.(rds|psv)$")
+# Define data path
+if (is.null(data_path)) data_path <- file.path(w_path, "data")
+
+# Define species data
+spe_glo <- list.files(file.path(data_path, "species", "glo"), 
+                      full.names = TRUE, pattern = "\\.psv$")
 
 if (n_levels > 1) {
-  spe_reg <- list.files(file.path(w_path, "data", "species", "reg"), 
-                        full.names = TRUE, pattern = "\\.(rds|psv)$")
+  spe_reg <- list.files(file.path(data_path, "species", "reg"), 
+                        full.names = TRUE, pattern = "\\.psv$")
 }
 
-# Define parameter grid and expert tables
+# Define parameter grid, expert tables and forced species list
 param_grid <- file.path(w_path, "scripts", "settings", param_grid)
 
-if (length(expert_table) > 0) {
-  expert_table <- file.path(w_path, "scripts", "settings", expert_table)
-}
+if (!is.null(expert_table)) expert_table <- file.path(w_path, "scripts", "settings", expert_table)
 
-if (length(forced_species) > 0) {
-  forced_species <- file.path(w_path, "scripts", "settings", forced_species)
-}
+if (!is.null(forced_species)) forced_species <- file.path(w_path, "scripts", "settings", forced_species)
 
 # Check and refine masks
-if (length(mask_pred_reg) > 0) {
-  mask_pred_reg <- file.path(w_path, "data", "masks", mask_pred_reg)
-}
-
-if (length(mask_pred_glo) > 0) {
-  mask_pred_glo <- file.path(w_path, "data", "masks", mask_pred_glo)
-}
+if (!is.null(mask_pred_reg))  mask_pred_reg <- file.path(data_path, "masks", mask_pred_reg)
+if (!is.null(mask_pred_glo))  mask_pred_glo <- file.path(data_path, "masks", mask_pred_glo)
 
 # Identify posthoc nesting methods
 posthoc_nesting_methods <- intersect(nesting_methods, c("multiply", "multiplyw", "average", "averagew"))
@@ -81,8 +74,6 @@ if (length(posthoc_nesting_methods) > 0) {
 # Save settings and clean up
 rm(settings, parameters, values, i)
 save.image(file.path(w_path, "tmp", "settings", "ref_nsdm_settings.RData"))
-
-# Print confirmation
 cat("N-SDM settings defined...\n")
 
 ### =========================================================================
@@ -104,14 +95,13 @@ ncores <- as.numeric(Sys.getenv('SLURM_CPUS_PER_TASK'))
 
 # Clean pre-prepared fst files
 if (clear_fst) {
-data_dir <- file.path(w_path, "data")
-fst_files <- list.files(data_dir, pattern = "\\.fst$", recursive = TRUE, full.names = TRUE)
+fst_files <- list.files(data_path, pattern = "\\.fst$", recursive = TRUE, full.names = TRUE)
 invisible(file.remove(fst_files))
 }
 
 # Initial data check
 nsdm.datacheck(
-  data_dir = file.path(w_path, "data"),
+  data_dir = data_path,
   n_levels = n_levels
 )
 
@@ -119,9 +109,9 @@ cat("Initial data check procedure completed..\n")
 
 # Generate and open covariate info table
 nsdm.covinfo(
-  cov_path = cov_path, 
+  cov_path = file.path(data_path, "covariates"), 
   save_path = file.path(w_path, "tmp", "settings"))
-cov_info <- fread(
+  cov_info <- fread(
   file.path(w_path, "tmp", "settings", "ref_covariates_available.psv"),
   na.strings = c("NA", "", "NULL")
 )

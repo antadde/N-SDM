@@ -49,60 +49,60 @@ array<-expand.grid(species=species, scenarios=scenars)
 ispi_name <- as.character(array[arrayID,"species"])
 scenar<-as.character(array[arrayID,"scenarios"])
 
-  for (model_name in mod_algo) {
-  for (per in proj_periods) {
+for (model_name in mod_algo) {
+for (per in proj_periods) {
 cat(paste0("Starting computation of ", scenar, " ", per, " ", toupper(model_name),  
-           " GLO projections for ", ispi_name, "...\n"))
-    
-    ### =========================================================================
-    ### C- Load GLO model
-    ### =========================================================================
-    
-    # Load GLO data
-    d0_datasets <- nsdm.loadthis(
-      species_name = ispi_name,
-      read_path = file.path(scr_path, "outputs", "d0_datasets", "glo")
-    )
-    
-    # Specific loading strategy for lgb.booster
-    if (model_name == "gbm") {
-	
-	substitut <- c("glm", "gam", "max", "rf")[c("glm", "gam", "max", "rf") %in% mod_algo][1]
+   " GLO projections for ", ispi_name, "...\n"))
 
-      prmod2 <- lgb.load(
-        file.path(scr_path, "outputs", "d2_models", "glo", 
-                  ispi_name, "gbm", paste0(ispi_name, "_gbm.rds"))
-      )
-      prmod <- nsdm.loadthis(
-        model_name = substitut,
-        species_name = ispi_name,
-		tag = substitut,
-        read_path = file.path(scr_path, "outputs", "d2_models", "glo")
-      )
-      prmod@fits[[1]] <- prmod2
-    } else {
-	
-	    # Load GLO model
-    prmod <- nsdm.loadthis(
-      model_name = model_name,
-      species_name = ispi_name,
-	  tag = model_name,
-      read_path = file.path(scr_path, "outputs", "d2_models", "glo"))
-	}
-    
-    # List covariates
-    cov <- unlist(strsplit(prmod@meta$env_vars, ", "))
-    
-    ### =========================================================================
-    ### B. Load scenario layers
-    ### =========================================================================
-    # Retrieve list of candidate covariates and covinfo table
-    lr_file <- file.path(w_path, "tmp", "settings", "ref_covariates.rds")
-    lr <- readRDS(lr_file)
-    cov_info <- lr$cov_info
-    cov_info$ID <- paste(cov_info$cada, cov_info$variable, cov_info$attribute, 
-                         cov_info$focal, sep = "_")
-						 
+### =========================================================================
+### C- Load GLO model
+### =========================================================================
+
+# Load GLO data
+d0_datasets <- nsdm.loadthis(
+species_name = ispi_name,
+read_path = file.path(scr_path, "outputs", "d0_datasets", "glo")
+)
+
+# Specific loading strategy for lgb.booster
+if (model_name == "gbm") {
+
+substitut <- c("glm", "gam", "max", "rf")[c("glm", "gam", "max", "rf") %in% mod_algo][1]
+
+prmod2 <- lgb.load(
+file.path(scr_path, "outputs", "d2_models", "glo", 
+		  ispi_name, "gbm", paste0(ispi_name, "_gbm.rds"))
+)
+prmod <- nsdm.loadthis(
+model_name = substitut,
+species_name = ispi_name,
+tag = substitut,
+read_path = file.path(scr_path, "outputs", "d2_models", "glo")
+)
+prmod@fits[[1]] <- prmod2
+} else {
+
+# Load GLO model
+prmod <- nsdm.loadthis(
+model_name = model_name,
+species_name = ispi_name,
+tag = model_name,
+read_path = file.path(scr_path, "outputs", "d2_models", "glo"))
+}
+
+# List covariates
+cov <- unlist(strsplit(prmod@meta$env_vars, ", "))
+
+### =========================================================================
+### B. Load scenario layers
+### =========================================================================
+# Retrieve list of candidate covariates and covinfo table
+lr_file <- file.path(w_path, "tmp", "settings", "ref_covariates.rds")
+lr <- readRDS(lr_file)
+cov_info <- lr$cov_info
+cov_info$ID <- paste(cov_info$cada, cov_info$variable, cov_info$attribute, 
+				 cov_info$focal, sep = "_")
+				 
 # Build the matching key
 cov_match <- gsub(".tif", "", basename(cov_info$file))
 
@@ -111,102 +111,193 @@ cov_ID <- cov_info$ID[match(cov, cov_match)]
 
 # Filter cov_info_pres
 if (n_levels == 1) {
-  cov_info_pres <- cov_info[cov_info$ID %in% cov_ID & 
-                            (is.na(cov_info$scenario) | trimws(cov_info$scenario) == ""), ]
+cov_info_pres <- cov_info[cov_info$ID %in% cov_ID & 
+						(is.na(cov_info$scenario) | trimws(cov_info$scenario) == ""), ]
 }
 
 if (n_levels == 2) {
-  cov_info_pres <- cov_info[cov_info$ID %in% cov_ID & 
-                            cov_info$level == "reg" & 
-                            (is.na(cov_info$scenario) | trimws(cov_info$scenario) == ""), ]
+cov_info_pres <- cov_info[cov_info$ID %in% cov_ID & 
+						cov_info$level == "reg" & 
+						(is.na(cov_info$scenario) | trimws(cov_info$scenario) == ""), ]
 }
 
 # Reorder according to the cov order
 cov_info_pres <- cov_info_pres[match(cov_ID, cov_info_pres$ID), ]
- 
+
 # --- B.1 List available scenario layers for cov_ID ---
 cov_info_sce <- cov_info[
-  cov_info$ID %in% cov_ID &
-  cov_info$scenario == scenar &
-  cov_info$year == per, ]
+cov_info$ID %in% cov_ID &
+cov_info$scenario == scenar &
+cov_info$level == "reg" &
+cov_info$year == per, ]
 
 # Reorder according to cov_ID
 cov_info_sce <- cov_info_sce[match(cov_ID, cov_info_sce$ID), ]
-
 lr_sce <- cov_info_sce$file
 lr_sce_ID <- cov_info_sce$ID
 
 # --- B.2 Load target scenario layers if available ---
 if (length(lr_sce) > 0) {	
-  stk_sce <- lapply(lr_sce, function(f) toMemory(rast(f)))
-  stk_sce <- rast(stk_sce)
+stk_sce <- lapply(lr_sce, function(f) toMemory(rast(f)))
+stk_sce <- rast(stk_sce)
 } else {
-  stk_sce <- list()
+stk_sce <- list()
 }
 
 # --- B.3 Complete with non-scenario layers if needed ---
 remainders <- setdiff(cov_ID, lr_sce_ID)
 
 if (length(remainders) > 0) {
-  cov_info_remain <- cov_info_pres[match(remainders, cov_info_pres$ID), ]
-  lr_remain <- cov_info_remain$file
-  stk_remain <- lapply(lr_remain, function(f) toMemory(rast(f)))
-  stk_remain <- rast(stk_remain)
+cov_info_remain <- cov_info_pres[match(remainders, cov_info_pres$ID), ]
+lr_remain <- cov_info_remain$file
+stk_remain <- lapply(lr_remain, function(f) toMemory(rast(f)))
+stk_remain <- rast(stk_remain)
 
-  # Combine scenario and remainder layers, preserving cov_ID order
-  stk_sce <- rast(c(stk_sce, stk_remain))
+# Combine scenario and remainder layers, preserving cov_ID order
+stk_sce <- rast(c(stk_sce, stk_remain))
 }
 
 # --- Final rename according to model covariates ---
 names(stk_sce) <- cov
-    
-    ### =========================================================================
-    ### C- Spatial projections
-    ### =========================================================================
-    
-	if (length(cov_observ) > 0) {
-	  cov_obs <- grep(paste(cov_observ, collapse = "|"), names(stk_sce), value = TRUE)
-	} else {
-	  cov_obs <- NULL
-	}
-	
-	# C.1 Prepare covariate data for projections
-      clim_df_reg <- nsdm.retrieve4pred(
-      covstk = stk_sce,
-	  observational = cov_obs,
-      obsval = cov_observ_val,
-      mask = mask_pred_reg,
-      scaleparam = attributes(d0_datasets$env_vars)[c("scaled:center", "scaled:scale")]
-    )
-    
-    ## C.2 Clean workspace to free some memory before predicting
-	template <- stk_sce[[1]]
-	suppressWarnings(suppressMessages({
-	  rm(d0_datasets, stk_sce)
-	  invisible(gc()) 
-	}))
-    
-    ## C.3 Predict
-    ndata_bck <- nsdm.predict(
-      models = prmod,
-      nwdata = clim_df_reg$covdf,
-      nsplits = ncores
-    )
-    
-    ## C.4 Save
-	template <- wrap(template)
-	
-    nsdm.savethis(
-      object = list(
-        ndata_bck = ndata_bck,
-        template = template,
-        nona_ix = clim_df_reg$covdf_ix
-      ),
-      model_name = model_name,
-      species_name = ispi_name,
-      save_path = file.path(scr_path, "outputs", "d12_preds-sce", "glo", scenar, per)
-    )
-  }
+
+
+# Optional same routine for glo_full_extent option
+if (n_levels == 2 && glo_full_extent == TRUE) {	
+
+cov_info_pres_glo <- cov_info[
+cov_info$ID %in% cov_ID & 
+cov_info$level == "glo" & 
+(is.na(cov_info$scenario) | trimws(cov_info$scenario) == ""), 
+]
+
+cov_info_pres_glo <- cov_info_pres_glo[match(cov_ID, cov_info_pres_glo$ID), ]
+
+# --- B.1 List available scenario layers for cov_ID ---
+cov_info_sce_glo <- cov_info[
+cov_info$ID %in% cov_ID &
+cov_info$scenario == scenar &
+cov_info$level == "glo" &
+cov_info$year == per,
+]
+
+if (nrow(cov_info_sce_glo) > 0) {
+
+# --- Reorder according to cov_ID ---
+cov_info_sce_glo <- cov_info_sce_glo[match(cov_ID, cov_info_sce_glo$ID), ]
+lr_sce_glo <- cov_info_sce_glo$file
+lr_sce_ID_glo <- cov_info_sce_glo$ID
+
+# --- B.2 Load target scenario layers if available ---
+if (length(lr_sce_glo) > 0) {	
+  stk_sce_glo <- lapply(lr_sce_glo, function(f) toMemory(rast(f)))
+  stk_sce_glo <- rast(stk_sce_glo)
+} else {
+  stk_sce_glo <- list()
+}
+
+# --- B.3 Complete with non-scenario layers if needed ---
+remainders_glo <- setdiff(lr_sce_glo, lr_sce_ID_glo)
+if (length(remainders_glo) > 0) {
+  cov_info_remain_glo <- cov_info_pres_glo[match(remainders_glo, cov_info_pres_glo$ID), ]
+  lr_remain_glo <- cov_info_remain_glo$file
+  stk_remain_glo <- lapply(lr_remain_glo, function(f) toMemory(rast(f)))
+  stk_remain_glo <- rast(stk_remain_glo)
+  stk_sce_glo <- rast(c(stk_sce_glo, stk_remain_glo))
+}
+
+# --- Final rename according to model covariates ---
+names(stk_sce_glo) <- cov
+}
+}
+
+### =========================================================================
+### C- Spatial projections
+### =========================================================================
+## C.1.0 Prepare Covariate Data for Predictions (optional glo extent projections)
+if (exists("stk_sce_glo")) {	
+if (length(cov_observ) > 0) {
+cov_obs_glo <- grep(paste(cov_observ, collapse = "|"), names(stk_sce_glo), value = TRUE)
+} else {
+cov_obs_glo <- NULL
+}
+
+clim_df_glo <- nsdm.retrieve4pred(
+covstk = stk_sce_glo, 
+observational = cov_obs_glo,
+obsval = cov_observ_val,
+mask = mask_pred_glo,
+scaleparam = attributes(d0_datasets$env_vars)[c("scaled:center", "scaled:scale")]
+)
+
+template_glo <- stk_sce_glo[[1]]
+template_glo <- wrap(template_glo)
+}
+
+
+# C.1.1 Prepare covariate data for projections
+if (length(cov_observ) > 0) {
+cov_obs <- grep(paste(cov_observ, collapse = "|"), names(stk_sce), value = TRUE)
+} else {
+cov_obs <- NULL
+}
+
+clim_df_reg <- nsdm.retrieve4pred(
+covstk = stk_sce,
+observational = cov_obs,
+obsval = cov_observ_val,
+mask = mask_pred_reg,
+scaleparam = attributes(d0_datasets$env_vars)[c("scaled:center", "scaled:scale")]
+)
+
+template_reg <- stk_sce[[1]]
+template_reg <- wrap(template_reg)
+
+## C.2 Clean workspace to free some memory before predicting
+suppressWarnings(suppressMessages({
+rm(d0_datasets, stk_sce, stk_sce_glo)
+invisible(gc()) 
+}))
+
+## C.3.0 Predict
+if (exists("stk_sce_glo")) {	
+ndata_bck_glo <- nsdm.predict(
+models = prmod,
+nwdata = clim_df_glo$covdf,
+nsplits = ncores
+)
+
+## C.4 Save
+nsdm.savethis(
+object = list(
+ndata_bck = ndata_bck_glo,
+template = template_glo,
+nona_ix = clim_df_glo$covdf_ix
+),
+model_name = model_name,
+species_name = ispi_name,
+save_path = file.path(scr_path, "outputs", "d12_preds-sce", "glo_full_extent", scenar, per)
+)
+}
+
+## C.3.1 Predict
+ndata_bck <- nsdm.predict(
+models = prmod,
+nwdata = clim_df_reg$covdf,
+nsplits = ncores
+)
+
+## C.4.1 Save
+nsdm.savethis(
+object = list(
+ndata_bck = ndata_bck,
+template = template_reg,
+nona_ix = clim_df_reg$covdf_ix
+),
+model_name = model_name,
+species_name = ispi_name,
+save_path = file.path(scr_path, "outputs", "d12_preds-sce", "glo", scenar, per)
+)
+} 
 }
 
 cat("Projections calculated and saved \n")

@@ -71,7 +71,7 @@ for(i in seq_along(mod_algo)){
   save_path <- file.path(scr_path, "outputs", "d7_maps/glo")
   nsdm.savemap(maps=map_i, species_name=ispi_name, model_name=model_name, format="tif", save_path=save_path)
   
-  cat(paste0(model_name, " glo predictions saved\n"))
+  cat(paste0(model_name, " predictions saved\n"))
 }
 
 # Optional glo_full_extent mapping
@@ -122,14 +122,15 @@ ensemble_glo <- nsdm.ensemble(model_names = mod_algo,
 nsdm.savemap(maps = ensemble_glo$ensemble, species_name = ispi_name, model_name = NULL, format="tif",
                save_path = file.path(scr_path, "outputs", "d8_ensembles/glo"))
 
+if (!is.null(ensemble_glo$ensemble_cv)) {
 nsdm.savemap(maps = ensemble_glo$ensemble_cv, species_name = ispi_name, model_name = NULL, format="tif",
-               save_path = file.path(scr_path, "outputs", "d9_ensembles-cv/glo"))
+               save_path = file.path(scr_path, "outputs", "d9_ensembles-cv/glo")) }
 
-cat("glo ensemble predictions saved \n")
+cat("ensemble predictions saved \n")
 
 # Optional glo_full_extent ensembling
 if(n_levels == 2 && glo_full_extent == TRUE){
-ensemble_glo <- nsdm.ensemble(model_names = mod_algo,
+ensemble_glo_full_extent <- nsdm.ensemble(model_names = mod_algo,
                               species_name = ispi_name,
                               level = "glo",
                               map_path = file.path(scr_path, "outputs", "d7_maps/glo_full_extent"), 
@@ -138,11 +139,12 @@ ensemble_glo <- nsdm.ensemble(model_names = mod_algo,
                               weight_metric = weight_metric, 
                               discthre = disc_thre_glo)
 
-nsdm.savemap(maps = ensemble_glo$ensemble, species_name = ispi_name, model_name = NULL, format="tif",
+nsdm.savemap(maps = ensemble_glo_full_extent$ensemble, species_name = ispi_name, model_name = NULL, format="tif",
                save_path = file.path(scr_path, "outputs", "d8_ensembles/glo_full_extent"))
 
-nsdm.savemap(maps = ensemble_glo$ensemble_cv, species_name = ispi_name, model_name = NULL, format="tif",
-               save_path = file.path(scr_path, "outputs", "d9_ensembles-cv/glo_full_extent"))
+if (!is.null(ensemble_glo_full_extent$ensemble_cv)) {
+nsdm.savemap(maps = ensemble_glo_full_extent$ensemble_cv, species_name = ispi_name, model_name = NULL, format="tif",
+               save_path = file.path(scr_path, "outputs", "d9_ensembles-cv/glo_full_extent"))}
 
 cat("glo_full_extent ensemble predictions saved \n")	
 }

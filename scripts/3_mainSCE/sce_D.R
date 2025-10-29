@@ -113,13 +113,14 @@ cat(paste0("Starting mapping and ensembling of ", scenar, " ", per,
       save_path = file.path(scr_path, "outputs", "d14_ensembles-sce", "reg", nesting_method, scenar, per)
     )
     
+	if (!is.null(ensemble_reg$ensemble_cv)) {
     nsdm.savemap(
       maps = ensemble_reg$ensemble_cv, 
       species_name = ispi_name, 
       model_name = NULL, 
       format = "tif", 
       save_path = file.path(scr_path, "outputs", "d15_ensembles-cv-sce", "reg", nesting_method, scenar, per)
-    )
+    )}
     
     ### =========================================================================
     ### E- Combine REG and GLO projections

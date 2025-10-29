@@ -99,8 +99,9 @@ ensemble_reg <- nsdm.ensemble(model_names = mod_algo,
 nsdm.savemap(maps = ensemble_reg$ensemble, species_name = ispi_name, model_name = NULL, format="tif", 
                save_path = file.path(scr_path, "outputs", "d8_ensembles/reg", nesting_method))
 
+if (!is.null(ensemble_reg$ensemble_cv)) {
 nsdm.savemap(maps = ensemble_reg$ensemble_cv, species_name = ispi_name, model_name = NULL, format="tif", 
-               save_path = file.path(scr_path, "outputs", "d9_ensembles-cv/reg", nesting_method))
+               save_path = file.path(scr_path, "outputs", "d9_ensembles-cv/reg", nesting_method))}
 
 cat("Ensemble predictions saved \n")
 }

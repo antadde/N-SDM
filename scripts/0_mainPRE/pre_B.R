@@ -71,7 +71,7 @@ if ("group" %in% colnames(sp_dat_glo)) {
 
 sampf_glo <- if (back_strat == "random_w" & !is.null(selected_group)) {
   selected_files <- list.files(
-    file.path(w_path, "data", "background", "random_w"),
+    file.path(data_path, "background", "random_w"),
     pattern = paste0(selected_group, "_glo\\.tif$"),  
     full.names = TRUE
   )
@@ -88,7 +88,7 @@ sampf_glo <- if (back_strat == "random_w" & !is.null(selected_group)) {
 # Select filtering shapefile if biogeographical background sampling is applied
 biog_glo <- if (back_strat == "random_biog") {
   selected_files <- list.files(
-    file.path(w_path, "data", "background", "random_biog"),
+    file.path(data_path, "background", "random_biog"),
     pattern = "_glo\\.shp$",  
     full.names = TRUE
   )
@@ -134,7 +134,7 @@ if ("group" %in% colnames(sp_dat_reg)) {
 }
 sampf_reg <- if (back_strat == "random_w" & !is.null(selected_group)) {
   selected_files <- list.files(
-    file.path(w_path, "data", "background", "random_w"),
+    file.path(data_path, "background", "random_w"),
     pattern = paste0(selected_group, "_reg\\.tif$"),  
     full.names = TRUE
   )
@@ -151,7 +151,7 @@ sampf_reg <- if (back_strat == "random_w" & !is.null(selected_group)) {
 # Select filtering shapefile if biogeographical background sampling is applied
 biog_reg <- if (back_strat == "random_biog") {
   selected_files <- list.files(
-    file.path(w_path, "data", "background", "random_biog"),
+    file.path(data_path, "background", "random_biog"),
     pattern = "_reg\\.shp$",  
     full.names = TRUE
   )

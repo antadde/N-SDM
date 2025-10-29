@@ -87,6 +87,43 @@ cat(paste0("Starting mapping and ensembling of ", scenar, " ", per,
       
       cat(paste0(model_name, " projections saved \n"))
     }
+	
+    # Optional glo_full_extent ensembling
+	pred_path <- file.path(scr_path, "outputs", "d12_preds-sce", "glo_full_extent", scenar, per)
+	if (length(list.files(pred_path)) != 0) {
+	    for (i in seq_along(mod_algo)) {
+      # C.1 Load raw prediction data
+      model_name <- mod_algo[i]
+      pred_path <- file.path(scr_path, "outputs", "d12_preds-sce", "glo_full_extent", scenar, per)
+      full_pred_path <- file.path(pred_path, ispi_name, model_name)
+      
+      pred_file <- list.files(full_pred_path, pattern = ".rds", full.names = TRUE)
+      pred <- readRDS(pred_file)
+      
+      # C.2 Predict
+      map_i <- nsdm.map(
+        template = unwrap(pred$template),
+        nona_ix = pred$nona_ix,
+        species_name = ispi_name,
+        model_name = model_name,
+        level = "glo",
+        scenar_name = scenar,
+        period_name = per,
+        pred = pred$ndata_bck
+      ) 
+      
+      # C.3 Save
+      nsdm.savemap(
+        maps = map_i, 
+        species_name = ispi_name, 
+        model_name = model_name, 
+        format = "tif", 
+        save_path = file.path(scr_path, "outputs", "d13_maps-sce", "glo_full_extent", scenar, per)
+      )
+      
+      cat(paste0(model_name, " glo_full_extent projections saved \n"))
+    }
+	}
     
     ### =========================================================================
     ### D- Ensemble projections
@@ -112,14 +149,48 @@ cat(paste0("Starting mapping and ensembling of ", scenar, " ", per,
       save_path = file.path(scr_path, "outputs", "d14_ensembles-sce", "glo", scenar, per)
     )
     
+	if (!is.null(ensemble_glo$ensemble_cv)) {
     nsdm.savemap(
       maps = ensemble_glo$ensemble_cv, 
       species_name = ispi_name, 
       model_name = NULL, format = "tif",
       save_path = file.path(scr_path, "outputs", "d15_ensembles-cv-sce", "glo", scenar, per)
+    )}
+	cat("ensemble projections saved \n")
+	
+	# Optional glo_full_extent ensembling
+	map_path = file.path(scr_path, "outputs", "d13_maps-sce", "glo_full_extent", scenar, per)
+	if (length(list.files(map_path)) != 0) {
+      ensemble_glo_full_extent <- nsdm.ensemble(
+      model_names = mod_algo,
+      species_name = ispi_name,
+      level = "glo",
+      scenar_name = scenar,
+      period_name = per,
+      map_path = file.path(scr_path, "outputs", "d13_maps-sce", "glo_full_extent", scenar, per), 
+      score_path = file.path(scr_path, "outputs", "d3_evals", "glo"),
+      weighting = as.logical(do_weighting),
+      weight_metric = weight_metric, 
+      discthre = disc_thre_glo
     )
+
+    nsdm.savemap(
+      maps = ensemble_glo_full_extent$ensemble, 
+      species_name = ispi_name, 
+      model_name = NULL, format = "tif",
+      save_path = file.path(scr_path, "outputs", "d14_ensembles-sce", "glo_full_extent", scenar, per)
+    )
+    
+	if (!is.null(ensemble_glo_full_extent$ensemble_cv)) {
+    nsdm.savemap(
+      maps = ensemble_glo_full_extent$ensemble_cv, 
+      species_name = ispi_name, 
+      model_name = NULL, format = "tif",
+      save_path = file.path(scr_path, "outputs", "d15_ensembles-cv-sce", "glo_full_extent", scenar, per)
+    )}
+	cat("glo_full_extent ensemble projections saved \n")	
+	}	
   }
 }
 
-cat("Ensemble projections saved \n")
 cat("Finished!\n")
