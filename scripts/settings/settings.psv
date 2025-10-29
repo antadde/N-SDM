@@ -6,6 +6,7 @@ new_sess|TRUE|General Environment|Indicates whether this run is treated as a new
 exit_any|TRUE|General Environment|Exiting N-SDM on any error.
 w_path|/work/nsdm|General Environment|Path to the working directory.
 svp_path|/project/nsdm_save|General Environment|Path where final outputs are transferred and stored permanently.
+data_path||General Environment|Path to the input data directory. Optional if using a custom location. Leave empty to use the default N-SDM data path.
 rsync_exclude|d1_covsels,d2_models,d6_preds,d12_preds-sce|General Environment|Output folders excluded when transferring results to svp_path.
 scr_path|/scratch/nsdm|General Environment|Path to the scratch directory for temporary storage.
 clear_scr|TRUE|General Environment|If TRUE, clears the scratch directory before starting.
@@ -30,7 +31,7 @@ disag_glo|TRUE|Species Data|If TRUE, applies spatial and/or temporal disaggregat
 thin_dist_reg|200|Species Data|If disag_reg. Distance threshold for spatial thinning of regional occurrences (level units, usually meters).
 thin_time_reg|5|Species Data|If disag_reg. Minimum temporal distance (in years) between retained presences for regional data.
 thin_dist_glo|0.008333333|Species Data|If disag_reg. Distance threshold for spatial thinning of regional occurrences (level units, usually degrees).
-thin_time_glo|NULL|Species Data|If disag_reg. Minimum temporal distance (in years) between retained presences for global data.
+thin_time_glo|0|Species Data|If disag_reg. Minimum temporal distance (in years) between retained presences for global data.
 back_strat|random|Species Data|Strategy for generating background points in presence-only data. Currently,  'random', 'random_biog' or 'random_w' are available.
 n_back|10000|Species Data|If pa_po_reg  or pa_po_glo is TRUE. Number of background points to generate.
 expert_table|expert_table.psv|Covariate Data and Selection|(Optional) Name of the .psv file for the pre-filtering table listing allowed covariates for each species group, to be stored in ./scripts/settings.
@@ -78,7 +79,7 @@ nesting_methods|covariate,multiply,multiplyw,average,averagew|Nesting|Methods fo
 ###
 glo_full_extent|FALSE|Predicting and Projecting|Predict global model over the full domain extent grid ('TRUE' = full extent, 'FALSE' = regional extent only, default).
 mask_pred_reg|lakes_mask.tif|Predicting and Projecting|Optional binary raster .tif prediction mask (0/1) stored in the folder ./data/masks. Pixels with value 0 are excluded from predictions.
-mask_pred_glo|NULL|Predicting and Projecting|If glo_full_extent, optional binary raster .tif prediction mask (0/1) stored in the folder ./data/masks. Pixels with value 0 are excluded from predictions.
+mask_pred_glo||Predicting and Projecting|If glo_full_extent, optional binary raster .tif prediction mask (0/1) stored in the folder ./data/masks. Pixels with value 0 are excluded from predictions.
 do_proj|TRUE|Predicting and Projecting|If TRUE, performs projections under alternative scenarios.
 proj_scenarios|rcp45,rcp85|Predicting and Projecting|List of scenario names. Must match names in covariate scenario folders.
 proj_periods|2085|Predicting and Projecting|Projection periods, must match names covariate scenario folders.
