@@ -107,7 +107,8 @@ stack_map <- terra::subset(stack_map, keep_indices)
 
 ensemble_mn <- ensemble  # Store mean ensemble
 
-# Compute coefficient of variation using terra
+if(nlyr(stack_map) > 1){
+# Compute coefficient of variation
 rasterstack_sd_fast <- function(x) {
   s0 <- nlyr(x)
   s1 <- terra::subset(x, 1)
@@ -123,19 +124,18 @@ rasterstack_sd_fast <- function(x) {
 ensemble_sd <- rasterstack_sd_fast(stack_map)
 ensemble_cv <- (ensemble_sd / ensemble_mn) * 100
 
-# Final rounding and type conversion
+# Final rounding, type conversion, and rename
 ensemble_cv <- terra::round(ensemble_cv)
-ensemble_mn <- terra::round(ensemble_mn)
-
 storage.mode(values(ensemble_cv)) <- "integer"
-storage.mode(values(ensemble_mn)) <- "integer"
-
-# Rename layers
-ensemble_name <- paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble", sep = "_")
 ensemble_cv_name <- paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble_cv", sep = "_")
-
-names(ensemble_mn) <- gsub("_NA", "", ensemble_name)
 names(ensemble_cv) <- gsub("_NA", "", ensemble_cv_name)
+}
+ensemble_mn <- terra::round(ensemble_mn)
+storage.mode(values(ensemble_mn)) <- "integer"
+ensemble_name <- paste(ispi_name, level, nesting_name, scenar_name, period_name, "ensemble", sep = "_")
+names(ensemble_mn) <- gsub("_NA", "", ensemble_name)
 
-return(list(ensemble=toMemory(ensemble_mn), ensemble_cv=toMemory(ensemble_cv)))
+res <- list(ensemble = toMemory(ensemble_mn))
+if (exists("ensemble_cv")) res$ensemble_cv <- toMemory(ensemble_cv)
+return(res)
 }
