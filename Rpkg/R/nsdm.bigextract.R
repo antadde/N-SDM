@@ -61,7 +61,20 @@ suppressMessages({
   }, mc.cores = ncores)
 })
 
-# Combine extracted data
+# Check and combine safely
+bad <- which(sapply(xt_pres, function(x) is.null(x) || !is.data.frame(x)))
+if (length(bad) > 0) {
+  bad_names <- names(xt_pres)[bad]
+  stop("Invalid elements in xt_pres:\n",
+       paste0("  [", bad, "] ", bad_names, collapse = "\n"))
+}
+
+nrows <- sapply(xt_pres, nrow)
+if (length(unique(nrows)) > 1) {
+  row_info <- paste0("[", seq_along(nrows), "] ", names(xt_pres), ": ", nrows)
+  stop("Row mismatch across xt_pres elements:\n", paste(row_info, collapse = "\n"))
+}
+
 xt_pres <- do.call(cbind, xt_pres)
 
 # Only run temporal matching if years are available and t_match is TRUE and temporal covariates are available

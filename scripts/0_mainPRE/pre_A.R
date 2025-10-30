@@ -286,11 +286,6 @@ if (exists("forced_species") && length(forced_species) > 0) {
   }
 }
 
-# Limit species to n_spe if required
-if (exists("n_spe") && n_spe < length(species)) {
-  species <- species[1:n_spe]
-}
-
 cat(paste0("Total number of species considered for this N-SDM run is: ", length(species), "...\n"))
 
 ### =========================================================================
@@ -353,7 +348,8 @@ if (disag_glo) {
 }
 
 # Use both reg and glo or glo-only species data in the global model if requested
-if (n_levels > 1 & glo_use_reg == TRUE) {
+if (n_levels > 1) {
+	if (glo_use_reg) {
 cat(paste0("Combined use of global and regional species data in the global model requested...\n"))
   # Reproject regional dataset to match global CRS
   spe_reg_dis_reproj <- st_transform(spe_reg_dis, crs = st_crs(spe_glo_dis))
@@ -382,9 +378,10 @@ cat(paste0("Combined use of global and regional species data in the global model
   sp_combined <- sp_combined
 }
 }
+}
 
 # Save species data settings
-l3 <- if (n_levels > 1 & glo_use_reg == TRUE) {
+l3 <- if (n_levels > 1 && !is.null(glo_use_reg) && glo_use_reg) {
   list(spe_reg_dis = spe_reg_dis, spe_glo_dis = sp_combined)  # Include both regional and global data
 } else if (n_levels > 1) {
 	list(spe_reg_dis = spe_reg_dis, spe_glo_dis = spe_glo_dis)  # Use separate global and regional data
