@@ -381,7 +381,7 @@ cat(paste0("Combined use of global and regional species data in the global model
 }
 
 # Save species data settings
-l3 <- if (n_levels > 1 && !is.null(glo_use_reg) && glo_use_reg) {
+l3 <- if (n_levels > 1 && isTRUE(glo_use_reg)) {
   list(spe_reg_dis = spe_reg_dis, spe_glo_dis = sp_combined)  # Include both regional and global data
 } else if (n_levels > 1) {
 	list(spe_reg_dis = spe_reg_dis, spe_glo_dis = spe_glo_dis)  # Use separate global and regional data
