@@ -86,7 +86,7 @@ nsdm.datacheck <- function(data_dir, n_levels) {
 
   # Step 2b: Check for special characters in folder names
   spec_char <- dirs_with_data |>
-  sub(".*?/data/covariates/", "", x = _) |>
+  sub(".*?/covariates/", "", x = _) |>
   (\(rel_paths) rel_paths[grepl("_|[^a-zA-Z0-9/\\.]", rel_paths)])()
   
   if (length(spec_char) > 0) {

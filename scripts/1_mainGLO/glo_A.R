@@ -78,7 +78,7 @@ cov_info_glo <- cov_info_glo[na.omit(match(reg_files, glo_files)),]
 }
 
 # Subset with expert-filtered candidate covariates, if available
-if (file.exists(expert_table)) {
+if (!is.null(expert_table) && file.exists(expert_table)) {
   
   expert_tab <- try(fread(expert_table, sep="|"), silent = TRUE)
 
