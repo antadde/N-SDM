@@ -56,7 +56,7 @@ N-SDM v2.0.0 (and nsdm2 R package) has been successfully installed and executed 
   - `r/4.3.2`
 - Required modules are specified in the `settings.psv` file through the parameters:
   - `module_r = r/4.3.2`
-  - `module_others = stack/2024-06,gcc/12.2.0,gdal,udunits/2.2.28`
+  - `module_others = stack/2024-06,gcc/12.2.0,gdal/3.6.3,udunits/2.2.28`
 
 ***R environment:***
 - Platform: R version 4.3.2 (2023-10-31)
