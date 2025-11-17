@@ -51,7 +51,7 @@ N-SDM v2.0.0 (and nsdm2 R package) has been successfully installed and executed 
 - Modules:
   - `stack/2024-06`
   - `gcc/12.2.0`
-  - `gdal`
+  - `gdal/3.6.3`
   - `udunits/2.2.28`
   - `r/4.3.2`
 - Required modules are specified in the `settings.psv` file through the parameters:
