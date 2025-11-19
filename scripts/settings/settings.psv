@@ -33,7 +33,6 @@ thin_dist_glo|0.008333333|Species Data|If disag_reg. Distance threshold for spat
 thin_time_glo|0|Species Data|If disag_reg. Minimum temporal distance (in years) between retained presences for global data.
 back_strat|random|Species Data|Strategy for generating background points in presence-only data. Currently,  'random', 'random_biog' or 'random_w' are available.
 n_back|10000|Species Data|If pa_po_reg  or pa_po_glo is TRUE. Number of background points to generate.
-expert_table|expert_table.psv|Covariate Data and Selection|(Optional) Name of the .psv file for the pre-filtering table listing allowed covariates for each species group, to be stored in ./scripts/settings.
 ###
 ### Covariate Data and Selection
 ###
@@ -45,6 +44,7 @@ tmatch_scheme_glo|npts|Covariate Data and Selection|Scheme for temporal matching
 tmatch_scheme_reg|npts|Covariate Data and Selection|Scheme for temporal matching (regional level) ('npts' or 'nts').
 cor_cut|0.7|Covariate Data and Selection|Threshold for Pearson correlation coefficient used to filter colinear covariates.
 max_thre|12|Covariate Data and Selection|Maximum possible number of covariates allowed in a model.
+expert_table|expert_table.psv|Covariate Data and Selection|(Optional) Name of the .psv file for the pre-filtering table listing allowed covariates for each species group, to be stored in ./scripts/settings.
 ###
 ### Modelling Algorithms and Validation
 ###
