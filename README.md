@@ -19,12 +19,8 @@ N-SDM is a high-performance computing pipeline for Nested-Species Distribution M
    git clone https://github.com/antadde/N-SDM.git nsdm
    ```
 
-3. An installation of the **nsdm2 R package**:
+3. An installation of the **nsdm R package**:
    ```r
-   # --- Stable release ---
-   # NOT OUT YET
-   
-   # --- Development version ---
    remotes::install_github("antadde/N-SDM/Rpkg")
    ```
    
