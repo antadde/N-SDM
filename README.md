@@ -38,7 +38,7 @@ N-SDM is a high-performance computing pipeline for Nested-Species Distribution M
 
 ## Tested cluster environments
 
-N-SDM v2.0.0 (and nsdm2 R package) has been successfully installed and executed on multiple high-performance computing (HPC) systems. The following configurations describe the module environments and R setups that were verified to work.
+N-SDM v2.0.0 (and nsdm R package) has been successfully installed and executed on multiple high-performance computing (HPC) systems. The following configurations describe the module environments and R setups that were verified to work.
 
 #### 1. ETH Zürich – Euler Cluster
 ***Cluster environment:***
