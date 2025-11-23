@@ -37,9 +37,8 @@ and presence values.}
 }
 \value{
 A named list of ensemble evaluation scores, averaged across replicates.
-Elements correspond to ensemble types (e.g. \code{"GLO"}, \code{"REG"}, \code{"MUL"}, \code{"MULW"}, \code{"COV"}).
 
-Evaluation is performed with \code{\link[=nsdm.ceval]{nsdm.ceval()}}, returning mean values over replicates.
+#'
 }
 \description{
 Evaluate ensemble predictions for a given species, level, and nesting strategy.

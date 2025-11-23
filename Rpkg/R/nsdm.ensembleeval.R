@@ -21,11 +21,8 @@
 #'   `"multiply"`, `"average"`, etc.
 #'
 #' @return A named list of ensemble evaluation scores, averaged across replicates. 
-#' Elements correspond to ensemble types (e.g. `"GLO"`, `"REG"`, `"MUL"`, `"MULW"`, `"COV"`).
 #'
-#'
-#' Evaluation is performed with [nsdm.ceval()], returning mean values over replicates.
-#'
+#'#'
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 

@@ -1,6 +1,6 @@
 Package: nsdm2
 Title: Nested-Species Distribution Modelling
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: 
     person(given = "Antoine",
            family = "Adde",
@@ -11,4 +11,4 @@ Depends: data.table, fst, gam, glmnet, lightgbm, maxnet, Metrics, mgcv, parallel
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
