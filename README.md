@@ -89,7 +89,7 @@ Following the spatially-nested framework, we distinguished between 'regional' an
 
 ## Data
 
-Further details on covariate and species data preparation are available in the [DATA_PREPARATION.odt](./documentation/DATA_PREPARATION_20251002.odt) document located in the `documentation` directory.
+Further details on covariate and species data preparation are available in the [DATA_PREP.odt](./documentation/DATAPREP.odt) document located in the `documentation` directory.
 
 ### Species data
 
@@ -101,7 +101,7 @@ We used a suite of 374 candidate covariates categorized into six main categories
 
 ## N-SDM settings
 
-Further details on N-SDM settings and hyperparameter tuning options are available in the [SETTINGS_DETAILS.odt](./documentation/SETTINGS_DETAILS_20251002.odt) and [ALGORITHMS_PARAMETERS.odt](./documentation/ALGORITHMS_PARAMETERS_20251003.odt) documents located in the `documentation` directory.
+Further details on N-SDM settings and hyperparameter tuning options are available in the [SETTINGS.odt](./documentation/SETTINGS.odt) and [ALGORITHMS.odt](./documentation/ALGORITHMS.odt) documents located in the `documentation` directory.
 
 N-SDM settings must be adapted to your computing environment (e.g., paths and module versions) by editing the `settings.psv` file in `./scripts/settings` with an editor that preserves the `"|"` delimiter. You can also customize data and modeling options such as covariate selection, modeling algorithms, and ensembling strategies.  
 
@@ -124,7 +124,7 @@ nohup bash nsdm.sh > nsdm.out &
 You can monitor the execution of N-SDM by checking the main `nsdm.out` file, and inspecting the individual job files (.sbatch, .err, .out) generated in the `./log` directories of each key step (pre, glo, reg, sce).
 
 ## Outputs
-Further details on N-SDM outputs are available in the [OUTPUTS_DETAILS.odt](./documentation/OUTPUTS_DETAILS_20251003.odt) document located in the `documentation` directory.
+Further details on N-SDM outputs are available in the [OUTPUTS.odt](./documentation/OUTPUTS.odt) document located in the `documentation` directory.
 
 Each N-SDM run produces a structured set of outputs stored first in the **scratch directory**, then automatically synchronized to the **save directory**.  
 - The **scratch folder** serves as temporary storage and may be cleared before a new run.  
