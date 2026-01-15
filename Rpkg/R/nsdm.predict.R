@@ -58,7 +58,7 @@ ndata_bck<-data.table::rbindlist(ndata, fill = TRUE)
 
 ## GBM
 if(c("lgb.Booster") %in% class(model)){
-ndata_bck<-data.frame(fit=predict(model, as.matrix(nwdata), num_threads=nsplits)) # already makes use of all available cores
+ndata_bck <- data.frame(fit=predict(model, as.matrix(nwdata), params = list(num_threads = nsplits)))
 }
 
 ndata_bck_f[[m]]<-ndata_bck
