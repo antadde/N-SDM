@@ -135,6 +135,7 @@ nsdm.datacheck <- function(data_dir, n_levels) {
     }
   }
   }
+  }
   
 check_covariate_consistency <- function(level = "reg", cov_dir, sp_dir) {
   base_path <- file.path(cov_dir, level)
