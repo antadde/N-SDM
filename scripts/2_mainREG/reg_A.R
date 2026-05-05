@@ -81,7 +81,8 @@ lr_reg <- lr$lr_reg[!grepl("/scenario/", lr$lr_reg) & lr$lr_reg %in% common_catv
 cov_info_reg <- cov_info[match(lr_reg, cov_info$file), , drop = FALSE]
 
 # Subset with expert-filtered candidate covariates, if available
-if (file.exists(expert_table)) {
+if (!is.null(expert_table) && file.exists(expert_table)) {
+
   expert_tab <- try(fread(expert_table, sep="|"), silent = TRUE)
 
   if (!inherits(expert_tab, "try-error")) {
