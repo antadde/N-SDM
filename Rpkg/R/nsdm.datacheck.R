@@ -168,7 +168,7 @@ check_covariate_consistency <- function(level = "reg", cov_dir, sp_dir) {
     r <- valid_rasters[[i]]
     compare_df[i, 2:5] <- list(
       ext(r) == ext(ref),
-      all(res(r) == res(ref)),
+      isTRUE(all.equal(res(r), res(ref), tolerance = 1e-6)),
       crs(r) == crs(ref),
       compareGeom(r, ref, stopOnError = FALSE)
     )
