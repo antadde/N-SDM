@@ -66,7 +66,7 @@ lr <- readRDS(lr_file)
 cov_info <- lr$cov_info
 
 # Refine global (glo) set
-cov_info_glo <- cov_info[cov_info$level == "glo"]
+cov_info_glo <- cov_info[cov_info$level == "glo" & is.na(cov_info$scenario)]
 
 if (n_levels > 1) {
 cov_info_reg <- cov_info[cov_info$level == "reg"]

@@ -196,7 +196,7 @@ if (length(lr_sce_glo) > 0) {
 }
 
 # --- B.3 Complete with non-scenario layers if needed ---
-remainders_glo <- setdiff(lr_sce_glo, lr_sce_ID_glo)
+remainders_glo <- setdiff(cov_ID, lr_sce_ID_glo)
 if (length(remainders_glo) > 0) {
   cov_info_remain_glo <- cov_info_pres_glo[match(remainders_glo, cov_info_pres_glo$ID), ]
   lr_remain_glo <- cov_info_remain_glo$file
