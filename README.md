@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17691895.svg)](https://doi.org/10.5281/zenodo.17691895)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7311718.svg)](https://doi.org/10.5281/zenodo.7311718)
 <img src="https://github.com/N-SDM/N-SDM/blob/main/images/n-sdm_bandeau_v4.png" alt="N-SDM bandeau" align="right" width="40%"/>
 
 <h3>📢 N-SDM 2.0 Available </h3>
