@@ -17,7 +17,7 @@
 #' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @export
 
-nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_scheme="npts", nzvt=10, nsplits=ncores){
+nsdm.bigextract<-function(cov, data, rst_ref, cov_info, t_match=FALSE, tmatch_scheme="npts", nzvt=12, nsplits=ncores){
 
  # Get data
 xy <- data@xy
