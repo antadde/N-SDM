@@ -11,7 +11,7 @@ nsdm.bigextract(
   cov_info,
   t_match = FALSE,
   tmatch_scheme = "npts",
-  nzvt = 10,
+  nzvt = 12,
   nsplits = ncores
 )
 }

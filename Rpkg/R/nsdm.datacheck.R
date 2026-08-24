@@ -124,6 +124,7 @@ nsdm.datacheck <- function(data_dir, n_levels) {
     } else {
       # Create comparable keys for both
       glo_keys <- vapply(glo_tifs, normalize_path, character(1))
+	  glo_keys <- glo_keys[!grepl("/scenario/", glo_keys, fixed = TRUE)]
       reg_keys <- vapply(reg_tifs, normalize_path, character(1))
 
       # Identify missing matches
