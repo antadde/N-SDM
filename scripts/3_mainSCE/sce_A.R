@@ -111,7 +111,8 @@ cov_ID <- cov_info$ID[match(cov, cov_match)]
 
 # Filter cov_info_pres
 if (n_levels == 1) {
-cov_info_pres <- cov_info[cov_info$ID %in% cov_ID & 
+cov_info_pres <- cov_info[cov_info$ID %in% cov_ID &
+                          cov_info$level == "glo" &  
 						(is.na(cov_info$scenario) | trimws(cov_info$scenario) == ""), ]
 }
 
@@ -125,11 +126,19 @@ cov_info_pres <- cov_info[cov_info$ID %in% cov_ID &
 cov_info_pres <- cov_info_pres[match(cov_ID, cov_info_pres$ID), ]
 
 # --- B.1 List available scenario layers for cov_ID ---
+if (n_levels == 1) {
+cov_info_sce <- cov_info[
+cov_info$ID %in% cov_ID &
+cov_info$scenario == scenar &
+cov_info$level == "glo" &
+cov_info$year == per, ]}
+
+if (n_levels == 2) {
 cov_info_sce <- cov_info[
 cov_info$ID %in% cov_ID &
 cov_info$scenario == scenar &
 cov_info$level == "reg" &
-cov_info$year == per, ]
+cov_info$year == per, ]}
 
 # Reorder according to cov_ID
 cov_info_sce <- cov_info_sce[match(cov_ID, cov_info_sce$ID), ]
