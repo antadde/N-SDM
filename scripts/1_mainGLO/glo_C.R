@@ -159,19 +159,36 @@ d1_covsels <- readRDS(file.path(scr_path, "outputs", "d1_covsels", "glo", ispi_n
 d0_test_train <- readRDS(file.path(scr_path, "outputs", "d0_datasets", "base", ispi_name, paste0(ispi_name, ".rds")))$all_sets
 
 # Evaluate
-scores_array<-nsdm.ensembleeval(sets = d0_test_train, level = "glo", model_names = mod_algo, species_name = ispi_name, scratch_path = scr_path)
+scores_array<-nsdm.ensembleeval_pooled(sets = d0_test_train, level = "glo", model_names = mod_algo, species_name = ispi_name, scratch_path = scr_path)
+scores_pooled<-attr(scores_array, "pooled")
 
+cat("\nMean evaluation across cross-validation repetitions:\n")
 print(lapply(scores_array, function(x) round(rowMeans(x), 2)))
+
+cat("\nPooled out-of-fold evaluation:\n")
+print(lapply(scores_pooled, function(x) round(x, 2)))
 
 scores_array_df <- do.call(rbind, lapply(names(scores_array), function(level)
   data.frame(
     Level = level,
-    Rep = rep(1:ncol(scores_array[[level]]), each = nrow(scores_array[[level]])),
+    Rep = as.character(rep(1:ncol(scores_array[[level]]), each = nrow(scores_array[[level]]))),
     Metric = rep(rownames(scores_array[[level]]), ncol(scores_array[[level]])),
     Value = round(c(scores_array[[level]]), 3),
     stringsAsFactors = FALSE
   )
 ))
+
+scores_pooled_df <- do.call(rbind, lapply(names(scores_pooled), function(level)
+  data.frame(
+    Level = level,
+    Rep = "pooled",
+    Metric = names(scores_pooled[[level]]),
+    Value = round(as.numeric(scores_pooled[[level]]), 3),
+    stringsAsFactors = FALSE
+  )
+))
+
+scores_array_df<-rbind(scores_array_df, scores_pooled_df)
 
 ### =========================================================================
 ### Save
