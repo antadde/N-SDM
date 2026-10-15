@@ -121,13 +121,21 @@ if (!all(is.na(years)) && isTRUE(t_match) && nrow(cov_info_fst_tempo) > 0) {
         stop("Unknown tmatch_scheme: use 'npts' or 'nts'")
       }
 
-      paste(x$dataset[x$year %in% to_remove_years], to_remove_years, sep = "_")
+      if (length(to_remove_years) == 0L) return(character(0))
+	  paste(x$dataset[x$year %in% to_remove_years], to_remove_years, sep = "_")
     }))
 
-    # Remove columns not matching the selected temporal layer
-    pattern <- paste(to_remove, collapse = "|")
-    matching_indices <- grep(pattern, names(xt_pres_sta_r))
-    xt_pres_sta_r <- xt_pres_sta_r[, -matching_indices, drop = FALSE]
+	# Remove columns only when there are temporal layers to discard
+	if (length(to_remove) > 0L) {
+	  pattern <- paste(to_remove, collapse = "|")
+	  matching_indices <- grep(pattern, names(xt_pres_sta_r))
+
+	  if (length(matching_indices) > 0L) {
+		xt_pres_sta_r <- xt_pres_sta_r[
+		  , -matching_indices, drop = FALSE
+		]
+	  }
+	}
 
     # Remove year info from column names
     names(xt_pres_sta_r) <- gsub("_[0-9]+_", "_TBD_", names(xt_pres_sta_r))

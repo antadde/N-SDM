@@ -9,7 +9,7 @@
 #' @param corcut numeric value for the correlation coefficient threshold used for identifying collinearity
 #'
 #' @return A data.frame of "non-collinear" candidate covariates
-#' @author Antoine Adde (antoine.adde@unil.ch)
+#' @author Antoine Adde (antoine.adde@eawag.ch)
 #' @examples
 #' library(covsel)
 #' covdata<-data_covsel$env_vars
@@ -58,7 +58,8 @@ force_dat<-data.frame(covdata[, force])
 names(force_dat)<-force
 if(length(force)>1)  ix<-unique(rownames(which(abs(cor(covdata)[,force])>corcut, arr.ind=TRUE)))
 if(length(force)==1) ix<-names(which(abs(cor(covdata)[,force])>corcut))
-covdata<-covdata[, !(colnames(covdata) %in% ix)]
+covdata <- covdata[, !(colnames(covdata) %in% ix), drop=FALSE]
+if(ncol(covdata)==0L) return(force_dat)
 }
 }
 
@@ -72,7 +73,10 @@ min(summary(suppressWarnings(glm(covdata$pa ~ poly(x, degree=2), family="binomia
 covranked<-data.frame(pval=res, row.names=names(res))
 
 # Reorder covdata accordingly and compute initial correlation matrix
-covdata.ranked <- data.frame(covdata[, row.names(covranked)])
+covdata.ranked <- data.frame(
+  covdata[, row.names(covranked)],
+  check.names=FALSE
+)
 cor.mat<-abs(cor(covdata.ranked,use="pairwise.complete.obs"))
 
 # Thin candidate covariate set until no correlation > corcut
@@ -94,12 +98,10 @@ cor.mat<-abs(cor(covdata.ranked,use="pairwise.complete.obs"))
     }
 
 # Return dataframe of selected covariates
-covdata.filter<-as.data.frame(covdata[,sanctuaire])
+covdata.filter <- covdata[, sanctuaire, drop=FALSE]
 
 # If covariates to force, add it
 if(ncol(force_dat)>0) covdata.filter<-cbind(covdata.filter, force_dat)
-
-if(length(sanctuaire)==1) colnames(covdata.filter)<-sanctuaire
 
 return(covdata.filter)
 }
