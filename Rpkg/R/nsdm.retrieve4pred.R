@@ -19,7 +19,7 @@
 nsdm.retrieve4pred <- function(covstk, scaleparam, mask=NULL, observational=NULL, obsval=NULL){
 # Transform as data.frame and retrieve non-na cells indices
 covdf<-as.data.frame(covstk, row.names=T)
-covdf<-covdf[complete.cases(covdf), ]
+covdf <- covdf[complete.cases(covdf), , drop=FALSE]
 covdf_ix<-as.numeric(row.names(covdf))
 
 # If a mask is provided, mask predictions
@@ -27,9 +27,9 @@ if(length(mask)>0){
 m<-rast(mask)
 tbm<-which(m[]==0)
 tbr<-which(covdf_ix %in% tbm)
-if(length(tbr)>1){
-covdf<-covdf[-tbr,]
-covdf_ix<-covdf_ix[-tbr]
+if(length(tbr)>0){
+  covdf <- covdf[-tbr, , drop=FALSE]
+  covdf_ix <- covdf_ix[-tbr]
 }
 }
 
@@ -44,7 +44,7 @@ if(obsval=="max") covdf[,observational[i]]<-max(covdf[,observational[i]])
 
 # Transform covariates with desired scaling parameters
 mat_sc<-list()
-for(i in 1:ncol(covdf)){
+for(i in seq_len(ncol(covdf))){
 col<-covdf[,i] 
 col_sc<-(col - scaleparam$'scaled:center'[names(covdf[i])])/scaleparam$'scaled:scale'[names(covdf[i])]
 mat_sc<-append(mat_sc, data.frame(col_sc))
