@@ -73,10 +73,8 @@ min(summary(suppressWarnings(glm(covdata$pa ~ poly(x, degree=2), family="binomia
 covranked<-data.frame(pval=res, row.names=names(res))
 
 # Reorder covdata accordingly and compute initial correlation matrix
-covdata.ranked <- data.frame(
-  covdata[, row.names(covranked)],
-  check.names=FALSE
-)
+covdata.ranked <- covdata[, row.names(covranked), drop=FALSE]
+
 cor.mat<-abs(cor(covdata.ranked,use="pairwise.complete.obs"))
 
 # Thin candidate covariate set until no correlation > corcut
