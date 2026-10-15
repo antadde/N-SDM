@@ -457,10 +457,9 @@ if (any(c("multiply", "multiplyw", "average", "averagew") %in% posthoc_nesting_n
 
 target <- REG_posthoc_preds
     for (z in seq_len(outerloop)) {
-    good_ix <- which(!is.na(glo_prob2[[z]]))
-	z_target <- target[[z]]
+	good_ix <- which(!is.na(glo_prob2[[z]][[1]]))
 	z_target <- lapply(z_target, function(g){g[good_ix]})
-	z_glo_prob2 <- glo_prob2[[z]][good_ix]
+	z_glo_prob2 <- glo_prob2[[z]][good_ix, , drop = FALSE]
 	pa_posthoc[[z]] <- papa_reg[[z]][good_ix]
 
 if (any(c("multiply") %in% posthoc_nesting_name)){  
