@@ -458,6 +458,7 @@ if (any(c("multiply", "multiplyw", "average", "averagew") %in% posthoc_nesting_n
 target <- REG_posthoc_preds
     for (z in seq_len(outerloop)) {
 	good_ix <- which(!is.na(glo_prob2[[z]][[1]]))
+	z_target <- target[[z]]
 	z_target <- lapply(z_target, function(g){g[good_ix]})
 	z_glo_prob2 <- glo_prob2[[z]][good_ix, , drop = FALSE]
 	pa_posthoc[[z]] <- papa_reg[[z]][good_ix]
@@ -473,7 +474,7 @@ if (any(c("multiply") %in% posthoc_nesting_name)){
 	}
 
 if (any(c("multiplyw") %in% posthoc_nesting_name)){  
-# Multiply weigthed
+# Multiply weighted
 	f_mw <- (((rowMeans(as.data.frame(z_target), na.rm = TRUE) ^ w_reg) * (z_glo_prob2[[1]] ^ w_glo)) ^ (1 / w_sum))
 	score_mw <- nsdm.ceval2(
     f = f_mw,
