@@ -460,9 +460,7 @@ target <- REG_posthoc_preds
     good_ix <- which(!is.na(glo_prob2[[z]]))
 	z_target <- target[[z]]
 	z_target <- lapply(z_target, function(g){g[good_ix]})
-	papa_reg_c <- lapply(papa_reg, function(g){g[good_ix]})
-	testa_reg_c <- lapply(testa_reg, function(g){g[good_ix,]})
-	z_glo_prob2 <- glo_prob2[[z]]
+	z_glo_prob2 <- glo_prob2[[z]][good_ix]
 	pa_posthoc[[z]] <- papa_reg[[z]][good_ix]
 
 if (any(c("multiply") %in% posthoc_nesting_name)){  
@@ -470,7 +468,7 @@ if (any(c("multiply") %in% posthoc_nesting_name)){
     f_m <- sqrt(rowMeans(as.data.frame(z_target), na.rm = TRUE) * z_glo_prob2)[[1]]
     score_m <- nsdm.ceval2(
     f = f_m,
-    pa = papa_reg[[z]])
+    pa = pa_posthoc[[z]])
 	scores_m[[z]] <- score_m
 	preds_m[[z]] <- f_m
 	}
@@ -480,7 +478,7 @@ if (any(c("multiplyw") %in% posthoc_nesting_name)){
 	f_mw <- (((rowMeans(as.data.frame(z_target), na.rm = TRUE) ^ w_reg) * (z_glo_prob2[[1]] ^ w_glo)) ^ (1 / w_sum))
 	score_mw <- nsdm.ceval2(
     f = f_mw,
-    pa = papa_reg[[z]])
+    pa = pa_posthoc[[z]])
 	scores_mw[[z]] <- score_mw
 	preds_mw[[z]] <- f_mw
 	}
@@ -490,7 +488,7 @@ if (any(c("average") %in% posthoc_nesting_name)) {
    f_a <- ((rowMeans(as.data.frame(z_target), na.rm = TRUE) + z_glo_prob2[[1]]) / 2)
    score_a <- nsdm.ceval2(
    f = f_a,
-   pa = papa_reg[[z]])
+   pa = pa_posthoc[[z]])
    scores_a[[z]] <- score_a
    preds_a[[z]] <- f_a
    }
@@ -500,7 +498,7 @@ if (any(c("averagew") %in% posthoc_nesting_name)) {
    f_aw <- ((w_reg * rowMeans(as.data.frame(z_target), na.rm = TRUE)) + (w_glo * z_glo_prob2[[1]])) / (w_reg + w_glo)
    score_aw <- nsdm.ceval2(
    f = f_aw,
-   pa = papa_reg[[z]])
+   pa = pa_posthoc[[z]])
    scores_aw[[z]] <- score_aw
    preds_aw[[z]] <- f_aw
    }
