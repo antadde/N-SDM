@@ -66,7 +66,8 @@ imp_scaled <- data.frame(
 }
 
 if(c("gam") %in% class(model)){
-imp<-summary(model)$s.table[,"Chi.sq"]
+s_table<-summary(model)$s.table
+imp<-setNames(s_table[,"Chi.sq"], rownames(s_table))
 imp_scaled <- data.frame(Variable=names(imp), Importance=scale(imp,FALSE,max(imp)))
 imp_scaled$Variable<-gsub("[\\(\\)]", "", regmatches(imp_scaled$Variable, gregexpr("\\(.*?\\)", imp_scaled$Variable)))
 }
